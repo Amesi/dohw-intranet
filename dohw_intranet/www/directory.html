@@ -1,97 +1,74 @@
-{% extends "dohw_intranet/templates/dohw_base.html" %}
+{% extends "templates/web.html" %}
+
+{% block title %}Staff Directory — DoWH{% endblock %}
 
 {% block page_content %}
-
-<!-- HEADER -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
     <div>
-        <h1 style="font-size: 24px; font-weight: 800; color: var(--dowh-dark); margin: 0;">
+        <h1 style="font-size:24px; font-weight:800; color:var(--dowh-dark); margin:0;">
             Staff Directory
         </h1>
-        <p style="color: #888; font-size: 13px; margin: 4px 0 0;">
+        <p style="color:#888; font-size:13px; margin:4px 0 0;">
             {{ total_staff }} staff members across {{ wings|length }} Wings
         </p>
     </div>
 </div>
 
-<!-- STATS CARDS -->
-<div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 20px; text-align: center; flex: 1; min-width: 100px;">
-        <div style="font-size: 28px; font-weight: 800; color: var(--dowh-dark);">{{ total_staff }}</div>
-        <div style="font-size: 11px; color: #888;">Total Staff</div>
+<!-- Stats cards -->
+<div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px 20px; text-align:center; flex:1; min-width:100px;">
+        <div style="font-size:28px; font-weight:800; color:var(--dowh-dark);">{{ total_staff }}</div>
+        <div style="font-size:11px; color:#888;">Total Staff</div>
     </div>
     {% for w in wings[:4] %}
-    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 20px; text-align: center; flex: 1; min-width: 100px;">
-        <div style="font-size: 28px; font-weight: 800; color: var(--dowh-gold);">{{ wing_counts.get(w.department_name, 0) }}</div>
-        <div style="font-size: 10px; color: #888;">{{ w.department_name }}</div>
+    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px 20px; text-align:center; flex:1; min-width:100px;">
+        <div style="font-size:28px; font-weight:800; color:var(--dowh-gold);">{{ wing_counts.get(w.department_name, 0) }}</div>
+        <div style="font-size:10px; color:#888;">{{ w.department_name }}</div>
     </div>
     {% endfor %}
 </div>
 
-<!-- SEARCH + FILTER BAR -->
-<div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-    <form method="GET" action="/directory" style="display: flex; gap: 12px; align-items: center; flex: 1; flex-wrap: wrap;">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search by name, department, or title..." 
-            style="padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; flex: 1; min-width: 200px;">
-        <button type="submit" style="padding: 8px 16px; background: var(--dowh-gold); color: var(--dowh-dark); border: none; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer;">Search</button>
-        {% if search or active_wing %}
-        <a href="/directory" style="color: #cc0000; font-size: 12px; text-decoration: none;">Clear</a>
-        {% endif %}
-    </form>
-</div>
+<!-- Search -->
+<form method="GET" action="/directory" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search by name, department, or title..."
+        style="padding:8px 14px; border:1px solid #ddd; border-radius:6px; font-size:13px; flex:1; min-width:200px;">
+    <button type="submit" style="padding:8px 16px; background:var(--dowh-gold); color:var(--dowh-dark); border:none; border-radius:6px; font-weight:700; font-size:13px; cursor:pointer;">Search</button>
+    {% if search or active_wing %}
+    <a href="/directory" style="color:#cc0000; font-size:12px; text-decoration:none;">Clear</a>
+    {% endif %}
+</form>
 
-<!-- WING FILTER TABS -->
-<div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;">
-    <a href="/directory{% if search %}?search={{ search }}{% endif %}" 
-       style="padding: 6px 14px; border-radius: 16px; font-size: 12px; text-decoration: none; font-weight: 600;
-       {% if not active_wing %}background: var(--dowh-dark); color: #fff;{% else %}background: #fff; border: 1px solid #ddd; color: #555;{% endif %}">
+<!-- Wing filter tabs -->
+<div class="dowh-wing-tabs">
+    <a href="/directory{% if search %}?search={{ search }}{% endif %}" class="dowh-wing-tab {% if not active_wing %}active{% endif %}">
         All Wings
     </a>
     {% for w in wings %}
-    <a href="/directory?wing={{ w.name }}{% if search %}&search={{ search }}{% endif %}" 
-       style="padding: 6px 14px; border-radius: 16px; font-size: 12px; text-decoration: none; font-weight: 600;
-       {% if active_wing == w.name %}background: var(--dowh-gold); color: var(--dowh-dark);{% else %}background: #fff; border: 1px solid #ddd; color: #555;{% endif %}">
+    <a href="/directory?wing={{ w.name }}{% if search %}&search={{ search }}{% endif %}" class="dowh-wing-tab {% if active_wing == w.name %}active{% endif %}">
         {{ w.department_name }}
     </a>
     {% endfor %}
 </div>
 
-<!-- STAFF GRID -->
+<!-- Staff grid -->
 {% if employees %}
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+<div class="dowh-staff-grid">
     {% for e in employees %}
-    <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; transition: box-shadow 0.15s;"
-         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-
-        <!-- Avatar -->
-        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--dowh-gold), #e6ac00); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: var(--dowh-dark); font-weight: 800; font-size: 16px; text-transform: uppercase;">
-                {% set parts = e.employee_name.split() %}
-                {{ parts[0][0] if parts else '?' }}{{ parts[-1][0] if parts|length > 1 else '' }}
-            </span>
+    <div class="dowh-staff-card">
+        <div class="dowh-staff-avatar">
+            {% set parts = e.employee_name.split() %}
+            {{ parts[0][0] if parts else '?' }}{{ parts[-1][0] if parts|length > 1 else '' }}
         </div>
-
-        <!-- Details -->
-        <div style="flex: 1; min-width: 0;">
-            <div style="font-size: 14px; font-weight: 700; color: var(--dowh-dark); margin-bottom: 2px;">
-                {{ e.employee_name }}
-            </div>
-            <div style="font-size: 12px; color: #888; margin-bottom: 2px;">
-                {{ e.designation or "—" }}
-            </div>
-            <div style="font-size: 11px; color: #aaa; margin-bottom: 6px;">
-                {{ e.department or "—" }}
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div style="flex:1; min-width:0;">
+            <div class="dowh-staff-name">{{ e.employee_name }}</div>
+            <div class="dowh-staff-title">{{ e.designation or "—" }}</div>
+            <div class="dowh-staff-dept">{{ e.department or "—" }}</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 {% if e.company_email %}
-                <a href="mailto:{{ e.company_email }}" style="font-size: 11px; color: var(--dowh-dark); text-decoration: none;" title="Email">
-                    ✉ Email
-                </a>
+                <a href="mailto:{{ e.company_email }}" style="font-size:11px; color:var(--dowh-dark); text-decoration:none;">✉ Email</a>
                 {% endif %}
                 {% if e.cell_number %}
-                <a href="tel:{{ e.cell_number }}" style="font-size: 11px; color: var(--dowh-dark); text-decoration: none;" title="Call">
-                    📞 Call
-                </a>
+                <a href="tel:{{ e.cell_number }}" style="font-size:11px; color:var(--dowh-dark); text-decoration:none;">📞 Call</a>
                 {% endif %}
             </div>
         </div>
@@ -99,9 +76,9 @@
     {% endfor %}
 </div>
 {% else %}
-<div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 60px 40px; text-align: center; color: #888;">
-    <p style="font-size: 18px; margin-bottom: 8px;">No Staff Found</p>
-    <p style="font-size: 13px;">{% if search %}No results for "{{ search }}". Try a different search.{% else %}Employee records are being added. Check back soon.{% endif %}</p>
+<div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:60px 40px; text-align:center; color:#888;">
+    <p style="font-size:18px; margin-bottom:8px;">No Staff Found</p>
+    <p style="font-size:13px;">{% if search %}No results for "{{ search }}".{% else %}Employee records are being added.{% endif %}</p>
 </div>
 {% endif %}
 {% endblock %}

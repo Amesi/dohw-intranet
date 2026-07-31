@@ -1,0 +1,100 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_content %}
+
+<!-- MASTHEAD -->
+<div class="dowh-masthead">
+    <img src="/files/dowh-logo-original.svg" alt="DoWH Seal" class="dowh-seal">
+    <h1>Department of Works &amp; Highways</h1>
+    <h2>Staff Circulars &amp; Announcements</h2>
+</div>
+
+<!-- FILTER BAR -->
+<div class="dowh-filter-bar">
+    <span style="font-weight: 600; color: var(--dowh-dark);">Filter:</span>
+
+    <select onchange="location=this.value" style="padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+        <option value="/circulars">All Wings</option>
+        {% for w in wings %}
+        <option value="/circulars?wing={{ w.name }}" {% if active_wing == w.name %}selected{% endif %}>{{ w.department_name }}</option>
+        {% endfor %}
+    </select>
+
+    <select onchange="location=this.value" style="padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+        <option value="/circulars{% if active_wing %}?wing={{ active_wing }}{% endif %}">All Types</option>
+        <option value="/circulars?classification=For+Information{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Information' %}selected{% endif %}>For Information</option>
+        <option value="/circulars?classification=For+Action{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Action' %}selected{% endif %}>For Action</option>
+        <option value="/circulars?classification=Urgent{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'Urgent' %}selected{% endif %}>Urgent</option>
+    </select>
+
+    {% if active_wing or active_class or active_tag %}
+    <a href="/circulars" style="color: #cc0000; text-decoration: none; font-size: 11px; font-weight: 600;">✕ Clear</a>
+    {% endif %}
+
+    {% if all_tags %}
+    <div class="dowh-tag-cloud">
+        {% for tag in all_tags %}
+        <a href="/circulars?tag={{ tag }}"
+           style="padding:2px 8px; border-radius:10px; font-size:10px; text-decoration:none;
+           {% if active_tag == tag %}background: var(--dowh-gold); color: var(--dowh-dark);
+           {% else %}background: #eee; color: #555;{% endif %}">
+            #{{ tag }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- CIRCULARS LIST -->
+{% if circulars %}
+    {% for c in circulars %}
+    <div class="dowh-circular">
+        <div class="circular-meta">
+            <span class="circular-no">{% if c.circular_number %}{{ c.circular_number }}{% endif %}</span>
+            <span class="classification-badge
+                {% if c.classification == 'For Action' %}for-action
+                {% elif c.classification == 'Urgent' %}urgent
+                {% else %}for-information{% endif %}">
+                {{ c.classification or "For Information" }}
+            </span>
+        </div>
+
+        <div class="circular-date">
+            {{ frappe.utils.format_date(c.date) }}{% if c.wing %} • {{ c.wing }}{% endif %}
+        </div>
+
+        <h3><a href="/{{ c.route }}" style="color: var(--dowh-dark); text-decoration: none;">{{ c.title }}</a></h3>
+
+        <div class="circular-body">
+            {{ c.content | striptags | truncate(250) }}
+        </div>
+
+        <div class="circular-tags">
+            {% if c.wing %}
+            <span class="wing-pill">🏛 {{ c.wing.split(' - ')[0] }}</span>
+            {% endif %}
+            {% if c.tags %}
+            {% for tag in c.tags.split(',') %}
+            <a href="/circulars?tag={{ tag.strip() }}" class="tag">#{{ tag.strip() }}</a>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div style="background:#fff; border:1px solid #e0e0e0; padding:60px 40px; text-align:center; color:#888;">
+        <p style="font-size:18px; margin-bottom:8px;">No Circulars Found</p>
+        <p style="font-size:13px;">Try adjusting your filters or check back later.</p>
+    </div>
+{% endif %}
+
+<!-- SIDEBAR: Quick Stats -->
+<div style="margin-top: 20px;">
+    <div class="dowh-sidebar-official">
+        For Official Use Only<br>DoWH Internal Communication
+    </div>
+</div>
+
+{% endblock %}

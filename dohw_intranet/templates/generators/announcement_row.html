@@ -1,0 +1,32 @@
+<div class="dowh-circular">
+    <div class="circular-meta">
+        <span class="circular-no">{% if doc.circular_number %}{{ doc.circular_number }}{% endif %}</span>
+        <span class="classification-badge
+            {% if doc.classification == 'For Action' %}for-action
+            {% elif doc.classification == 'Urgent' %}urgent
+            {% else %}for-information{% endif %}">
+            {{ doc.classification or "For Information" }}
+        </span>
+    </div>
+
+    <div class="circular-date">
+        {{ frappe.utils.format_date(doc.date) }}{% if doc.wing %} • {{ doc.wing }}{% endif %}
+    </div>
+
+    <h3><a href="/{{ doc.route }}" style="color: var(--dowh-dark); text-decoration: none;">{{ doc.title }}</a></h3>
+
+    <div class="circular-body">
+        {{ doc.content | striptags | truncate(250) }}
+    </div>
+
+    <div class="circular-tags">
+        {% if doc.wing %}
+        <span class="wing-pill">🏛 {{ doc.wing.split(' - ')[0] }}</span>
+        {% endif %}
+        {% if doc.tags %}
+        {% for tag in doc.tags.split(',') %}
+        <a href="/circulars?tag={{ tag.strip() }}" class="tag">#{{ tag.strip() }}</a>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>

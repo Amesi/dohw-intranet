@@ -7,16 +7,13 @@ app_description = "DoWH Staff Intranet Portal"
 app_email = "ict@works.gov.pg"
 app_license = "mit"
 
-# Website generators — auto-generate web pages from DocTypes
-website_generators = ["Announcement"]
-
-# Home page: circular listing is the default landing
+# Home page — circulars listing
 home_page = "/circulars"
 
 # Web CSS — loaded on all website pages
 web_include_css = "/assets/dohw_intranet/css/dohw_intranet.css"
 
-# Portal settings hook
+# Website context
 website_context = {
     "favicon": "/files/dowh-favicon.png",
 }

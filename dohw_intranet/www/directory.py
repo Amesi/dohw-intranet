@@ -1,12 +1,11 @@
+"""DoWH Staff Directory — portal page using native Frappe patterns."""
+
 import frappe
 
-def get_context(context):
-    if frappe.session.user == "Guest":
-        frappe.local.flags.redirect_location = "/login?redirect-to=/directory"
-        raise frappe.Redirect
 
+def get_context(context):
     context.no_cache = 1
-    context.base_template = "dohw_intranet/templates/dohw_base.html"
+    context.show_sidebar = 1
     context.title = "Staff Directory"
 
     wing_filter = frappe.form_dict.get("wing")
@@ -21,14 +20,18 @@ def get_context(context):
         filters=filters,
         fields=["employee_name", "designation", "department", "company_email", "cell_number", "image"],
         order_by="employee_name asc",
-        limit=200
+        limit=200,
     )
 
-    # Search filter (client-side)
+    # Client-side search filter
     if search:
-        employees = [e for e in employees if search.lower() in (e.employee_name or "").lower() 
-                     or search.lower() in (e.department or "").lower()
-                     or search.lower() in (e.designation or "").lower()]
+        employees = [
+            e
+            for e in employees
+            if search.lower() in (e.employee_name or "").lower()
+            or search.lower() in (e.department or "").lower()
+            or search.lower() in (e.designation or "").lower()
+        ]
 
     context.employees = employees
     context.search = search
@@ -38,17 +41,18 @@ def get_context(context):
     context.wings = frappe.get_all(
         "Department",
         filters={"company": "Department of Works and Highways", "is_group": 1},
-        fields=["name", "department_name"]
+        fields=["name", "department_name"],
     )
 
     # Stats
-    context.total_staff = len(frappe.get_all("Employee", filters={"status": "Active"}))
-    
+    context.total_staff = frappe.db.count("Employee", {"status": "Active"})
+
     # Per-wing counts
     wing_counts = {}
     for w in context.wings:
-        count = len(frappe.get_all("Employee", filters={"status": "Active", "department": w.name}))
-        wing_counts[w.department_name] = count
+        wing_counts[w.department_name] = frappe.db.count(
+            "Employee", {"status": "Active", "department": w.name}
+        )
     context.wing_counts = wing_counts
 
     return context
