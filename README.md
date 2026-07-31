@@ -1,33 +1,64 @@
-### DoWH Intranet
+# DoWH Staff Intranet Portal
 
-DoWH Staff Intranet Portal
+> Custom Frappe app powering the Department of Works &amp; Highways (PNG) staff intranet portal at [erpnext.kumi-tech.com](https://erpnext.kumi-tech.com).
 
-### Installation
+## Features
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+### 📢 Staff Circulars &amp; Announcements ()
+- Government bulletin-style layout with masthead
+- Circular number assignments (auto-generated)
+- Classification system: For Information, For Action, Urgent
+- Wing and classification filtering
+- Tag cloud with clickable filters
+- Quick statistics widget (total, urgent, action required)
+- Recent documents integration with Frappe Wiki
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch main
-bench install-app dohw_intranet
-```
+### 👥 Staff Directory ()
+- Search by name, department, or title
+- Wing-level filter tabs
+- Per-wing staff counts
+- Employee cards with avatar, contact links
+- Grid layout (responsive)
 
-### Contributing
+### 📁 Document Library ()
+- Powered by Frappe Wiki 3.0
+- Wing-specific Wiki Spaces
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+### 🔐 Authentication
+- All portal pages are login-gated
+- Guest users redirected to branded DoWH login page
+- Custom DoWH login template
 
-```bash
-cd apps/dohw_intranet
-pre-commit install
-```
+## Tech Stack
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+- **Framework:** Frappe 16.x
+- **Platform:** ERPNext 16.x
+- **Database:** MariaDB
+- **Runtime:** Docker (erpnext docker compose)
+- **Deployment:** VPS + Cloudflare Tunnel
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
+## App Structure
 
-### License
 
-mit
+
+## Branding
+
+- **Primary:** DoWH Gold (#FFBF00)
+- **Dark:** #1A1A1A
+- **Font:** Inter
+- **Logo:** DoWH official seal (SVG)
+- **Style:** Government bulletin — formal, numbered circulars, classification badges
+
+## Getting Started
+
+
+
+## Deployment
+
+Deployed at: 
+
+erpnext-backend-1
+
+## License
+
+MIT — Department of Works &amp; Highways, Papua New Guinea

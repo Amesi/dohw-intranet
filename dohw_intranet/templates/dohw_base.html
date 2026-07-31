@@ -1,0 +1,110 @@
+{% extends "templates/base.html" %}
+
+{% block style %}
+<style>
+    :root {
+        --dowh-gold: #FFBF00;
+        --dowh-dark: #1A1A1A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', 'Arial', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    .dowh-navbar {
+        background: var(--dowh-dark);
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #fff;
+    }
+    .dowh-navbar img { height: 32px; }
+    .dowh-navbar .brand {
+        color: var(--dowh-gold);
+        font-weight: 700;
+        font-size: 15px;
+    }
+    .dowh-navbar .spacer { flex: 1; }
+    .dowh-navbar a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 13px;
+        margin-left: 16px;
+    }
+    .dowh-navbar a:hover { color: var(--dowh-gold); }
+
+    .dowh-layout {
+        display: flex;
+        flex: 1;
+    }
+    
+    .dowh-sidebar {
+        width: 220px;
+        background: #fff;
+        border-right: 1px solid #e0e0e0;
+        padding: 16px 0;
+    }
+    .dowh-sidebar a {
+        display: block;
+        padding: 10px 20px;
+        color: var(--dowh-dark);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-left: 3px solid transparent;
+    }
+    .dowh-sidebar a:hover, .dowh-sidebar a.active {
+        background: #f8f8f8;
+        border-left-color: var(--dowh-gold);
+        color: var(--dowh-dark);
+    }
+    
+    .dowh-main {
+        flex: 1;
+        padding: 32px 40px;
+    }
+    
+    .dowh-footer {
+        background: var(--dowh-dark);
+        color: #888;
+        text-align: center;
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .dowh-sidebar { display: none; }
+        .dowh-main { padding: 20px 16px; }
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<div class="dowh-navbar">
+    <img src="/files/dowh-logo-original.svg" alt="DoWH">
+    <span class="brand">DoWH Staff Portal</span>
+    <div class="spacer"></div>
+    <a href="/desk">ERP Desk</a>
+    {% if frappe.session.user != "Guest" %}
+    <span>{{ frappe.session.user }}</span>
+    <a href="/api/method/logout">Logout</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="dowh-layout">
+    <aside class="dowh-sidebar">
+        <a href="/announcements">📢 Announcements</a>
+        <a href="/directory">👥 Staff Directory</a>
+        <a href="/wiki">📁 Document Library</a>
+    </aside>
+    <main class="dowh-main">
+        {% block page_content %}{% endblock %}
+    </main>
+</div>
+<div class="dowh-footer">
+    Department of Works &amp; Highways — Staff Intranet
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
