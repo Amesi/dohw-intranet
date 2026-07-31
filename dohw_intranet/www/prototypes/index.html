@@ -1,0 +1,90 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Intranet Prototypes{% endblock %}
+
+{% block style %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+body { font-family: 'Inter', Arial, sans-serif; background: #f5f5f5; }
+
+.prototype-header {
+    background: var(--dowh-dark); padding: 24px 32px; text-align: center;
+    border-bottom: 3px solid var(--dowh-gold);
+}
+.prototype-header h1 { color: var(--dowh-gold); font-size: 20px; font-weight: 800; margin: 0; }
+.prototype-header p { color: #888; font-size: 13px; margin: 4px 0 0; }
+
+.prototype-grid {
+    max-width: 900px; margin: 32px auto; padding: 0 16px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;
+}
+.prototype-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+    padding: 24px; text-decoration: none; transition: all 0.2s;
+    border-left: 4px solid var(--dowh-gold);
+}
+.prototype-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.prototype-card .icon { font-size: 32px; margin-bottom: 12px; }
+.prototype-card h3 { font-size: 16px; font-weight: 700; color: var(--dowh-dark); margin: 0 0 6px; }
+.prototype-card p { font-size: 12px; color: #888; margin: 0; line-height: 1.5; }
+.prototype-card .badge {
+    display: inline-block; margin-top: 12px; padding: 3px 10px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+}
+.badge-new { background: var(--dowh-gold); color: var(--dowh-dark); }
+.badge-enhanced { background: #e8f0fe; color: #1a73e8; }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="prototype-header">
+    <h1>DoWH Intranet — Zone Prototypes</h1>
+    <p>Click any prototype to review. Select which to build first.</p>
+</div>
+
+<div class="prototype-grid">
+
+    <a href="/prototypes/links" class="prototype-card">
+        <div class="icon">🔗</div>
+        <h3>Links & Electronic Forms</h3>
+        <p>Hub linking to all digital forms — HRMS leave, payslips, assets, and other ERPNext forms</p>
+        <span class="badge badge-new">New</span>
+    </a>
+
+    <a href="/prototypes/calendar" class="prototype-card">
+        <div class="icon">📅</div>
+        <h3>Department Calendar</h3>
+        <p>Shared calendar with events and deadlines, filterable by Wing</p>
+        <span class="badge badge-new">New</span>
+    </a>
+
+    <a href="/prototypes/projects" class="prototype-card">
+        <div class="icon">📊</div>
+        <h3>Project Updates</h3>
+        <p>Active projects with status and milestones, filterable by Wing</p>
+        <span class="badge badge-new">New</span>
+    </a>
+
+    <a href="/prototypes/circulars" class="prototype-card">
+        <div class="icon">📢</div>
+        <h3>Circulars — Enhanced</h3>
+        <p>Improved circular listing with tag filtering, classification cards, and detail view</p>
+        <span class="badge badge-enhanced">Enhanced</span>
+    </a>
+
+    <a href="/prototypes/directory" class="prototype-card">
+        <div class="icon">👥</div>
+        <h3>Staff Directory — Enhanced</h3>
+        <p>Search, avatars, org structure, contact links, Wing filtering</p>
+        <span class="badge badge-enhanced">Enhanced</span>
+    </a>
+
+    <a href="/prototypes/portal" class="prototype-card">
+        <div class="icon">🏛</div>
+        <h3>Portal Design</h3>
+        <p>Consistent navigation, sidebar, branding, and responsive layout</p>
+        <span class="badge badge-enhanced">Enhanced</span>
+    </a>
+
+</div>
+{% endblock %}

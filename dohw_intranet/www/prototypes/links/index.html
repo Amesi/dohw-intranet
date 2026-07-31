@@ -1,0 +1,131 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Links & Electronic Forms — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+
+.proto-banner {
+    background: linear-gradient(135deg, var(--dowh-dark), #2d2d2d);
+    color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.proto-banner h2 { margin: 0; font-size: 18px; }
+.proto-banner p { margin: 4px 0 0; font-size: 12px; color: #aaa; }
+
+.form-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;
+}
+.form-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;
+    text-decoration: none; transition: box-shadow 0.15s;
+}
+.form-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.form-card .icon { font-size: 28px; margin-bottom: 8px; }
+.form-card h4 { font-size: 14px; font-weight: 700; color: var(--dowh-dark); margin: 0 0 4px; }
+.form-card p { font-size: 11px; color: #888; margin: 0; }
+.form-card .wing-tag {
+    display: inline-block; margin-top: 8px; padding: 2px 8px;
+    background: #f0f0f0; border-radius: 8px; font-size: 10px; color: #666;
+}
+
+.section-title {
+    font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin: 24px 0 12px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--dowh-gold);
+}
+</style>
+
+<div class="proto-banner">
+    <h2>🔗 Links & Electronic Forms</h2>
+    <p>All electronic forms accessible from one place. Click any card to open.</p>
+</div>
+
+<!-- HR & Personnel -->
+<h3 class="section-title">👤 HR & Personnel</h3>
+<div class="form-grid">
+    <a href="#" class="form-card">
+        <div class="icon">🏖</div>
+        <h4>Leave Application</h4>
+        <p>Request annual, sick, or compassionate leave</p>
+        <span class="wing-tag">All Staff</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">💰</div>
+        <h4>Payslip Access</h4>
+        <p>View and download your monthly payslip</p>
+        <span class="wing-tag">All Staff</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">📋</div>
+        <h4>Timesheet</h4>
+        <p>Submit your daily or weekly timesheet</p>
+        <span class="wing-tag">All Staff</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">🎓</div>
+        <h4>Training Request</h4>
+        <p>Apply for professional development courses</p>
+        <span class="wing-tag">All Staff</span>
+    </a>
+</div>
+
+<!-- Operations & Technical -->
+<h3 class="section-title">🏗 Operations & Technical</h3>
+<div class="form-grid">
+    <a href="#" class="form-card">
+        <div class="icon">📦</div>
+        <h4>Material Requisition</h4>
+        <p>Request construction materials and supplies</p>
+        <span class="wing-tag">NPDS · Highways</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">🚛</div>
+        <h4>Vehicle Request</h4>
+        <p>Book a departmental vehicle for field work</p>
+        <span class="wing-tag">All Wings</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">🔧</div>
+        <h4>Asset Maintenance Request</h4>
+        <p>Report equipment or vehicle needing repair</p>
+        <span class="wing-tag">NPDS · Field Ops</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">📐</div>
+        <h4>Project Variation Request</h4>
+        <p>Submit a scope or budget variation</p>
+        <span class="wing-tag">NPDS · Highways</span>
+    </a>
+</div>
+
+<!-- Finance & Admin -->
+<h3 class="section-title">📋 Finance & Administration</h3>
+<div class="form-grid">
+    <a href="#" class="form-card">
+        <div class="icon">🧾</div>
+        <h4>Expense Claim</h4>
+        <p>Submit travel and out-of-pocket expenses</p>
+        <span class="wing-tag">All Staff</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">🛒</div>
+        <h4>Purchase Requisition</h4>
+        <p>Request procurement of goods or services</p>
+        <span class="wing-tag">Corporate Services</span>
+    </a>
+    <a href="#" class="form-card">
+        <div class="icon">📝</div>
+        <h4>Memo / Correspondence</h4>
+        <p>Draft an official departmental memo</p>
+        <span class="wing-tag">All Wings</span>
+    </a>
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+{% endblock %}

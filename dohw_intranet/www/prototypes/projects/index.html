@@ -1,0 +1,129 @@
+{% extends "templates/web.html" %}
+{% block title %}Project Updates — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+.proto-banner {
+    background: linear-gradient(135deg, var(--dowh-dark), #2d2d2d);
+    color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.proto-banner h2 { margin: 0; font-size: 18px; }
+.proto-banner p { margin: 4px 0 0; font-size: 12px; color: #aaa; }
+
+.filters {
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px;
+}
+.filters select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+
+.stats-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 20px;
+    text-align: center; flex: 1; min-width: 100px;
+}
+.stat-card .num { font-size: 24px; font-weight: 800; color: var(--dowh-dark); }
+.stat-card .label { font-size: 10px; color: #888; }
+
+.project-list { display: flex; flex-direction: column; gap: 12px; }
+.project-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px 24px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.project-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+.project-card h4 { font-size: 15px; font-weight: 700; color: var(--dowh-dark); margin: 0 0 4px; }
+.project-card .wing-badge {
+    padding: 2px 8px; background: #f0f0f0; border-radius: 8px; font-size: 10px; color: #666;
+}
+.project-card .desc { font-size: 12px; color: #666; line-height: 1.5; margin: 8px 0 12px; }
+.progress-bar {
+    height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 8px;
+}
+.progress-bar .fill { height: 100%; border-radius: 3px; }
+.progress-meta { display: flex; justify-content: space-between; font-size: 11px; color: #888; }
+.milestones { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.milestone { font-size: 11px; }
+.milestone .circle { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+</style>
+
+<div class="proto-banner">
+    <h2>📊 Project Updates</h2>
+    <p>Active projects with status, progress, and milestones. Filter by Wing.</p>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card"><div class="num">47</div><div class="label">Active Projects</div></div>
+    <div class="stat-card"><div class="num" style="color:#cc0000;">8</div><div class="label">Behind Schedule</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--dowh-gold);">12</div><div class="label">Due This Month</div></div>
+    <div class="stat-card"><div class="num">156M</div><div class="label">Total Budget (PGK)</div></div>
+</div>
+
+<div class="filters">
+    <span style="font-size:12px; font-weight:600; color:var(--dowh-dark);">Filter:</span>
+    <select><option>All Wings</option><option>NPDS</option><option>Highways</option><option>Field Operations</option></select>
+    <select><option>All Status</option><option>On Track</option><option>Behind</option><option>Completed</option></select>
+</div>
+
+<div class="project-list">
+    <div class="project-card">
+        <div class="top">
+            <div>
+                <h4>Lae Provincial HQ — Design & Construction</h4>
+                <span class="wing-badge">NPDS</span>
+            </div>
+            <span style="font-size:11px; color:#888;">PGK 45M</span>
+        </div>
+        <div class="desc">New provincial headquarters building in Lae. Design phase complete, tendering in progress.</div>
+        <div class="progress-bar"><div class="fill" style="width:65%; background:var(--dowh-gold);"></div></div>
+        <div class="progress-meta"><span>65% complete</span><span>Est. Dec 2026</span></div>
+        <div class="milestones">
+            <span class="milestone"><span class="circle" style="background:#008000;"></span>Design ✓</span>
+            <span class="milestone"><span class="circle" style="background:var(--dowh-gold);"></span>Tender</span>
+            <span class="milestone"><span class="circle" style="background:#e0e0e0;"></span>Build</span>
+        </div>
+    </div>
+
+    <div class="project-card" style="border-left-color: #cc0000;">
+        <div class="top">
+            <div>
+                <h4>Trans-National Highway — Section 4B</h4>
+                <span class="wing-badge">Highways</span>
+            </div>
+            <span style="font-size:11px; color:#888;">PGK 78M</span>
+        </div>
+        <div class="desc">Bulolo to Wau section. Experiencing delays due to weather and land access issues.</div>
+        <div class="progress-bar"><div class="fill" style="width:38%; background:#cc0000;"></div></div>
+        <div class="progress-meta"><span style="color:#cc0000;">38% · BEHIND</span><span>Est. Mar 2027</span></div>
+        <div class="milestones">
+            <span class="milestone"><span class="circle" style="background:#008000;"></span>Survey ✓</span>
+            <span class="milestone"><span class="circle" style="background:var(--dowh-gold);"></span>Grading</span>
+            <span class="milestone"><span class="circle" style="background:#e0e0e0;"></span>Sealing</span>
+        </div>
+    </div>
+
+    <div class="project-card">
+        <div class="top">
+            <div>
+                <h4>Connect PNG — Phase 1 Rural Roads</h4>
+                <span class="wing-badge">Field Operations</span>
+            </div>
+            <span style="font-size:11px; color:#888;">PGK 22M</span>
+        </div>
+        <div class="desc">Feeder road construction across 12 rural districts. On schedule.</div>
+        <div class="progress-bar"><div class="fill" style="width:82%; background:#008000;"></div></div>
+        <div class="progress-meta"><span>82% complete</span><span>Est. Oct 2026</span></div>
+        <div class="milestones">
+            <span class="milestone"><span class="circle" style="background:#008000;"></span>Phase 1 ✓</span>
+            <span class="milestone"><span class="circle" style="background:#008000;"></span>Phase 2 ✓</span>
+            <span class="milestone"><span class="circle" style="background:var(--dowh-gold);"></span>Phase 3</span>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+{% endblock %}

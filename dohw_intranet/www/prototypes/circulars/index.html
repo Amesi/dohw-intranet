@@ -1,0 +1,152 @@
+{% extends "templates/web.html" %}
+{% block title %}Circulars Enhanced — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+.proto-banner {
+    background: linear-gradient(135deg, var(--dowh-dark), #2d2d2d);
+    color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.proto-banner h2 { margin: 0; font-size: 18px; }
+.proto-banner p { margin: 4px 0 0; font-size: 12px; color: #aaa; }
+.masthead {
+    text-align: center; margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 3px solid var(--dowh-gold);
+}
+.masthead img { height: 48px; margin-bottom: 8px; }
+.masthead h1 { font-size: 13px; font-weight: 800; color: var(--dowh-dark); letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+.masthead h2 { font-size: 12px; font-weight: 600; color: var(--dowh-gold); letter-spacing: 1px; margin: 4px 0 0; }
+
+.filters {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px;
+    margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.filters select { padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; }
+.tag-cloud { flex-basis: 100%; display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.tag-cloud a { padding: 2px 8px; border-radius: 10px; font-size: 10px; text-decoration: none; }
+
+.layout { display: flex; gap: 20px; }
+.main { flex: 1; }
+.sidebar { width: 260px; flex-shrink: 0; }
+
+.circular {
+    background: #fff; border: 1px solid #d0d0d0; border-left: 4px solid var(--dowh-gold);
+    padding: 18px 20px; margin-bottom: 12px;
+}
+.circular .top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.circular .circ-no { font-weight: 700; font-size: 11px; color: var(--dowh-dark); }
+.circular .badge {
+    padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase;
+}
+.badge-info { background: #e8e8e8; color: #555; }
+.badge-action { background: var(--dowh-gold); color: var(--dowh-dark); }
+.badge-urgent { background: #cc0000; color: #fff; }
+.circular .date { font-size: 10px; color: #888; margin-bottom: 6px; }
+.circular h4 { font-size: 14px; font-weight: 700; color: var(--dowh-dark); margin: 0 0 6px; text-transform: uppercase; }
+.circular .excerpt { font-size: 12px; color: #666; line-height: 1.5; max-height: 48px; overflow: hidden; }
+.circular .tags-row { display: flex; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+.circular .tags-row .tag { padding: 2px 6px; background: #e8f0fe; border-radius: 8px; font-size: 9px; color: #1a73e8; }
+.circular .tags-row .wing-pill { padding: 2px 6px; background: #f0f0f0; border-radius: 8px; font-size: 9px; color: #666; }
+
+.widget {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; margin-bottom: 12px;
+}
+.widget h5 { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin: 0 0 10px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-item { padding: 8px; border-radius: 6px; text-align: center; }
+.stat-item .big { font-size: 20px; font-weight: 800; }
+.stat-item .small { font-size: 9px; color: #888; }
+</style>
+
+<div class="masthead">
+    <img src="/files/dowh-logo-original.svg" alt="DoWH">
+    <h1>Department of Works &amp; Highways</h1>
+    <h2>Staff Circulars &amp; Announcements</h2>
+</div>
+
+<div class="proto-banner">
+    <h2>📢 Enhanced Circulars</h2>
+    <p>Improved browsing with tags, classification cards, and keyword search.</p>
+</div>
+
+<div class="filters">
+    <span style="font-size:11px; font-weight:600;">Filter:</span>
+    <select><option>All Wings</option><option>Corporate Services</option><option>NPDS</option><option>Highways</option><option>Field Ops</option></select>
+    <select><option>All Types</option><option>For Information</option><option>For Action</option><option>Urgent</option></select>
+    <input type="text" placeholder="Search circulars..." style="padding:5px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px; flex:1; min-width:150px;">
+    <div class="tag-cloud">
+        <a href="#" style="background:#eee; color:#555;">#ict</a>
+        <a href="#" style="background:var(--dowh-gold); color:var(--dowh-dark);">#security</a>
+        <a href="#" style="background:#eee; color:#555;">#finance</a>
+        <a href="#" style="background:#eee; color:#555;">#roads</a>
+        <a href="#" style="background:#eee; color:#555;">#hr</a>
+        <a href="#" style="background:#eee; color:#555;">#emergency</a>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="main">
+        <div class="circular">
+            <div class="top-row"><span class="circ-no">C-2026-008</span><span class="badge badge-urgent">Urgent</span></div>
+            <div class="date">21 Jul 2026 · Highways Wing</div>
+            <h4>Urgent: Kassam Pass Landslide — Road Closure</h4>
+            <div class="excerpt">The Kassam Pass section of the Highlands Highway is closed due to a major landslide. All traffic diverted via...</div>
+            <div class="tags-row">
+                <span class="wing-pill">🏛 Highways</span>
+                <a href="#" class="tag">#emergency</a>
+                <a href="#" class="tag">#landslide</a>
+                <a href="#" class="tag">#kassam</a>
+            </div>
+        </div>
+
+        <div class="circular">
+            <div class="top-row"><span class="circ-no">C-2026-005</span><span class="badge badge-action">For Action</span></div>
+            <div class="date">15 Jul 2026 · Corporate Services</div>
+            <h4>Quarterly Financial Reporting — Q2 Deadlines</h4>
+            <div class="excerpt">All Wings must submit Q2 expenditure reports by 31 July. Late submissions will affect Q3 budget releases...</div>
+            <div class="tags-row">
+                <span class="wing-pill">🏛 Corp Services</span>
+                <a href="#" class="tag">#finance</a>
+                <a href="#" class="tag">#deadline</a>
+            </div>
+        </div>
+
+        <div class="circular">
+            <div class="top-row"><span class="circ-no">C-2026-012</span><span class="badge badge-info">For Information</span></div>
+            <div class="date">28 Jul 2026 · All Wings</div>
+            <h4>Ministerial Visit — Southern Region Tour</h4>
+            <div class="excerpt">The Minister for Works will tour Southern Region projects 5-8 August. All regional offices to prepare briefing notes...</div>
+            <div class="tags-row">
+                <span class="wing-pill">🏛 All Wings</span>
+                <a href="#" class="tag">#minister</a>
+                <a href="#" class="tag">#southern</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="widget">
+            <h5>📊 Quick Stats</h5>
+            <div class="stat-grid">
+                <div class="stat-item" style="background:#f8f8f8;"><div class="big" style="color:var(--dowh-dark);">14</div><div class="small">Total</div></div>
+                <div class="stat-item" style="background:#fff5f5;"><div class="big" style="color:#cc0000;">3</div><div class="small">Urgent</div></div>
+                <div class="stat-item" style="background:#fffdf0;"><div class="big" style="color:var(--dowh-gold);">5</div><div class="small">For Action</div></div>
+            </div>
+        </div>
+        <div class="widget">
+            <h5>⏰ Action Required</h5>
+            <div style="font-size:11px; padding:6px 0; border-bottom:1px solid #f0f0f0;"><strong>Q2 Reports Due</strong><br><span style="color:#888;">31 Jul 2026</span></div>
+            <div style="font-size:11px; padding:6px 0; border-bottom:1px solid #f0f0f0;"><strong>Fleet Audit</strong><br><span style="color:#888;">15 Aug 2026</span></div>
+            <div style="font-size:11px; padding:6px 0;"><strong>Bridge Standards Review</strong><br><span style="color:#888;">30 Aug 2026</span></div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+{% endblock %}

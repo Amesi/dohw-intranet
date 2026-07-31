@@ -1,0 +1,135 @@
+{% extends "templates/web.html" %}
+{% block title %}Department Calendar — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+.proto-banner {
+    background: linear-gradient(135deg, var(--dowh-dark), #2d2d2d);
+    color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.proto-banner h2 { margin: 0; font-size: 18px; }
+.proto-banner p { margin: 4px 0 0; font-size: 12px; color: #aaa; }
+.wing-pills { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.wing-pill {
+    padding: 6px 14px; border-radius: 16px; font-size: 12px; text-decoration: none;
+    font-weight: 600; background: #fff; border: 1px solid #ddd; color: #555;
+}
+.wing-pill.active { background: var(--dowh-gold); color: var(--dowh-dark); border-color: var(--dowh-gold); }
+
+.calendar-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+}
+.calendar-header h3 { font-size: 16px; font-weight: 700; color: var(--dowh-dark); margin: 0; }
+.calendar-header .month-nav { display: flex; gap: 8px; }
+.month-nav button {
+    padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px;
+    background: #fff; font-size: 12px; cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+    background: #e0e0e0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;
+}
+.calendar-grid .day-header {
+    background: var(--dowh-dark); color: #fff; padding: 8px;
+    text-align: center; font-size: 11px; font-weight: 700;
+}
+.calendar-grid .day {
+    background: #fff; min-height: 80px; padding: 6px; font-size: 11px;
+    position: relative;
+}
+.calendar-grid .day .date { font-weight: 700; color: var(--dowh-dark); }
+.calendar-grid .day .event {
+    margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-size: 10px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.event.deadline { background: #ffe0e0; color: #cc0000; }
+.event.meeting { background: #e0f0ff; color: #1a73e8; }
+.event.holiday { background: #e0ffe0; color: #008000; }
+.event.wing-event { background: #fff8e0; color: #996600; }
+
+.upcoming { margin-top: 24px; }
+.upcoming h4 { font-size: 13px; color: #888; text-transform: uppercase; margin: 0 0 12px; }
+.upcoming-list { display: flex; flex-direction: column; gap: 8px; }
+.upcoming-item {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+}
+.upcoming-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.upcoming-item .info { flex: 1; }
+.upcoming-item .title { font-size: 13px; font-weight: 600; color: var(--dowh-dark); }
+.upcoming-item .meta { font-size: 11px; color: #888; margin-top: 2px; }
+</style>
+
+<div class="proto-banner">
+    <h2>📅 Department Calendar</h2>
+    <p>Shared calendar — events, deadlines, and holidays. Filter by Wing.</p>
+</div>
+
+<div class="wing-pills">
+    <a href="#" class="wing-pill active">All Wings</a>
+    <a href="#" class="wing-pill">Corporate Services</a>
+    <a href="#" class="wing-pill">NPDS</a>
+    <a href="#" class="wing-pill">Highways</a>
+    <a href="#" class="wing-pill">Field Operations</a>
+</div>
+
+<div class="calendar-header">
+    <h3>July 2026</h3>
+    <div class="month-nav">
+        <button>‹ Jun</button>
+        <button>Aug ›</button>
+    </div>
+</div>
+
+<div class="calendar-grid">
+    <div class="day-header">Mon</div><div class="day-header">Tue</div><div class="day-header">Wed</div>
+    <div class="day-header">Thu</div><div class="day-header">Fri</div><div class="day-header">Sat</div>
+    <div class="day-header">Sun</div>
+
+    {% for d in range(1, 32) %}
+    <div class="day">
+        <div class="date">{{ d }}</div>
+        {% if d == 15 %}<div class="event deadline">Payroll Deadline</div>{% endif %}
+        {% if d == 21 %}<div class="event meeting">Wing Heads Meeting</div>{% endif %}
+        {% if d == 23 %}<div class="event holiday">Remembrance Day</div>{% endif %}
+        {% if d == 28 %}<div class="event wing-event">Highways Site Visit</div>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="upcoming">
+    <h4>⏰ Upcoming</h4>
+    <div class="upcoming-list">
+        <div class="upcoming-item">
+            <div class="dot" style="background:#cc0000;"></div>
+            <div class="info">
+                <div class="title">Q2 Financial Reports Due</div>
+                <div class="meta">15 Jul 2026 · All Wings · Deadline</div>
+            </div>
+        </div>
+        <div class="upcoming-item">
+            <div class="dot" style="background:#1a73e8;"></div>
+            <div class="info">
+                <div class="title">Wing Heads Monthly Briefing</div>
+                <div class="meta">21 Jul 2026 · Board Room · Meeting</div>
+            </div>
+        </div>
+        <div class="upcoming-item">
+            <div class="dot" style="background:#996600;"></div>
+            <div class="info">
+                <div class="title">Lae Provincial HQ Site Inspection</div>
+                <div class="meta">28 Jul 2026 · Highways Wing · Field Visit</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+{% endblock %}

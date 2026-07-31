@@ -1,0 +1,121 @@
+{% extends "templates/web.html" %}
+{% block title %}Portal Design — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+
+.proto-banner {
+    background: linear-gradient(135deg, var(--dowh-dark), #2d2d2d);
+    color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px;
+    border-left: 4px solid var(--dowh-gold);
+}
+.proto-banner h2 { margin: 0; font-size: 18px; }
+.proto-banner p { margin: 4px 0 0; font-size: 12px; color: #aaa; }
+
+.showcase {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; margin-bottom: 20px;
+}
+.showcase h3 { font-size: 14px; font-weight: 700; color: var(--dowh-dark); margin: 0 0 8px; }
+.showcase p { font-size: 12px; color: #666; margin: 0 0 16px; }
+
+/* Demo sidebar */
+.demo-layout { display: flex; gap: 0; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+.demo-sidebar {
+    width: 200px; background: #fff; border-right: 1px solid #e0e0e0; padding: 12px 0;
+}
+.demo-sidebar a {
+    display: block; padding: 10px 16px; color: var(--dowh-dark); text-decoration: none;
+    font-size: 12px; font-weight: 500; border-left: 3px solid transparent;
+}
+.demo-sidebar a:hover, .demo-sidebar a.active {
+    background: #f8f8f8; border-left-color: var(--dowh-gold);
+}
+.demo-main { flex: 1; padding: 20px; background: #fafafa; }
+
+.demo-nav {
+    background: var(--dowh-dark); padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+}
+.demo-nav .brand { color: var(--dowh-gold); font-weight: 700; font-size: 13px; }
+.demo-nav .spacer { flex: 1; }
+.demo-nav a { color: #ccc; text-decoration: none; font-size: 11px; }
+
+.swatches { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.swatch { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; padding: 6px; }
+.swatch span { font-size: 9px; font-weight: 700; }
+</style>
+
+<div class="proto-banner">
+    <h2>🏛 Portal Design</h2>
+    <p>Consistent navigation, sidebar, branding, responsive layout. Golden government aesthetic.</p>
+</div>
+
+<div class="showcase">
+    <h3>🎨 Brand Colours</h3>
+    <div class="swatches">
+        <div class="swatch" style="background:var(--dowh-gold);"><span style="color:var(--dowh-dark);">Gold<br>#FFBF00</span></div>
+        <div class="swatch" style="background:var(--dowh-dark);"><span style="color:#fff;">Dark<br>#1A1A1A</span></div>
+        <div class="swatch" style="background:#fff; border:1px solid #ddd;"><span style="color:#333;">White<br>#FFFFFF</span></div>
+        <div class="swatch" style="background:#cc0000;"><span style="color:#fff;">Urgent<br>#CC0000</span></div>
+        <div class="swatch" style="background:#008000;"><span style="color:#fff;">Success<br>#008000</span></div>
+        <div class="swatch" style="background:#1a73e8;"><span style="color:#fff;">Links<br>#1A73E8</span></div>
+    </div>
+</div>
+
+<div class="showcase">
+    <h3>🧭 Navigation Bar</h3>
+    <p>Dark navbar with gold brand accent. Links to ERP Desk, user menu, logout.</p>
+    <div class="demo-nav">
+        <span style="font-size:16px;">🏛</span>
+        <span class="brand">DoWH Staff Portal</span>
+        <div class="spacer"></div>
+        <a href="#">ERP Desk</a>
+        <span style="color:#888; font-size:11px;">Administrator</span>
+        <a href="#">Logout</a>
+    </div>
+</div>
+
+<div class="showcase">
+    <h3>📂 Sidebar Navigation</h3>
+    <p>Left sidebar with gold active indicator. Configurable via Desk.</p>
+    <div class="demo-layout">
+        <div class="demo-sidebar">
+            <a href="#" class="active">📢 Circulars</a>
+            <a href="#">👥 Directory</a>
+            <a href="#">📁 Documents</a>
+            <a href="#">🔗 Forms</a>
+            <a href="#">📅 Calendar</a>
+            <a href="#">📊 Projects</a>
+        </div>
+        <div class="demo-main">
+            <strong style="font-size:13px;">Page Content Area</strong>
+            <p style="font-size:11px; color:#888; margin-top:4px;">Clean white background, max-width content, responsive grid.</p>
+        </div>
+    </div>
+</div>
+
+<div class="showcase">
+    <h3>📱 Responsive</h3>
+    <p>Sidebar collapses below 768px. Stacked layout on mobile. Touch-friendly navigation.</p>
+    <div style="display:flex; gap:12px;">
+        <div style="background:#f0f0f0; border-radius:6px; padding:16px; text-align:center; flex:1;">
+            <span style="font-size:24px;">🖥</span><br>
+            <span style="font-size:10px; color:#888;">Desktop</span>
+        </div>
+        <div style="background:#f0f0f0; border-radius:6px; padding:16px; text-align:center; flex:1;">
+            <span style="font-size:24px;">📱</span><br>
+            <span style="font-size:10px; color:#888;">Mobile</span>
+        </div>
+        <div style="background:#f0f0f0; border-radius:6px; padding:16px; text-align:center; flex:1;">
+            <span style="font-size:24px;">💻</span><br>
+            <span style="font-size:10px; color:#888;">Tablet</span>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+{% endblock %}

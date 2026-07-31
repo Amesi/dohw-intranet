@@ -25,7 +25,7 @@ def get_context(context):
     circulars = frappe.get_all(
         "Announcement",
         filters=filters,
-        fields=["name", "title", "content", "date", "wing", "classification", "circular_number", "tags", "route"],
+        fields=["name", "title", "content", "date", "wing", "classification", "circular_number", "tags", "route", "attachment"],
         order_by="date desc",
         limit=50,
     )
