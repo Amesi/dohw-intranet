@@ -1,15 +1,21 @@
-"""DoWH Circulars listing page — /circulars"""
+"""DoWH Circulars listing + detail page — /circulars"""
 
 import frappe
 
 
 def get_context(context):
     context.no_cache = 1
-    if frappe.session.user == "Guest":
-        frappe.local.flags.redirect_location = "/login?redirect-to=/circulars"
-        raise frappe.Redirect
-
     context.show_sidebar = 1
+
+    # Detail view — specific circular by name
+    circular_name = frappe.form_dict.get("name")
+    context.debug_name = circular_name  # DEBUG
+    if circular_name:
+        context.circular = frappe.get_doc("Announcement", circular_name)
+        context.title = context.circular.title
+        return context
+
+    # Listing view
     context.title = "Staff Circulars & Announcements"
 
     wing_filter = frappe.form_dict.get("wing")
@@ -36,16 +42,14 @@ def get_context(context):
     context.circulars = circulars
     context.active_wing = wing_filter
     context.active_class = class_filter
-    context.active_tag = tag_filter
+    context.active_tags = [tag_filter] if tag_filter else []
 
-    # Wings
     context.wings = frappe.get_all(
         "Department",
         filters={"company": "Department of Works and Highways", "is_group": 1},
         fields=["name", "department_name"],
     )
 
-    # Tags
     all_announcements = frappe.get_all("Announcement", filters={"published": 1}, fields=["tags"])
     tag_set = set()
     for a in all_announcements:
@@ -53,12 +57,5 @@ def get_context(context):
             for t in a.tags.split(","):
                 tag_set.add(t.strip().lower())
     context.all_tags = sorted(tag_set)
-
-    # Stats
-    context.stats = {
-        "total": frappe.db.count("Announcement", {"published": 1}),
-        "urgent": frappe.db.count("Announcement", {"published": 1, "classification": "Urgent"}),
-        "for_action": frappe.db.count("Announcement", {"published": 1, "classification": "For Action"}),
-    }
 
     return context

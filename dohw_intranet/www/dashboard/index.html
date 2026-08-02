@@ -1,0 +1,108 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Dashboard — DoWH{% endblock %}
+
+{% block page_content %}
+
+<style>
+:root { --gold: #FFBF00; --dark: #1A1A1A; }
+
+.dash-title { font-size: 20px; font-weight: 800; color: var(--dark); margin: 0 0 4px; }
+.dash-sub { color: #888; font-size: 12px; margin-bottom: 20px; }
+
+/* Metric cards */
+.metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 24px; }
+.metric {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 16px; text-align: center; border-top: 3px solid var(--gold);
+}
+.metric .num { font-size: 28px; font-weight: 800; color: var(--dark); }
+.metric .label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+.metric.urgent { border-top-color: #cc0000; }
+.metric.urgent .num { color: #cc0000; }
+.metric.action { border-top-color: #e6ac00; }
+.metric.action .num { color: #e6ac00; }
+
+/* Section headers */
+.section { margin-bottom: 24px; }
+.section h3 { font-size: 13px; font-weight: 700; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--gold); }
+
+/* Bar chart */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.bar-label { width: 120px; font-size: 11px; color: #555; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; background: #f0f0f0; border-radius: 4px; height: 20px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; background: var(--gold); display: flex; align-items: center; padding-left: 6px; }
+.bar-fill span { font-size: 10px; font-weight: 700; color: var(--dark); }
+
+/* Recent list */
+.recent-item {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;
+}
+.recent-item .rtitle { font-size: 12px; font-weight: 600; color: var(--dark); }
+.recent-item .rmeta { font-size: 10px; color: #888; }
+.badge-sm {
+    padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase;
+}
+.bs-info { background: #e8e8e8; color: #555; }
+.bs-action { background: var(--gold); color: var(--dark); }
+.bs-urgent { background: #cc0000; color: #fff; }
+</style>
+
+<h1 class="dash-title">📊 Dashboard</h1>
+<p class="dash-sub">Key metrics across the Department of Works &amp; Highways</p>
+
+<!-- METRIC CARDS -->
+<div class="metrics">
+    <div class="metric"><div class="num">{{ circular_total }}</div><div class="label">Circulars</div></div>
+    <div class="metric urgent"><div class="num">{{ circular_urgent }}</div><div class="label">Urgent</div></div>
+    <div class="metric action"><div class="num">{{ circular_action }}</div><div class="label">For Action</div></div>
+    <div class="metric"><div class="num">{{ staff_total }}</div><div class="label">Staff</div></div>
+    <div class="metric"><div class="num">{{ issues_open }}</div><div class="label">Open Issues</div></div>
+</div>
+
+<!-- CIRCULARS BY WING -->
+<div class="section">
+    <h3>📢 Circulars by Wing</h3>
+    {% for w in wing_circulars %}
+    <div class="bar-row">
+        <div class="bar-label">{{ w.name }}</div>
+        <div class="bar-track">
+            <div class="bar-fill" style="width:{{ (w.count / wing_circulars[0].count * 100)|int if wing_circulars[0].count > 0 else 0 }}%">
+                <span>{{ w.count }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- STAFF BY WING -->
+<div class="section">
+    <h3>👥 Staff by Wing</h3>
+    {% for w in wing_staff %}
+    <div class="bar-row">
+        <div class="bar-label">{{ w.name }}</div>
+        <div class="bar-track">
+            <div class="bar-fill" style="width:{{ (w.count / wing_staff[0].count * 100)|int if wing_staff[0].count > 0 else 0 }}%; background:#1a73e8;">
+                <span style="color:#fff;">{{ w.count }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- RECENT -->
+<div class="section">
+    <h3>🕐 Recent Circulars</h3>
+    {% for r in recent %}
+    <div class="recent-item">
+        <span class="rtitle">{{ r.title | truncate(50) }}</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+            <span class="rmeta">{{ frappe.utils.format_date(r.date) }}</span>
+            <span class="badge-sm {% if r.classification == 'For Action' %}bs-action{% elif r.classification == 'Urgent' %}bs-urgent{% else %}bs-info{% endif %}">{{ r.classification }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

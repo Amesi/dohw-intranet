@@ -1,0 +1,24 @@
+{% macro render_node(node, level) %}
+<div class="org-node">
+    <div class="org-node-inner level-{{ level }}">
+        {% if node.head and node.head.image %}
+        <img src="{{ node.head.image }}" class="org-avatar" alt="{{ node.head.employee_name }}">
+        {% else %}
+        <div class="org-avatar-placeholder">{{ node.name[:2] }}</div>
+        {% endif %}
+        <div>
+            <div class="org-name">{{ node.name }}</div>
+            {% if node.head %}
+            <div class="org-title">{{ node.head.employee_name }} · {{ node.head.designation }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% if node.children %}
+{% for child in node.children %}
+{{ render_node(child, level + 1) }}
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+{{ render_node(node, 1) }}

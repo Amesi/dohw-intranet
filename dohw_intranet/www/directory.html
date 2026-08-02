@@ -3,72 +3,111 @@
 {% block title %}Staff Directory — DoWH{% endblock %}
 
 {% block page_content %}
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
     <div>
-        <h1 style="font-size:24px; font-weight:800; color:var(--dowh-dark); margin:0;">
-            Staff Directory
-        </h1>
-        <p style="color:#888; font-size:13px; margin:4px 0 0;">
-            {{ total_staff }} staff members across {{ wings|length }} Wings
-        </p>
+        <h1 style="font-size:22px; font-weight:800; color:var(--dowh-dark); margin:0;">Staff Directory</h1>
+        <p style="color:#888; font-size:12px; margin:2px 0 0;">{{ total_staff }} staff across {{ wings|length }} Wings</p>
     </div>
 </div>
 
-<!-- Stats cards -->
-<div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
-    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px 20px; text-align:center; flex:1; min-width:100px;">
-        <div style="font-size:28px; font-weight:800; color:var(--dowh-dark);">{{ total_staff }}</div>
-        <div style="font-size:11px; color:#888;">Total Staff</div>
+<!-- SEARCH -->
+<form method="GET" action="/directory" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:10px 14px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
+    <input type="text" name="search" value="{{ search }}" placeholder="Search by name, department, or title..."
+        style="padding:7px 12px; border:1px solid #ddd; border-radius:6px; font-size:12px; flex:1; min-width:140px;">
+    {% if active_wing %}<input type="hidden" name="wing" value="{{ active_wing }}">{% endif %}
+    {% if active_division %}<input type="hidden" name="division" value="{{ active_division }}">{% endif %}
+    {% if active_section %}<input type="hidden" name="section" value="{{ active_section }}">{% endif %}
+    {% if active_branch %}<input type="hidden" name="branch" value="{{ active_branch }}">{% endif %}
+    <button type="submit" style="padding:7px 14px; background:var(--dowh-gold); color:var(--dowh-dark); border:none; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;">Search</button>
+    {% if search or active_wing or active_division or active_section or active_branch %}
+    <a href="/directory" style="color:#cc0000; font-size:11px; text-decoration:none; white-space:nowrap;">✕ Clear</a>
+    {% endif %}
+</form>
+
+<!-- HIERARCHICAL FILTERS — Wing → Division → Section + Branch -->
+<div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:10px 14px; margin-bottom:14px;">
+    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;" class="filters-row">
+        <span style="font-size:11px; font-weight:700; color:#888; min-width:50px;">Wing:</span>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <a href="/directory" class="chip {% if not active_wing %}active{% endif %}">All</a>
+            {% for w in wings %}
+            <a href="/directory?wing={{ w.name }}" class="chip {% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if divisions %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;" class="filters-row">
+        <span style="font-size:11px; font-weight:700; color:#888; min-width:50px;">Division:</span>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <a href="/directory?wing={{ active_wing }}" class="chip {% if not active_division %}active{% endif %}">All</a>
+            {% for d in divisions %}
+            <a href="/directory?wing={{ active_wing }}&division={{ d.name }}" class="chip {% if active_division == d.name %}active{% endif %}">{{ d.department_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if sections %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;" class="filters-row">
+        <span style="font-size:11px; font-weight:700; color:#888; min-width:50px;">Section:</span>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <a href="/directory?wing={{ active_wing }}&division={{ active_division }}" class="chip {% if not active_section %}active{% endif %}">All</a>
+            {% for s in sections %}
+            <a href="/directory?wing={{ active_wing }}&division={{ active_division }}&section={{ s.name }}" class="chip {% if active_section == s.name %}active{% endif %}">{{ s.department_name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if branches %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+        <span style="font-size:11px; font-weight:700; color:#888; min-width:50px;">Branch:</span>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <a href="/directory{% if active_wing %}?wing={{ active_wing }}{% if active_division %}&division={{ active_division }}{% endif %}{% if active_section %}&section={{ active_section }}{% endif %}{% endif %}" class="chip {% if not active_branch %}active{% endif %}">All</a>
+            {% for b in branches %}
+            <a href="/directory?branch={{ b.name }}{% if active_wing %}&wing={{ active_wing }}{% endif %}{% if active_division %}&division={{ active_division }}{% endif %}{% if active_section %}&section={{ active_section }}{% endif %}" class="chip {% if active_branch == b.name %}active{% endif %}">{{ b.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- STATS -->
+<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:70px;">
+        <div style="font-size:22px; font-weight:800; color:var(--dowh-dark);">{{ total_staff }}</div>
+        <div style="font-size:10px; color:#888;">Total</div>
     </div>
     {% for w in wings[:4] %}
-    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px 20px; text-align:center; flex:1; min-width:100px;">
-        <div style="font-size:28px; font-weight:800; color:var(--dowh-gold);">{{ wing_counts.get(w.department_name, 0) }}</div>
+    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:70px;">
+        <div style="font-size:22px; font-weight:800; color:var(--dowh-gold);">{{ wing_counts.get(w.department_name, 0) }}</div>
         <div style="font-size:10px; color:#888;">{{ w.department_name }}</div>
     </div>
     {% endfor %}
 </div>
 
-<!-- Search -->
-<form method="GET" action="/directory" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-    <input type="text" name="search" value="{{ search }}" placeholder="Search by name, department, or title..."
-        style="padding:8px 14px; border:1px solid #ddd; border-radius:6px; font-size:13px; flex:1; min-width:200px;">
-    <button type="submit" style="padding:8px 16px; background:var(--dowh-gold); color:var(--dowh-dark); border:none; border-radius:6px; font-weight:700; font-size:13px; cursor:pointer;">Search</button>
-    {% if search or active_wing %}
-    <a href="/directory" style="color:#cc0000; font-size:12px; text-decoration:none;">Clear</a>
-    {% endif %}
-</form>
-
-<!-- Wing filter tabs -->
-<div class="dowh-wing-tabs">
-    <a href="/directory{% if search %}?search={{ search }}{% endif %}" class="dowh-wing-tab {% if not active_wing %}active{% endif %}">
-        All Wings
-    </a>
-    {% for w in wings %}
-    <a href="/directory?wing={{ w.name }}{% if search %}&search={{ search }}{% endif %}" class="dowh-wing-tab {% if active_wing == w.name %}active{% endif %}">
-        {{ w.department_name }}
-    </a>
-    {% endfor %}
-</div>
-
-<!-- Staff grid -->
+<!-- STAFF GRID -->
 {% if employees %}
-<div class="dowh-staff-grid">
+<div class="staff-grid">
     {% for e in employees %}
-    <div class="dowh-staff-card">
-        <div class="dowh-staff-avatar">
-            {% set parts = e.employee_name.split() %}
-            {{ parts[0][0] if parts else '?' }}{{ parts[-1][0] if parts|length > 1 else '' }}
-        </div>
+    <div class="staff-card">
+        {% if e.image %}
+        <img src="{{ e.image }}" class="staff-photo" alt="{{ e.employee_name }}">
+        {% else %}
+        <div class="staff-avatar">{{ e.employee_name.split()[0][0] }}{{ e.employee_name.split()[-1][0] }}</div>
+        {% endif %}
         <div style="flex:1; min-width:0;">
-            <div class="dowh-staff-name">{{ e.employee_name }}</div>
-            <div class="dowh-staff-title">{{ e.designation or "—" }}</div>
-            <div class="dowh-staff-dept">{{ e.department or "—" }}</div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                {% if e.company_email %}
-                <a href="mailto:{{ e.company_email }}" style="font-size:11px; color:var(--dowh-dark); text-decoration:none;">✉ Email</a>
-                {% endif %}
+            <div class="staff-name">{{ e.employee_name }}</div>
+            <div class="staff-title">{{ e.designation or "—" }}</div>
+            <div class="staff-dept">{{ e.department or "—" }}{% if e.branch %} · {{ e.branch }}{% endif %}</div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; font-size:10px; color:#555;">
                 {% if e.cell_number %}
-                <a href="tel:{{ e.cell_number }}" style="font-size:11px; color:var(--dowh-dark); text-decoration:none;">📞 Call</a>
+                <a href="tel:{{ e.cell_number }}" class="staff-link" title="Mobile">📱 {{ e.cell_number }}</a>
+                {% endif %}
+                {% if e.company_email %}
+                <a href="mailto:{{ e.company_email }}" class="staff-link" title="Email">✉ {{ e.company_email.split('@')[0] }}</a>
                 {% endif %}
             </div>
         </div>
@@ -76,9 +115,95 @@
     {% endfor %}
 </div>
 {% else %}
-<div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:60px 40px; text-align:center; color:#888;">
-    <p style="font-size:18px; margin-bottom:8px;">No Staff Found</p>
-    <p style="font-size:13px;">{% if search %}No results for "{{ search }}".{% else %}Employee records are being added.{% endif %}</p>
+<div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:48px 24px; text-align:center; color:#888;">
+    <p style="font-size:16px; margin-bottom:6px;">No Staff Found</p>
+    <p style="font-size:12px;">{% if search %}No results for "{{ search }}".{% else %}No staff match these filters.{% endif %}</p>
 </div>
 {% endif %}
+
+<!-- ORG CHART -->
+{% if org_chart %}
+<div style="margin-top:32px;">
+    <h3 style="font-size:14px; font-weight:700; color:var(--dowh-dark); margin-bottom:16px;">🏛 Organisation Structure</h3>
+    {% for node in org_chart %}
+    {% include "dohw_intranet/templates/includes/org_node.html" %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block style %}
+<style>
+:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+
+.staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+.staff-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;
+    transition: box-shadow 0.15s;
+}
+.staff-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+.staff-photo {
+    width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    border: 2px solid var(--dowh-gold);
+}
+.staff-avatar {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--dowh-gold), #e6ac00);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--dowh-dark); font-weight: 800; font-size: 13px;
+}
+.staff-name { font-size: 13px; font-weight: 700; color: var(--dowh-dark); margin-bottom:1px; }
+.staff-title { font-size: 11px; color: #888; }
+.staff-dept { font-size: 10px; color: #aaa; margin-bottom: 2px; }
+.staff-link { color: #555; text-decoration: none; white-space: nowrap; }
+.staff-link:hover { color: var(--dowh-gold); }
+
+/* Filter chips */
+.chip {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; text-decoration: none; font-weight: 600;
+    background: #f0f0f0; color: #555; border: 1px solid #e0e0e0;
+}
+.chip.active, .chip:hover { background: var(--dowh-gold); color: var(--dowh-dark); border-color: var(--dowh-gold); }
+
+/* Org chart */
+.org-node { margin-bottom: 2px; }
+.org-node-inner {
+    background: #fff; border: 1px solid #e0e0e0; border-left: 3px solid var(--dowh-gold);
+    border-radius: 6px; padding: 7px 10px; display: flex; align-items: center; gap: 8px;
+}
+.org-node-inner.level-2 { margin-left: 16px; }
+.org-node-inner.level-3 { margin-left: 32px; font-size: 11px; padding: 5px 8px; }
+.org-node-inner.level-4 { margin-left: 48px; font-size: 10px; padding: 4px 6px; }
+.org-node-inner .org-avatar {
+    width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    border: 2px solid var(--dowh-gold);
+}
+.org-node-inner .org-avatar-placeholder {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--dowh-gold), #e6ac00);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--dowh-dark); font-weight: 700; font-size: 9px;
+}
+.org-node-inner .org-name { font-weight: 700; color: var(--dowh-dark); font-size: inherit; }
+.org-node-inner .org-title { font-size: 10px; color: #888; }
+
+@media (max-width: 600px) {
+    .staff-grid { grid-template-columns: 1fr; }
+    .staff-card { padding: 10px 12px; }
+    .staff-name { font-size: 12px; }
+    .staff-title { font-size: 10px; }
+    .staff-dept { font-size: 9px; }
+    .staff-link { font-size: 9px; }
+    .org-node-inner.level-2 { margin-left: 10px; }
+    .org-node-inner.level-3 { margin-left: 18px; }
+    .org-node-inner.level-4 { margin-left: 26px; }
+    /* Filters stack vertically */
+    .filters-row { flex-direction: column; align-items: stretch; }
+    .chip { font-size: 9px; padding: 2px 7px; }
+}
+</style>
 {% endblock %}
