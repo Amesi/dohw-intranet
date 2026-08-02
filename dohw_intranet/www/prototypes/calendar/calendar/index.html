@@ -1,0 +1,243 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Calendar — DoWH{% endblock %}
+
+{% block page_content %}
+
+<style>
+:root { --gold: #FFBF00; --dark: #1A1A1A; }
+
+.cal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+.cal-header h2 { font-size: 18px; font-weight: 800; color: var(--dark); margin: 0; }
+.cal-nav { display: flex; gap: 4px; }
+.cal-nav a {
+    padding: 5px 12px; border: 1px solid #ddd; border-radius: 4px;
+    font-size: 11px; text-decoration: none; color: var(--dark); font-weight: 600;
+}
+.cal-nav a:hover { background: var(--gold); color: var(--dark); }
+
+/* Month grid */
+.cal-grid {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    margin-bottom: 24px; overflow: hidden;
+}
+.cal-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-row.header { background: var(--dark); color: var(--gold); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.cal-cell {
+    min-height: 80px; padding: 6px; border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0; font-size: 10px;
+}
+.cal-cell:last-child { border-right: none; }
+.cal-cell.empty { background: #fafafa; }
+.cal-cell .day-num { font-weight: 700; color: #aaa; margin-bottom: 2px; }
+.cal-cell.today .day-num { color: var(--dark); background: var(--gold); display: inline-block; padding: 2px 6px; border-radius: 10px; }
+.cal-event {
+    padding: 2px 5px; border-radius: 3px; margin-bottom: 2px; font-size: 9px;
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-left: 2px solid var(--gold);
+}
+.cal-event:hover { background: #f5f5f5; }
+.cal-event.meeting { border-left-color: #1a73e8; }
+.cal-event.event { border-left-color: var(--gold); }
+.cal-event.other { border-left-color: #888; }
+
+/* Upcoming */
+.upcoming-list { display: flex; flex-direction: column; gap: 6px; }
+.upcoming-item {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
+    padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+    border-left: 3px solid var(--gold); cursor: pointer; transition: box-shadow 0.15s;
+}
+.upcoming-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.upcoming-date {
+    text-align: center; min-width: 48px;
+    font-size: 10px; font-weight: 700; color: var(--dark);
+}
+.upcoming-date .day { font-size: 22px; line-height: 1; }
+.upcoming-info { flex: 1; min-width: 0; }
+.upcoming-info .title { font-size: 12px; font-weight: 700; color: var(--dark); }
+.upcoming-info .meta { font-size: 10px; color: #888; }
+
+/* Modal overlay */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center;
+    align-items: center; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-card {
+    background: #fff; border-radius: 10px; padding: 24px; max-width: 480px;
+    width: 100%; border-top: 4px solid var(--gold); position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.modal-close {
+    position: absolute; top: 12px; right: 16px;
+    font-size: 20px; cursor: pointer; color: #888; font-weight: 700;
+}
+.modal-card h3 { font-size: 16px; font-weight: 800; color: var(--dark); margin: 0 0 12px; padding-right: 24px; }
+.modal-card .row { font-size: 12px; color: #555; margin-bottom: 6px; display: flex; gap: 6px; align-items: baseline; }
+.modal-card .row .label { font-weight: 600; color: #888; min-width: 70px; }
+.modal-card .row .label::after { content: ":"; }
+.modal-card .desc { font-size: 12px; color: #333; line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; white-space: pre-wrap; }
+
+@media (max-width: 600px) {
+    .cal-cell { min-height: 50px; padding: 4px; font-size: 9px; }
+    .cal-event { font-size: 8px; }
+    .cal-header h2 { font-size: 15px; }
+    .modal-card { padding: 16px; }
+}
+</style>
+
+<h2 style="text-align:left;">📅 {{ month_name }}</h2>
+
+<div class="cal-header">
+    <div class="cal-nav">
+        <a href="{{ prev_month }}">◀ Prev</a>
+        <a href="/prototypes/calendar">Today</a>
+        <a href="{{ next_month }}">Next ▶</a>
+    </div>
+</div>
+
+<!-- MONTH GRID -->
+<div class="cal-grid">
+    <div class="cal-row header">
+        <div class="cal-cell">Mon</div><div class="cal-cell">Tue</div>
+        <div class="cal-cell">Wed</div><div class="cal-cell">Thu</div>
+        <div class="cal-cell">Fri</div><div class="cal-cell">Sat</div>
+        <div class="cal-cell">Sun</div>
+    </div>
+    {% for week in weeks %}
+    <div class="cal-row">
+        {% for cell in week %}
+        <div class="cal-cell {% if cell.day == 0 %}empty{% endif %} {% if cell.day == frappe.utils.now_datetime().day and month == frappe.utils.now_datetime().month and year == frappe.utils.now_datetime().year %}today{% endif %}">
+            {% if cell.day > 0 %}
+            <div class="day-num">{{ cell.day }}</div>
+            {% for e in cell.events[:3] %}
+            <div class="cal-event {{ e.event_category.lower().replace(' ','-') if e.event_category else 'other' }}"
+                 onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')"
+                 title="{{ e.subject }}">{{ e.subject[:20] }}</div>
+            {% endfor %}
+            {% if cell.events|length > 3 %}
+            <div class="cal-event" style="border-left-color:#ccc;">+{{ cell.events|length - 3 }} more</div>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- UPCOMING EVENTS -->
+<h3 style="font-size:14px; font-weight:700; color:var(--dark); margin-bottom:12px;">📋 Upcoming Events</h3>
+{% if upcoming %}
+<div class="upcoming-list">
+    {% for e in upcoming %}
+    <div class="upcoming-item"
+         onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
+        <div class="upcoming-date">
+            <div class="day">{{ frappe.utils.format_date(e.starts_on, "d") }}</div>
+            <div>{{ frappe.utils.format_date(e.starts_on, "MMM") }}</div>
+        </div>
+        <div class="upcoming-info">
+            <div class="title">{{ e.subject }}</div>
+            <div class="meta">
+                {{ frappe.utils.format_date(e.starts_on, "dd MMM yyyy") }}
+                · {{ e.event_category or "Event" }}
+                {% if e.location %} · 📍 {{ e.location }}{% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:32px; text-align:center; color:#888; font-size:13px;">No upcoming events</div>
+{% endif %}
+
+<!-- MODAL -->
+<div class="modal-overlay" id="eventModal" onclick="if(event.target==this)hideModal()">
+    <div class="modal-card">
+        <span class="modal-close" onclick="hideModal()">✕</span>
+        <h3 id="modalTitle"></h3>
+        <div class="row"><span class="label">Category</span><span id="modalCategory"></span></div>
+        <div class="row"><span class="label">When</span><span id="modalWhen"></span></div>
+        <div class="row" id="modalEndRow" style="display:none;"><span class="label">Until</span><span id="modalEnd"></span></div>
+        <div class="row" id="modalLocRow" style="display:none;"><span class="label">Location</span><span id="modalLocation"></span></div>
+        <div id="modalDesc" class="desc" style="display:none;"></div>
+        <div id="modalAttach" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #eee;"></div>
+    </div>
+</div>
+
+<script>
+var ATTACHMENTS = {
+{% for name, files in attachments.items() %}
+    "{{ name }}": [
+    {% for f in files %}
+        {"url":"{{ f.file_url }}","name":"{{ f.file_name or f.file_url.split('/')[-1] }}","size":"{{ f.file_size }}"} {% if not loop.last %},{% endif %}
+    {% endfor %}
+    ] {% if not loop.last %},{% endif %}
+{% endfor %}
+};
+
+function showModal(name, title, category, starts, ends, location, desc) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalCategory').textContent = category || 'Event';
+    document.getElementById('modalWhen').textContent = formatDate(starts);
+
+    if (ends) {
+        document.getElementById('modalEndRow').style.display = 'flex';
+        document.getElementById('modalEnd').textContent = formatDate(ends);
+    } else {
+        document.getElementById('modalEndRow').style.display = 'none';
+    }
+
+    if (location) {
+        document.getElementById('modalLocRow').style.display = 'flex';
+        document.getElementById('modalLocation').textContent = location;
+    } else {
+        document.getElementById('modalLocRow').style.display = 'none';
+    }
+
+    if (desc) {
+        document.getElementById('modalDesc').style.display = 'block';
+        document.getElementById('modalDesc').textContent = desc.replace(/\\n/g, '\n');
+    } else {
+        document.getElementById('modalDesc').style.display = 'none';
+    }
+
+    // Attachments
+    var attachDiv = document.getElementById('modalAttach');
+    var files = ATTACHMENTS[name];
+    if (files && files.length > 0) {
+        var html = '<div style="font-size:11px; font-weight:700; color:#888; margin-bottom:6px;">📎 Attachments (' + files.length + ')</div>';
+        for (var i = 0; i < files.length; i++) {
+            var f = files[i];
+            var icon = f.name.match(/\.(jpg|png|gif|webp|svg)$/i) ? '🖼' : '📄';
+            html += '<div style="margin-bottom:4px;">' + icon + ' <a href="' + f.url + '" download style="font-size:11px; color:var(--dark); text-decoration:none; font-weight:600;">' + f.name + '</a>';
+            if (f.size) html += ' <span style="font-size:9px; color:#aaa;">(' + (f.size/1024).toFixed(1) + ' KB)</span>';
+            html += '</div>';
+        }
+        attachDiv.innerHTML = html;
+        attachDiv.style.display = 'block';
+    } else {
+        attachDiv.style.display = 'none';
+    }
+
+    document.getElementById('eventModal').classList.add('show');
+}
+
+function hideModal() {
+    document.getElementById('eventModal').classList.remove('show');
+}
+
+function formatDate(dt) {
+    if (!dt) return '';
+    var d = new Date(dt);
+    return d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'})
+         + ' ' + d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+}
+</script>
+
+{% endblock %}

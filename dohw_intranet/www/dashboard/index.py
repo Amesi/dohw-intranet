@@ -9,7 +9,7 @@ def get_context(context):
         frappe.local.flags.redirect_location = "/login?redirect-to=/dashboard"
         raise frappe.Redirect
 
-    context.show_sidebar = 1
+    context.show_sidebar = 0
     context.title = "Dashboard"
 
     # Circular stats

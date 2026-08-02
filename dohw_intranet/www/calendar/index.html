@@ -133,17 +133,17 @@
 <!-- TOP BAR -->
 <div class="cal-top">
     <div class="cal-views">
-        <a href="/prototypes/calendar?view=day{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'day' %}active{% endif %}">Day</a>
-        <a href="/prototypes/calendar?view=week{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'week' %}active{% endif %}">Week</a>
-        <a href="/prototypes/calendar?view=month{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'month' %}active{% endif %}">Month</a>
+        <a href="/calendar?view=day{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'day' %}active{% endif %}">Day</a>
+        <a href="/calendar?view=week{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'week' %}active{% endif %}">Week</a>
+        <a href="/calendar?view=month{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'month' %}active{% endif %}">Month</a>
     </div>
 </div>
 
 <!-- WING FILTER -->
 <div class="cal-wing">
-    <a href="/prototypes/calendar?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
+    <a href="/calendar?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
     {% for w in wings %}
-    <a href="/prototypes/calendar?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+    <a href="/calendar?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
     {% endfor %}
 </div>
 

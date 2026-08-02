@@ -5,7 +5,7 @@ import frappe
 
 def get_context(context):
     context.no_cache = 1
-    context.show_sidebar = 1
+    context.show_sidebar = 0
 
     # Detail view — specific circular by name
     circular_name = frappe.form_dict.get("name")
