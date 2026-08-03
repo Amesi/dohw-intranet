@@ -28,7 +28,7 @@
 .proj-list { display: flex; flex-direction: column; gap: 10px; }
 .proj-card {
     background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 18px;
-    border-left: 4px solid var(--gold);
+    border-left: 4px solid var(--gold); cursor: pointer; transition: box-shadow 0.15s; text-decoration: none; display: block; color: inherit;
 }
 .proj-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .proj-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -153,9 +153,9 @@
 {% if projects %}
 <div class="proj-list">
     {% for p in projects %}
-    <div class="proj-card">
+    <a href="/prototypes/projects?name={{ p.name }}" class="proj-card">
         <div class="top">
-            <h3><a href="/prototypes/projects?proj={{ p.name }}" style="color:var(--dark); text-decoration:none;">{{ p.project_name }}</a></h3>
+            <h3>{{ p.project_name }}</h3>
             <span class="proj-badge pb-{{ p.priority.lower() if p.priority else 'low' }}">{{ p.priority or 'Normal' }}</span>
         </div>
         <div class="proj-meta">
@@ -170,7 +170,7 @@
             <div class="proj-bar-fill {{ p.progress_color }}" style="width:{{ p.percent_complete or 0 }}%"></div>
         </div>
         <div class="proj-pct">{{ p.percent_complete or 0 }}% complete</div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}

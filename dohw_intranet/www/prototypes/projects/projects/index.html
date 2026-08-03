@@ -9,8 +9,6 @@
 :root { --gold: #FFBF00; --dark: #1A1A1A; }
 
 .proj-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-.proj-header h2 { font-size: 19px; font-weight: 800; color: var(--dark); margin: 0; }
-
 .proj-views { display: flex; gap: 2px; }
 .proj-views a {
     padding: 5px 14px; border: 1px solid #ddd; font-size: 11px; text-decoration: none;
@@ -19,7 +17,6 @@
 .proj-views a:first-child { border-radius: 4px 0 0 4px; }
 .proj-views a:last-child { border-radius: 0 4px 4px 0; }
 .proj-views a.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-.proj-views a:hover:not(.active) { background: #f5f5f5; }
 
 .proj-wing { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
 .proj-wing a {
@@ -33,6 +30,7 @@
     background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 18px;
     border-left: 4px solid var(--gold);
 }
+.proj-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .proj-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .proj-card h3 { font-size: 14px; font-weight: 700; color: var(--dark); margin: 0; flex: 1; }
 .proj-badge {
@@ -42,6 +40,8 @@
 .pb-high { background: #ff6600; color: #fff; }
 .pb-medium { background: #f0ad4e; color: #fff; }
 .pb-low { background: #e0e0e0; color: #555; }
+.pb-open { background: #17a2b8; color: #fff; }
+.pb-completed { background: #28a745; color: #fff; }
 
 .proj-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; color: #888; margin-bottom: 8px; }
 .proj-meta span { white-space: nowrap; }
@@ -52,18 +52,89 @@
 .proj-bar-fill.gold { background: var(--gold); }
 .proj-bar-fill.orange { background: #ff6600; }
 .proj-bar-fill.grey { background: #ccc; }
-
 .proj-pct { font-size: 10px; font-weight: 700; color: #555; }
 
+/* Detail view */
+.detail-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px;
+    border-top: 4px solid var(--gold);
+}
+.detail-card h2 { font-size: 18px; font-weight: 800; color: var(--dark); margin: 0 0 16px; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.detail-item { font-size: 12px; }
+.detail-item .lbl { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+.detail-item .val { font-weight: 700; color: var(--dark); }
+.detail-notes { font-size: 12px; color: #333; line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
+
+.task-list { margin-top: 16px; }
+.task-list h4 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.task-item {
+    display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+    background: #f9f9f9; border-radius: 4px; margin-bottom: 4px; font-size: 11px;
+}
+.task-status {
+    padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;
+}
+.ts-open { background: #cce5ff; color: #004085; }
+.ts-working { background: #fff3cd; color: #856404; }
+.ts-completed { background: #d4edda; color: #155724; }
+
 .proj-empty { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 48px 24px; text-align: center; color: #888; font-size: 14px; }
+.btn-back { display: inline-block; margin-top: 16px; padding: 6px 14px; background: var(--gold); color: var(--dark); border-radius: 4px; font-weight: 700; font-size: 11px; text-decoration: none; }
 
 @media (max-width: 600px) {
     .proj-card { padding: 12px 14px; }
     .proj-card h3 { font-size: 12px; }
     .proj-meta { font-size: 10px; gap: 8px; }
+    .detail-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 
+{% if detail %}
+<!-- DETAIL VIEW -->
+<div class="detail-card">
+    <h2>{{ detail.project_name }}</h2>
+    <div class="detail-grid">
+        <div class="detail-item"><div class="lbl">Status</div><div class="val">{{ detail.status }}</div></div>
+        <div class="detail-item"><div class="lbl">Priority</div><div class="val">{{ detail.priority }}</div></div>
+        <div class="detail-item"><div class="lbl">Department</div><div class="val">{{ detail.department or '—' }}</div></div>
+        <div class="detail-item"><div class="lbl">Progress</div><div class="val">{{ detail.percent_complete }}%</div></div>
+        <div class="detail-item"><div class="lbl">Start</div><div class="val">{{ frappe.utils.format_date(detail.expected_start_date) }}</div></div>
+        <div class="detail-item"><div class="lbl">End</div><div class="val">{{ frappe.utils.format_date(detail.expected_end_date) }}</div></div>
+        <div class="detail-item"><div class="lbl">Est. Cost</div><div class="val">K{{ '{:,.0f}'.format(detail.estimated_costing / 1000) if detail.estimated_costing else '—' }}</div></div>
+        <div class="detail-item"><div class="lbl">Actual Cost</div><div class="val">K{{ '{:,.0f}'.format(detail.total_costing_amount / 1000) if detail.total_costing_amount else '—' }}</div></div>
+    </div>
+    {% if detail.users %}
+    <div class="detail-item" style="margin-bottom:12px;">
+        <div class="lbl">Team Members</div>
+        <div class="val">{% for u in detail.users %}{{ u.full_name }}{% if not loop.last %}, {% endif %}{% endfor %}</div>
+    </div>
+    {% endif %}
+    <div class="proj-bar" style="margin-bottom:6px;">
+        <div class="proj-bar-fill {% if detail.percent_complete >= 75 %}green{% elif detail.percent_complete >= 50 %}gold{% elif detail.percent_complete >= 25 %}orange{% else %}grey{% endif %}" style="width:{{ detail.percent_complete }}%"></div>
+    </div>
+
+    {% if detail.notes %}
+    <div class="detail-notes">{{ detail.notes }}</div>
+    {% endif %}
+
+    {% if detail.tasks %}
+    <div class="task-list">
+        <h4>📋 Tasks ({{ detail.tasks|length }})</h4>
+        {% for t in detail.tasks %}
+        <div class="task-item">
+            <span>{{ t.subject }}</span>
+            <span class="task-status ts-{{ t.status.lower() }}">{{ t.status }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <a href="/prototypes/projects" class="btn-back">← Back to Projects</a>
+</div>
+
+{% else %}
+<!-- LISTING VIEW -->
 <div class="proj-header">
     <div class="proj-views">
         <a href="/prototypes/projects?view=all" class="{% if view == 'all' %}active{% endif %}">All Projects</a>
@@ -84,7 +155,7 @@
     {% for p in projects %}
     <div class="proj-card">
         <div class="top">
-            <h3>{{ p.project_name }}</h3>
+            <h3><a href="/prototypes/projects?proj={{ p.name }}" style="color:var(--dark); text-decoration:none;">{{ p.project_name }}</a></h3>
             <span class="proj-badge pb-{{ p.priority.lower() if p.priority else 'low' }}">{{ p.priority or 'Normal' }}</span>
         </div>
         <div class="proj-meta">
@@ -93,11 +164,12 @@
             {% if p.estimated_costing %}
             <span>💰 K{{ '{:,.0f}'.format(p.estimated_costing / 1000) if p.estimated_costing else '—' }}</span>
             {% endif %}
+            <span class="proj-badge pb-{{ p.status.lower() }}">{{ p.status }}</span>
         </div>
         <div class="proj-bar">
             <div class="proj-bar-fill {{ p.progress_color }}" style="width:{{ p.percent_complete or 0 }}%"></div>
         </div>
-        <div class="proj-pct">{{ p.percent_complete or 0 }}% complete · {{ p.status }}</div>
+        <div class="proj-pct">{{ p.percent_complete or 0 }}% complete</div>
     </div>
     {% endfor %}
 </div>
@@ -105,5 +177,6 @@
 <div class="proj-empty">No projects found for this view.</div>
 {% endif %}
 
+{% endif %}
 </div>
 {% endblock %}

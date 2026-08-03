@@ -7,7 +7,7 @@ from datetime import datetime
 def get_context(context):
     context.no_cache = 1
     if frappe.session.user == "Guest":
-        frappe.local.flags.redirect_location = "/login?redirect-to=/prototypes/projects"
+        frappe.local.flags.redirect_location = "/login?redirect-to=/projects"
         raise frappe.Redirect
 
     context.show_sidebar = 0
