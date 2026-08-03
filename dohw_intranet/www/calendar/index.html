@@ -147,6 +147,45 @@
     {% endfor %}
 </div>
 
+{% if is_content_manager %}
+{% if posted %}
+<div style="background:#d4edda; color:#155724; padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:12px;">✅ Event posted successfully.</div>
+{% endif %}
+<details style="margin-bottom:14px;">
+    <summary style="cursor:pointer; padding:6px 14px; background:var(--gold); color:var(--dark); border-radius:6px; font-size:12px; font-weight:700; display:inline-block;">✚ New Event</summary>
+    <form method="POST" action="/calendar" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px; margin-top:8px;">
+        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Subject *</label>
+        <input type="text" name="ev_subject" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box;" placeholder="Event title...">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+            <div style="flex:1; min-width:120px;">
+                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Category</label>
+                <select name="ev_category" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
+                    <option value="Event">Event</option><option value="Meeting">Meeting</option><option value="Other">Other</option>
+                </select>
+            </div>
+            <div style="flex:1; min-width:120px;">
+                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Location</label>
+                <input type="text" name="ev_location" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;" placeholder="e.g. Mt Hagen">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Starts *</label>
+                <input type="datetime-local" name="ev_starts" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
+            </div>
+            <div style="flex:1; min-width:140px;">
+                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Ends</label>
+                <input type="datetime-local" name="ev_ends" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
+            </div>
+        </div>
+        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Description</label>
+        <textarea name="ev_description" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box; height:60px; resize:vertical;" placeholder="Event details..."></textarea>
+        <input type="hidden" name="submit_event" value="1">
+        <button type="submit" style="padding:7px 20px; background:var(--gold); color:var(--dark); border:none; border-radius:4px; font-weight:700; font-size:12px; cursor:pointer;">Post Event</button>
+    </form>
+</details>
+{% endif %}
+
 <!-- NAVIGATION -->
 <div class="cal-nav">
     <span class="cal-date-label">
