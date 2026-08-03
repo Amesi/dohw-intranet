@@ -1,4 +1,4 @@
-"""DoWH Projects — prototype with All/Wing/Team view toggles + detail drill-down."""
+"""DoWH Projects — prototype with All/Wing/Team view toggles."""
 
 import frappe
 from datetime import datetime
@@ -13,38 +13,6 @@ def get_context(context):
     context.show_sidebar = 0
     context.title = "Projects"
 
-    # Detail view
-    proj_name = frappe.request and frappe.request.args.get("proj") or frappe.form_dict.get("proj")
-    if proj_name:
-        try:
-            proj = frappe.get_doc("Project", proj_name)
-            context.detail = {
-                "name": proj.name,
-                "project_name": proj.project_name,
-                "status": proj.status,
-                "priority": proj.priority,
-                "department": proj.department,
-                "percent_complete": proj.percent_complete or 0,
-                "expected_start_date": proj.expected_start_date,
-                "expected_end_date": proj.expected_end_date,
-                "actual_start_date": proj.actual_start_date,
-                "actual_end_date": proj.actual_end_date,
-                "estimated_costing": proj.estimated_costing,
-                "total_costing_amount": proj.total_costing_amount,
-                "notes": proj.notes or "",
-                "users": [{"user": u.user, "full_name": u.full_name} for u in (proj.users or [])],
-            }
-            context.detail["tasks"] = frappe.get_all(
-                "Task",
-                filters={"project": proj_name},
-                fields=["subject", "status", "priority", "exp_start_date", "exp_end_date", "progress"],
-                order_by="status asc, exp_start_date asc",
-                limit=50,
-            )
-        except Exception as e:
-            context.detail_error = str(e)
-        return context
-
     view = frappe.form_dict.get("view", "wing")  # all, wing, team
     wing_filter = frappe.form_dict.get("wing")
     context.view = view
@@ -52,11 +20,13 @@ def get_context(context):
 
     filters = {}
     if view == "wing":
+        # Get user's department (wing)
         employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "department")
         if employee:
             filters["department"] = employee
-        # If no employee link, show all (admin/testing)
     elif view == "team":
+        # Projects where user is in the users table
+        # Fallback: show projects in user's department
         employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "department")
         if employee:
             filters["department"] = employee

@@ -14,35 +14,33 @@ def get_context(context):
     context.title = "Projects"
 
     # Detail view
-    proj_name = frappe.request and frappe.request.args.get("proj") or frappe.form_dict.get("proj")
+    proj_name = frappe.form_dict.get("name")
     if proj_name:
-        try:
-            proj = frappe.get_doc("Project", proj_name)
-            context.detail = {
-                "name": proj.name,
-                "project_name": proj.project_name,
-                "status": proj.status,
-                "priority": proj.priority,
-                "department": proj.department,
-                "percent_complete": proj.percent_complete or 0,
-                "expected_start_date": proj.expected_start_date,
-                "expected_end_date": proj.expected_end_date,
-                "actual_start_date": proj.actual_start_date,
-                "actual_end_date": proj.actual_end_date,
-                "estimated_costing": proj.estimated_costing,
-                "total_costing_amount": proj.total_costing_amount,
-                "notes": proj.notes or "",
-                "users": [{"user": u.user, "full_name": u.full_name} for u in (proj.users or [])],
-            }
-            context.detail["tasks"] = frappe.get_all(
-                "Task",
-                filters={"project": proj_name},
-                fields=["subject", "status", "priority", "exp_start_date", "exp_end_date", "progress"],
-                order_by="status asc, exp_start_date asc",
-                limit=50,
-            )
-        except Exception as e:
-            context.detail_error = str(e)
+        proj = frappe.get_doc("Project", proj_name)
+        context.detail = {
+            "name": proj.name,
+            "project_name": proj.project_name,
+            "status": proj.status,
+            "priority": proj.priority,
+            "department": proj.department,
+            "percent_complete": proj.percent_complete or 0,
+            "expected_start_date": proj.expected_start_date,
+            "expected_end_date": proj.expected_end_date,
+            "actual_start_date": proj.actual_start_date,
+            "actual_end_date": proj.actual_end_date,
+            "estimated_costing": proj.estimated_costing,
+            "total_costing_amount": proj.total_costing_amount,
+            "notes": proj.notes or "",
+            "users": [{"user": u.user, "full_name": u.full_name} for u in (proj.users or [])],
+        }
+        # Fetch tasks
+        context.detail["tasks"] = frappe.get_all(
+            "Task",
+            filters={"project": proj_name},
+            fields=["subject", "status", "priority", "exp_start_date", "exp_end_date", "progress"],
+            order_by="status asc, exp_start_date asc",
+            limit=50,
+        )
         return context
 
     view = frappe.form_dict.get("view", "wing")  # all, wing, team

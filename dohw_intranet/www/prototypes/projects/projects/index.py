@@ -14,7 +14,8 @@ def get_context(context):
     context.title = "Projects"
 
     # Detail view
-    proj_name = frappe.request and frappe.request.args.get("proj") or frappe.form_dict.get("proj")
+    proj_name = frappe.form_dict.get("proj")
+    context.debug = str(proj_name)
     if proj_name:
         try:
             proj = frappe.get_doc("Project", proj_name)

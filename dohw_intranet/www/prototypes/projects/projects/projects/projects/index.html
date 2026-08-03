@@ -1,0 +1,109 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Projects — DoWH{% endblock %}
+
+{% block page_content %}
+<div style="padding: 20px 0 40px 0;">
+
+<style>
+:root { --gold: #FFBF00; --dark: #1A1A1A; }
+
+.proj-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.proj-header h2 { font-size: 19px; font-weight: 800; color: var(--dark); margin: 0; }
+
+.proj-views { display: flex; gap: 2px; }
+.proj-views a {
+    padding: 5px 14px; border: 1px solid #ddd; font-size: 11px; text-decoration: none;
+    font-weight: 600; color: #555;
+}
+.proj-views a:first-child { border-radius: 4px 0 0 4px; }
+.proj-views a:last-child { border-radius: 0 4px 4px 0; }
+.proj-views a.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+.proj-views a:hover:not(.active) { background: #f5f5f5; }
+
+.proj-wing { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+.proj-wing a {
+    padding: 3px 10px; border-radius: 12px; font-size: 10px; text-decoration: none;
+    font-weight: 600; background: #f0f0f0; color: #555; border: 1px solid #e0e0e0;
+}
+.proj-wing a.active, .proj-wing a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+
+.proj-list { display: flex; flex-direction: column; gap: 10px; }
+.proj-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 18px;
+    border-left: 4px solid var(--gold);
+}
+.proj-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.proj-card h3 { font-size: 14px; font-weight: 700; color: var(--dark); margin: 0; flex: 1; }
+.proj-badge {
+    padding: 3px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; white-space: nowrap;
+}
+.pb-urgent { background: #cc0000; color: #fff; }
+.pb-high { background: #ff6600; color: #fff; }
+.pb-medium { background: #f0ad4e; color: #fff; }
+.pb-low { background: #e0e0e0; color: #555; }
+
+.proj-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; color: #888; margin-bottom: 8px; }
+.proj-meta span { white-space: nowrap; }
+
+.proj-bar { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.proj-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.proj-bar-fill.green { background: #28a745; }
+.proj-bar-fill.gold { background: var(--gold); }
+.proj-bar-fill.orange { background: #ff6600; }
+.proj-bar-fill.grey { background: #ccc; }
+
+.proj-pct { font-size: 10px; font-weight: 700; color: #555; }
+
+.proj-empty { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 48px 24px; text-align: center; color: #888; font-size: 14px; }
+
+@media (max-width: 600px) {
+    .proj-card { padding: 12px 14px; }
+    .proj-card h3 { font-size: 12px; }
+    .proj-meta { font-size: 10px; gap: 8px; }
+}
+</style>
+
+<div class="proj-header">
+    <div class="proj-views">
+        <a href="/prototypes/projects?view=all" class="{% if view == 'all' %}active{% endif %}">All Projects</a>
+        <a href="/prototypes/projects?view=wing" class="{% if view == 'wing' %}active{% endif %}">My Wing</a>
+        <a href="/prototypes/projects?view=team" class="{% if view == 'team' %}active{% endif %}">My Team</a>
+    </div>
+</div>
+
+<div class="proj-wing">
+    <a href="/prototypes/projects?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
+    {% for w in wings %}
+    <a href="/prototypes/projects?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+    {% endfor %}
+</div>
+
+{% if projects %}
+<div class="proj-list">
+    {% for p in projects %}
+    <div class="proj-card">
+        <div class="top">
+            <h3>{{ p.project_name }}</h3>
+            <span class="proj-badge pb-{{ p.priority.lower() if p.priority else 'low' }}">{{ p.priority or 'Normal' }}</span>
+        </div>
+        <div class="proj-meta">
+            <span>📍 {{ p.department or '—' }}</span>
+            <span>📅 {{ frappe.utils.format_date(p.expected_start_date) }} – {{ frappe.utils.format_date(p.expected_end_date) }}</span>
+            {% if p.estimated_costing %}
+            <span>💰 K{{ '{:,.0f}'.format(p.estimated_costing / 1000) if p.estimated_costing else '—' }}</span>
+            {% endif %}
+        </div>
+        <div class="proj-bar">
+            <div class="proj-bar-fill {{ p.progress_color }}" style="width:{{ p.percent_complete or 0 }}%"></div>
+        </div>
+        <div class="proj-pct">{{ p.percent_complete or 0 }}% complete · {{ p.status }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="proj-empty">No projects found for this view.</div>
+{% endif %}
+
+</div>
+{% endblock %}
