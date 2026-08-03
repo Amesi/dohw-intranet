@@ -13,6 +13,27 @@ def get_context(context):
     context.show_sidebar = 0
     context.title = "Calendar"
 
+    # Check if user is a content manager
+    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user},
+                                   ["name", "department", "content_manager"], as_dict=1)
+    context.is_content_manager = bool(employee and employee.content_manager)
+    context.user_department = employee.department if employee else None
+
+    # Handle new event submission
+    if frappe.form_dict.get("submit_event") and context.is_content_manager:
+        event = frappe.get_doc({
+            "doctype": "Event",
+            "subject": frappe.form_dict.get("ev_subject"),
+            "event_type": "Public",
+            "event_category": frappe.form_dict.get("ev_category", "Event"),
+            "starts_on": frappe.form_dict.get("ev_starts"),
+            "ends_on": frappe.form_dict.get("ev_ends") or None,
+            "location": frappe.form_dict.get("ev_location", ""),
+            "description": frappe.form_dict.get("ev_description", ""),
+        })
+        event.insert(ignore_permissions=True)
+        context.posted = True
+
     view = frappe.form_dict.get("view", "month")
     wing_filter = frappe.form_dict.get("wing")
     year = int(frappe.form_dict.get("year") or datetime.now().year)
