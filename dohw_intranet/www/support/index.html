@@ -4,114 +4,142 @@
 
 {% block page_content %}
 
-<style>
-:root { --gold: #FFBF00; --dark: #1A1A1A; }
-
-.issue-header { margin-bottom: 20px; }
-.issue-header h1 { font-size: 20px; font-weight: 800; color: var(--dark); margin: 0; }
-.issue-header p { color: #888; font-size: 12px; margin: 2px 0 0; }
-
-.issue-form {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-    padding: 20px; margin-bottom: 24px; border-left: 4px solid var(--gold);
-}
-.issue-form h3 { font-size: 14px; font-weight: 700; color: var(--dark); margin: 0 0 12px; }
-.issue-form label { display: block; font-size: 11px; font-weight: 600; color: #555; margin-bottom: 4px; }
-.issue-form input, .issue-form select, .issue-form textarea {
-    width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px;
-    font-size: 12px; margin-bottom: 10px; box-sizing: border-box;
-}
-.issue-form textarea { height: 80px; resize: vertical; }
-.issue-form button {
-    padding: 8px 20px; background: var(--gold); color: var(--dark);
-    border: none; border-radius: 4px; font-weight: 700; font-size: 12px; cursor: pointer;
-}
-
-.issue-list { display: flex; flex-direction: column; gap: 8px; }
-.issue-card {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
-    padding: 14px 18px; border-left: 3px solid var(--gold);
-}
-.issue-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.issue-card .subject { font-size: 13px; font-weight: 700; color: var(--dark); }
-.issue-card .status {
-    padding: 2px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase;
-}
-.status-open { background: #fff3cd; color: #856404; }
-.status-closed { background: #d4edda; color: #155724; }
-.status-replied { background: #cce5ff; color: #004085; }
-.issue-card .meta { font-size: 10px; color: #888; }
-.issue-card .desc { font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4; }
-
-.success-msg {
-    background: #d4edda; color: #155724; padding: 10px 14px;
-    border-radius: 6px; margin-bottom: 16px; font-size: 12px;
-}
-</style>
-
-<div class="issue-header">
-    <h1>Support Issues</h1>
-    <p>Submit IT, HR, or maintenance requests. Track their status.</p>
+<div class="sup-block">
+    <h1 class="dt-page-title">Support</h1>
+    <p class="dt-caption">Submit an issue or check the status of your requests</p>
 </div>
 
 {% if submitted %}
-<div class="success-msg">✅ Your issue has been submitted. We'll get back to you soon.</div>
+<div class="sup-block">
+    <div class="sup-success">Your issue has been submitted. We'll get back to you soon.</div>
+</div>
 {% endif %}
 
-<!-- SUBMIT FORM -->
-<div class="issue-form">
-    <h3>📝 Submit New Issue</h3>
-    <form method="POST" action="/issues">
-        <label>Subject *</label>
-        <input type="text" name="subject" placeholder="Brief title of your issue..." required>
-
-        <label>Issue Type</label>
-        <select name="issue_type">
-            <option value="IT Support">IT Support</option>
-            <option value="HR Request">HR Request</option>
-            <option value="Maintenance">Maintenance</option>
-            <option value="Facilities">Facilities</option>
-            <option value="Other">Other</option>
-        </select>
-
-        <label>Priority</label>
-        <select name="priority">
-            <option value="Low">Low</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="High">High</option>
-            <option value="Urgent">Urgent</option>
-        </select>
-
-        <label>Description</label>
-        <textarea name="description" placeholder="Describe your issue in detail..."></textarea>
-
+<div class="sup-block">
+    <p class="dash-section-label">New issue</p>
+    <form method="POST" action="/support" class="sup-form">
+        <div class="sup-form-row">
+            <label class="dt-caption">Subject</label>
+            <input type="text" name="subject" required class="dt-input" placeholder="Brief summary of the issue">
+        </div>
+        <div class="sup-form-row-split">
+            <div class="sup-form-row">
+                <label class="dt-caption">Issue type</label>
+                <select name="issue_type" class="dt-select">
+                    <option value="IT Support">IT Support</option>
+                    <option value="HR Request">HR Request</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Facilities">Facilities</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="sup-form-row">
+                <label class="dt-caption">Priority</label>
+                <select name="priority" class="dt-select">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                    <option value="Urgent">Urgent</option>
+                </select>
+            </div>
+        </div>
+        <div class="sup-form-row">
+            <label class="dt-caption">Description</label>
+            <textarea name="description" class="dt-textarea" placeholder="Describe your issue in detail"></textarea>
+        </div>
         <input type="hidden" name="submit" value="1">
-        <button type="submit">Submit Issue</button>
+        <button type="submit" class="dt-btn-primary">Submit issue &rarr;</button>
     </form>
 </div>
 
-<!-- ISSUE LIST -->
-<h3 style="font-size:14px; font-weight:700; color:var(--dark); margin-bottom:12px;">📋 Your Issues</h3>
-{% if issues %}
-<div class="issue-list">
-    {% for i in issues %}
-    <div class="issue-card">
-        <div class="top">
-            <span class="subject">{{ i.subject }}</span>
-            <span class="status status-{{ i.status.lower() }}">{{ i.status }}</span>
+<div class="sup-block">
+    <p class="dash-section-label">Your issues</p>
+    {% if issues %}
+    <div class="dt-card-list">
+        {% for i in issues %}
+        <div class="dt-card sup-issue-row">
+            <span class="sup-issue-top">
+                <span class="dt-card-title">{{ i.subject }}</span>
+                <span class="sup-status sup-status-{{ i.status.lower() }}">{{ i.status }}</span>
+            </span>
+            <span class="dt-caption">{{ frappe.utils.pretty_date(i.creation) }} &middot; {{ i.priority or 'Medium' }} priority</span>
+            {% if i.description %}
+            <span class="dt-body sup-issue-desc">{{ i.description | truncate(150) }}</span>
+            {% endif %}
         </div>
-        <div class="meta">{{ frappe.utils.pretty_date(i.creation) }} · {{ i.priority or 'Medium' }} priority</div>
-        {% if i.description %}
-        <div class="desc">{{ i.description | truncate(150) }}</div>
-        {% endif %}
+        {% endfor %}
     </div>
-    {% endfor %}
+    {% else %}
+    <div class="sup-empty">
+        <p class="dt-body">No issues yet</p>
+        <p class="dt-caption">Submit your first issue above.</p>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div style="background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:40px; text-align:center; color:#888;">
-    <p style="font-size:14px;">No issues yet</p>
-    <p style="font-size:11px;">Submit your first issue above.</p>
-</div>
-{% endif %}
 
+{% endblock %}
+
+{% block style %}
+<style>
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation — see docs/design/support.md for the decision record. */
+
+.sup-block { max-width: 520px; }
+.sup-block + .sup-block { margin-top: var(--space-6, 24px); }
+
+.sup-success {
+    background: #f4f9f4;
+    border: 1px solid #cfe8cf;
+    color: #2e6b2e;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.dash-section-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted, #9a9a9a);
+    margin: 0 0 var(--space-3, 10px);
+}
+
+.sup-form { display: flex; flex-direction: column; gap: 10px; }
+.sup-form-row { display: flex; flex-direction: column; gap: 4px; }
+.sup-form-row-split { display: flex; gap: 12px; }
+.sup-form-row-split .sup-form-row { flex: 1; }
+
+.sup-issue-row { display: flex; flex-direction: column; gap: 4px; }
+.sup-issue-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.sup-issue-desc { display: block; margin-top: 2px; }
+
+.sup-status {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: var(--radius-pill, 20px);
+    background: none;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+}
+.sup-status-open { color: #8a6d00; }
+.sup-status-replied { color: #1a73e8; }
+.sup-status-closed { color: var(--ink-muted, #7c7c7c); }
+.sup-status-resolved { color: var(--ink-muted, #7c7c7c); }
+
+.sup-empty {
+    padding: 40px 20px;
+    text-align: center;
+    border: 1px solid var(--border, #ededed);
+    border-radius: 6px;
+}
+.sup-empty p { margin: 0 0 4px; }
+
+@media (max-width: 500px) {
+    .sup-form-row-split { flex-direction: column; }
+}
+</style>
 {% endblock %}
