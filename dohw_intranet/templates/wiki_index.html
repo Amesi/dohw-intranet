@@ -1,0 +1,38 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Documents — DoWH{% endblock %}
+
+{% block page_content %}
+
+<div class="wiki-block">
+    <h1 class="dt-page-title">Documents</h1>
+    <p class="dt-caption">Wing and department documentation spaces</p>
+</div>
+
+<div class="wiki-block wiki-index-block">
+    {% if spaces %}
+    <div class="dt-card-list">
+        {% for s in spaces %}
+        <a href="/{{ s.route }}" class="dt-card wiki-index-row">
+            <span class="dt-card-title">{{ s.space_name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="wiki-empty">
+        <p class="dt-body">No document spaces published yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block style %}
+<style>
+.wiki-block { max-width: 640px; }
+.wiki-index-block { margin-top: var(--space-5, 20px); }
+.wiki-index-row { text-decoration: none; color: inherit; }
+.wiki-index-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.wiki-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+</style>
+{% endblock %}

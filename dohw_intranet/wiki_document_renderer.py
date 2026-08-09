@@ -35,6 +35,13 @@ WIKI_DOCUMENT_FIELDS = "name, title, route, content, is_published, is_group, wik
 
 class WikiDocumentRenderer(DocumentPage):
     def can_render(self):
+        # The sidebar's "Documents" link points at /wiki as a stable, memorable
+        # entry point — but /wiki isn't itself a Wiki Space or Wiki Document
+        # route, so it needs its own explicit index-of-spaces handling here.
+        if self.path == "wiki":
+            self.is_index = True
+            return True
+
         doc = self._get_document_by_route(self.path)
         if not doc:
             return False
@@ -51,6 +58,9 @@ class WikiDocumentRenderer(DocumentPage):
         if frappe.session.user == "Guest":
             frappe.local.flags.redirect_location = f"/login?redirect-to=/{self.path}"
             raise frappe.Redirect
+
+        if getattr(self, "is_index", False):
+            return self._render_index()
 
         doc = self._get_document(self.docname)
         space = frappe.get_cached_doc("Wiki Space", doc.wiki_space) if doc.wiki_space else None
@@ -73,6 +83,16 @@ class WikiDocumentRenderer(DocumentPage):
         self.post_process_context()
 
         html = frappe.get_template("templates/wiki_document.html").render(self.context)
+        html = self.add_csrf_token(html)
+        return build_response(self.path, html, self.http_status_code or 200, self.headers)
+
+    def _render_index(self):
+        self.init_context()
+        self.context.title = "Documents"
+        self.context.spaces = self._get_spaces()
+        self.post_process_context()
+
+        html = frappe.get_template("templates/wiki_index.html").render(self.context)
         html = self.add_csrf_token(html)
         return build_response(self.path, html, self.http_status_code or 200, self.headers)
 
