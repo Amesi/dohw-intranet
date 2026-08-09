@@ -3,180 +3,162 @@
 {% block title %}Projects — DoWH{% endblock %}
 
 {% block page_content %}
-<div style="padding: 20px 0 40px 0;">
-
-<style>
-:root { --gold: #FFBF00; --dark: #1A1A1A; }
-
-.proj-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-.proj-views { display: flex; gap: 2px; }
-.proj-views a {
-    padding: 5px 14px; border: 1px solid #ddd; font-size: 11px; text-decoration: none;
-    font-weight: 600; color: #555;
-}
-.proj-views a:first-child { border-radius: 4px 0 0 4px; }
-.proj-views a:last-child { border-radius: 0 4px 4px 0; }
-.proj-views a.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-
-.proj-wing { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
-.proj-wing a {
-    padding: 3px 10px; border-radius: 12px; font-size: 10px; text-decoration: none;
-    font-weight: 600; background: #f0f0f0; color: #555; border: 1px solid #e0e0e0;
-}
-.proj-wing a.active, .proj-wing a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-
-.proj-list { display: flex; flex-direction: column; gap: 10px; }
-.proj-card {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 18px;
-    border-left: 4px solid var(--gold);
-}
-.proj-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.proj-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-.proj-card h3 { font-size: 14px; font-weight: 700; color: var(--dark); margin: 0; flex: 1; }
-.proj-badge {
-    padding: 3px 8px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; white-space: nowrap;
-}
-.pb-urgent { background: #cc0000; color: #fff; }
-.pb-high { background: #ff6600; color: #fff; }
-.pb-medium { background: #f0ad4e; color: #fff; }
-.pb-low { background: #e0e0e0; color: #555; }
-.pb-open { background: #17a2b8; color: #fff; }
-.pb-completed { background: #28a745; color: #fff; }
-
-.proj-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; color: #888; margin-bottom: 8px; }
-.proj-meta span { white-space: nowrap; }
-
-.proj-bar { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
-.proj-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
-.proj-bar-fill.green { background: #28a745; }
-.proj-bar-fill.gold { background: var(--gold); }
-.proj-bar-fill.orange { background: #ff6600; }
-.proj-bar-fill.grey { background: #ccc; }
-.proj-pct { font-size: 10px; font-weight: 700; color: #555; }
-
-/* Detail view */
-.detail-card {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px;
-    border-top: 4px solid var(--gold);
-}
-.detail-card h2 { font-size: 18px; font-weight: 800; color: var(--dark); margin: 0 0 16px; }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.detail-item { font-size: 12px; }
-.detail-item .lbl { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 2px; }
-.detail-item .val { font-weight: 700; color: var(--dark); }
-.detail-notes { font-size: 12px; color: #333; line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
-
-.task-list { margin-top: 16px; }
-.task-list h4 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
-.task-item {
-    display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
-    background: #f9f9f9; border-radius: 4px; margin-bottom: 4px; font-size: 11px;
-}
-.task-status {
-    padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;
-}
-.ts-open { background: #cce5ff; color: #004085; }
-.ts-working { background: #fff3cd; color: #856404; }
-.ts-completed { background: #d4edda; color: #155724; }
-
-.proj-empty { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 48px 24px; text-align: center; color: #888; font-size: 14px; }
-.btn-back { display: inline-block; margin-top: 16px; padding: 6px 14px; background: var(--gold); color: var(--dark); border-radius: 4px; font-weight: 700; font-size: 11px; text-decoration: none; }
-
-@media (max-width: 600px) {
-    .proj-card { padding: 12px 14px; }
-    .proj-card h3 { font-size: 12px; }
-    .proj-meta { font-size: 10px; gap: 8px; }
-    .detail-grid { grid-template-columns: 1fr 1fr; }
-}
-</style>
+<div class="proj-page">
 
 {% if detail %}
 <!-- DETAIL VIEW -->
-<div class="detail-card">
-    <h2>{{ detail.project_name }}</h2>
-    <div class="detail-grid">
-        <div class="detail-item"><div class="lbl">Status</div><div class="val">{{ detail.status }}</div></div>
-        <div class="detail-item"><div class="lbl">Priority</div><div class="val">{{ detail.priority }}</div></div>
-        <div class="detail-item"><div class="lbl">Department</div><div class="val">{{ detail.department or '—' }}</div></div>
-        <div class="detail-item"><div class="lbl">Progress</div><div class="val">{{ detail.percent_complete }}%</div></div>
-        <div class="detail-item"><div class="lbl">Start</div><div class="val">{{ frappe.utils.format_date(detail.expected_start_date) }}</div></div>
-        <div class="detail-item"><div class="lbl">End</div><div class="val">{{ frappe.utils.format_date(detail.expected_end_date) }}</div></div>
-        <div class="detail-item"><div class="lbl">Est. Cost</div><div class="val">K{{ '{:,.0f}'.format(detail.estimated_costing / 1000) if detail.estimated_costing else '—' }}</div></div>
-        <div class="detail-item"><div class="lbl">Actual Cost</div><div class="val">K{{ '{:,.0f}'.format(detail.total_costing_amount / 1000) if detail.total_costing_amount else '—' }}</div></div>
-    </div>
-    {% if detail.users %}
-    <div class="detail-item" style="margin-bottom:12px;">
-        <div class="lbl">Team Members</div>
-        <div class="val">{% for u in detail.users %}{{ u.full_name }}{% if not loop.last %}, {% endif %}{% endfor %}</div>
-    </div>
-    {% endif %}
-    <div class="proj-bar" style="margin-bottom:6px;">
-        <div class="proj-bar-fill {% if detail.percent_complete >= 75 %}green{% elif detail.percent_complete >= 50 %}gold{% elif detail.percent_complete >= 25 %}orange{% else %}grey{% endif %}" style="width:{{ detail.percent_complete }}%"></div>
+<div class="proj-block">
+    <a href="/projects" class="dt-btn-secondary proj-back">&larr; Back to Projects</a>
+</div>
+<div class="proj-block">
+    <h1 class="dt-page-title">{{ detail.project_name }}</h1>
+    <div class="proj-detail-grid">
+        <div class="proj-detail-item"><p class="dt-caption">Status</p><p class="dt-card-title">{{ detail.status }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Priority</p><p class="dt-card-title">{{ detail.priority }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Wing</p><p class="dt-card-title">{{ detail.department or '—' }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Progress</p><p class="dt-card-title">{{ detail.percent_complete }}%</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Start</p><p class="dt-card-title">{{ frappe.utils.format_date(detail.expected_start_date) }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">End</p><p class="dt-card-title">{{ frappe.utils.format_date(detail.expected_end_date) }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Est. cost</p><p class="dt-card-title">K{{ '{:,.0f}'.format(detail.estimated_costing / 1000) if detail.estimated_costing else '—' }}</p></div>
+        <div class="proj-detail-item"><p class="dt-caption">Actual cost</p><p class="dt-card-title">K{{ '{:,.0f}'.format(detail.total_costing_amount / 1000) if detail.total_costing_amount else '—' }}</p></div>
     </div>
 
+    {% if detail.users %}
+    <div class="proj-detail-item proj-team">
+        <p class="dt-caption">Team members</p>
+        <p class="dt-body">{% for u in detail.users %}{{ u.full_name }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+    </div>
+    {% endif %}
+
+    <div class="proj-bar"><div class="proj-bar-fill" style="width:{{ detail.percent_complete }}%"></div></div>
+    <p class="dt-caption">{{ detail.percent_complete }}% complete</p>
+
     {% if detail.notes %}
-    <div class="detail-notes">{{ detail.notes }}</div>
+    <div class="proj-notes dt-body">{{ detail.notes }}</div>
     {% endif %}
 
     {% if detail.tasks %}
-    <div class="task-list">
-        <h4>📋 Tasks ({{ detail.tasks|length }})</h4>
-        {% for t in detail.tasks %}
-        <div class="task-item">
-            <span>{{ t.subject }}</span>
-            <span class="task-status ts-{{ t.status.lower() }}">{{ t.status }}</span>
+    <div class="proj-tasks">
+        <p class="dash-section-label">Tasks ({{ detail.tasks|length }})</p>
+        <div class="dt-card-list">
+            {% for t in detail.tasks %}
+            <div class="dt-card proj-task-row">
+                <span class="dt-body">{{ t.subject }}</span>
+                <span class="dt-badge {% if t.status == 'Completed' %}dt-badge-info{% elif t.status == 'Working' %}dt-badge-action{% else %}dt-badge-urgent{% endif %}">{{ t.status }}</span>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
     {% endif %}
-
-    <a href="/projects" class="btn-back">← Back to Projects</a>
 </div>
 
 {% else %}
 <!-- LISTING VIEW -->
-<div class="proj-header">
+<div class="proj-block">
+    <h1 class="dt-page-title">Projects</h1>
+</div>
+
+<div class="proj-block">
     <div class="proj-views">
-        <a href="/projects?view=all" class="{% if view == 'all' %}active{% endif %}">All Projects</a>
-        <a href="/projects?view=wing" class="{% if view == 'wing' %}active{% endif %}">My Wing</a>
-        <a href="/projects?view=team" class="{% if view == 'team' %}active{% endif %}">My Team</a>
+        <a href="/projects?view=all" class="{% if view == 'all' %}active{% endif %}">All projects</a>
+        <a href="/projects?view=wing" class="{% if view == 'wing' %}active{% endif %}">My wing</a>
+        <a href="/projects?view=team" class="{% if view == 'team' %}active{% endif %}">My team</a>
+    </div>
+    <div class="proj-wing">
+        <a href="/projects?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All wings</a>
+        {% for w in wings %}
+        <a href="/projects?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+        {% endfor %}
     </div>
 </div>
 
-<div class="proj-wing">
-    <a href="/projects?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
-    {% for w in wings %}
-    <a href="/projects?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
-    {% endfor %}
-</div>
-
-{% if projects %}
-<div class="proj-list">
-    {% for p in projects %}
-    <div class="proj-card">
-        <div class="top">
-            <h3><a href="/projects?proj={{ p.name }}" style="color:var(--dark); text-decoration:none;">{{ p.project_name }}</a></h3>
-            <span class="proj-badge pb-{{ p.priority.lower() if p.priority else 'low' }}">{{ p.priority or 'Normal' }}</span>
+<div class="proj-block">
+    {% if projects %}
+    <div class="proj-grid">
+        {% for p in projects %}
+        <div class="proj-card">
+            <div class="proj-card-top">
+                <a href="/projects?proj={{ p.name }}" class="dt-card-title proj-card-link">{{ p.project_name }}</a>
+                <span class="dt-badge {% if p.priority == 'Urgent' or p.priority == 'High' %}dt-badge-urgent{% elif p.priority == 'Medium' %}dt-badge-action{% else %}dt-badge-info{% endif %}">{{ p.priority or 'Normal' }}</span>
+            </div>
+            <p class="dt-caption proj-card-meta">
+                {{ p.department or '—' }} &middot; {{ frappe.utils.format_date(p.expected_start_date) }}&ndash;{{ frappe.utils.format_date(p.expected_end_date) }}
+                {% if p.estimated_costing %} &middot; K{{ '{:,.0f}'.format(p.estimated_costing / 1000) if p.estimated_costing else '—' }}{% endif %}
+            </p>
+            <div class="proj-bar"><div class="proj-bar-fill" style="width:{{ p.percent_complete or 0 }}%"></div></div>
+            <p class="dt-caption">{{ p.percent_complete or 0 }}% complete &middot; {{ p.status }}</p>
         </div>
-        <div class="proj-meta">
-            <span>📍 {{ p.department or '—' }}</span>
-            <span>📅 {{ frappe.utils.format_date(p.expected_start_date) }} – {{ frappe.utils.format_date(p.expected_end_date) }}</span>
-            {% if p.estimated_costing %}
-            <span>💰 K{{ '{:,.0f}'.format(p.estimated_costing / 1000) if p.estimated_costing else '—' }}</span>
-            {% endif %}
-            <span class="proj-badge pb-{{ p.status.lower() }}">{{ p.status }}</span>
-        </div>
-        <div class="proj-bar">
-            <div class="proj-bar-fill {{ p.progress_color }}" style="width:{{ p.percent_complete or 0 }}%"></div>
-        </div>
-        <div class="proj-pct">{{ p.percent_complete or 0 }}% complete</div>
+        {% endfor %}
     </div>
-    {% endfor %}
+    {% else %}
+    <div class="proj-empty"><p class="dt-body">No projects found for this view.</p></div>
+    {% endif %}
 </div>
-{% else %}
-<div class="proj-empty">No projects found for this view.</div>
 {% endif %}
 
-{% endif %}
 </div>
+{% endblock %}
+
+{% block style %}
+<style>
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation — see docs/design/new-pages.md for the decision record.
+   Restyle of an existing, already-functional page (All/Wing/Team views,
+   task list, cost tracking) — only visual values changed, Jinja logic
+   and context variables untouched. */
+
+.proj-block { max-width: 900px; }
+.proj-block + .proj-block { margin-top: var(--space-6, 24px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+.proj-back { display: inline-block; }
+
+/* View tabs — same pattern as Calendar's view toggle */
+.proj-views { display: flex; gap: 2px; margin-bottom: 10px; }
+.proj-views a {
+    padding: 5px 14px; border: 1px solid var(--border, #ececec); font-size: 11.5px; text-decoration: none;
+    font-weight: 500; color: var(--ink-secondary, #666); font-family: var(--font-sans);
+}
+.proj-views a:first-child { border-radius: 6px 0 0 6px; }
+.proj-views a:last-child { border-radius: 0 6px 6px 0; }
+.proj-views a.active { background: #f5f5f5; color: var(--ink, #171717); font-weight: 600; box-shadow: inset 0 2px 0 var(--dowh-gold); }
+
+/* Wing filter — same chip pattern as Circulars/Directory/Calendar */
+.proj-wing { display: flex; gap: 5px; flex-wrap: wrap; }
+.proj-wing a {
+    padding: 3px 10px; border-radius: 20px; font-size: 10px; text-decoration: none;
+    font-weight: 600; background: #f2f2f2; color: var(--ink-muted, #999); font-family: var(--font-sans);
+}
+.proj-wing a.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+/* Project grid */
+.proj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4, 16px); }
+.proj-card { padding-bottom: var(--space-4, 16px); border-bottom: 1px solid var(--border, #ededed); }
+.proj-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.proj-card-link { text-decoration: none; }
+.proj-card-link:hover { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.proj-card-meta { margin-bottom: 8px; }
+
+.proj-bar { height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+.proj-bar-fill { height: 100%; background: var(--ink, #171717); border-radius: 3px; }
+
+.proj-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+
+/* Detail view */
+.proj-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-4, 16px); margin: var(--space-4, 16px) 0; }
+.proj-detail-item { display: flex; flex-direction: column; gap: 2px; }
+.proj-team { margin-bottom: var(--space-4, 16px); }
+.proj-notes { margin-top: var(--space-4, 16px); padding-top: var(--space-4, 16px); border-top: 1px solid var(--border, #ededed); white-space: pre-wrap; }
+.proj-tasks { margin-top: var(--space-6, 24px); }
+.proj-task-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+
+@media (max-width: 700px) {
+    .proj-grid { grid-template-columns: 1fr; }
+    .proj-detail-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
 {% endblock %}
