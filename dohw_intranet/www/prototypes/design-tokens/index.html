@@ -1,0 +1,415 @@
+{% extends "templates/web.html" %}
+{% block title %}Design Tokens & Component Restyle — Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+  :root {
+    --dowh-gold: #FFBF00;
+    --dowh-dark: #1A1A1A;
+  }
+
+  .dt-meta {
+    max-width: 1000px; margin: 0 auto 18px;
+  }
+  .dt-eyebrow {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 11px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 6px;
+  }
+  .dt-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; color: var(--dowh-dark); }
+  .dt-desc { font-size: 13px; color: #666; margin: 0; max-width: 68ch; line-height: 1.55; }
+  .dt-desc a { color: #1a73e8; }
+
+  .variant-frame {
+    max-width: 1000px; margin: 0 auto; background: #fff;
+    border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;
+  }
+  .variant-label-row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid #e0e0e0; background: #fafafa;
+  }
+  .variant-label-row h2 { font-size: 14px; font-weight: 700; margin: 0; color: var(--dowh-dark); }
+  .variant-label-row p { font-size: 12px; color: #777; margin: 3px 0 0; max-width: 62ch; line-height: 1.5; }
+  .variant-key { font-family: ui-monospace, monospace; font-size: 11px; color: #999; white-space: nowrap; }
+
+  .canvas { background: #fff; color: #171717; padding: 28px 32px 34px; }
+  .canvas * { box-sizing: border-box; }
+  .section-label {
+    font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #9a9a9a; margin: 0 0 10px;
+  }
+  .block + .block { margin-top: 30px; }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .swatch { width: 84px; }
+  .swatch-chip { height: 44px; border-radius: 8px; border: 1px solid #e2e2e2; }
+  .swatch-name { font-size: 10px; font-weight: 600; margin-top: 6px; }
+  .swatch-hex { font-family: ui-monospace, monospace; font-size: 9px; color: #8a8a8a; }
+
+  .type-row { display: flex; align-items: baseline; gap: 14px; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
+  .type-row:last-child { border-bottom: none; }
+  .type-tag { font-family: ui-monospace, monospace; font-size: 10px; color: #9a9a9a; width: 150px; flex-shrink: 0; }
+
+  .space-row { display: flex; align-items: flex-end; gap: 10px; }
+  .space-block { background: #ededed; border-radius: 3px; }
+  .space-label { font-family: ui-monospace, monospace; font-size: 9px; color: #9a9a9a; text-align: center; margin-top: 5px; }
+  .space-col { text-align: center; }
+
+  .filter-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    background: #fafafa; border: 1px solid #e6e6e6; border-radius: 8px; padding: 10px 12px;
+  }
+  .filter-bar input, .filter-bar select {
+    font-size: 12.5px; padding: 7px 10px; border: 1px solid #dcdcdc; border-radius: 6px; background: #fff; color: #171717;
+  }
+  .filter-bar input { flex: 1; min-width: 160px; }
+
+  /* VARIANT A: frappe.io literal */
+  [data-v="a"] h1.demo-h { font-size: 20px; font-weight: 600; letter-spacing: -0.1px; margin: 0 0 4px; }
+  [data-v="a"] .btn { font-size: 13.5px; font-weight: 500; }
+  [data-v="a"] .btn-primary {
+    background: none; border: none; padding: 0; color: #171717;
+    text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px;
+    text-underline-offset: 3px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  [data-v="a"] .btn-secondary { background: none; border: none; padding: 0; color: #7c7c7c; cursor: pointer; }
+  [data-v="a"] .card-grid { display: flex; flex-direction: column; }
+  [data-v="a"] .card { padding: 16px 0; border-bottom: 1px solid #ededed; }
+  [data-v="a"] .card:first-child { padding-top: 0; }
+  [data-v="a"] .card:last-child { border-bottom: none; }
+  [data-v="a"] .card-title { font-size: 14.5px; font-weight: 600; margin: 0 0 4px; color: #171717; }
+  [data-v="a"] .card-meta { font-size: 11.5px; color: #999999; margin: 0 0 6px; }
+  [data-v="a"] .card-body { font-size: 13px; color: #525252; line-height: 1.5; margin: 0; }
+  [data-v="a"] .badge {
+    font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+    background: none; border: 1px solid currentColor;
+  }
+  [data-v="a"] .badge-urgent { color: #c0392b; }
+  [data-v="a"] .badge-action { color: #8a6d00; }
+  [data-v="a"] .badge-info { color: #7c7c7c; }
+
+  /* VARIANT B: institutional bridge */
+  [data-v="b"] h1.demo-h { font-size: 19px; font-weight: 700; letter-spacing: 0.2px; margin: 0 0 4px; text-transform: uppercase; }
+  [data-v="b"] .btn { font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 7px; cursor: pointer; }
+  [data-v="b"] .btn-primary { background: var(--dowh-gold); border: 1px solid var(--dowh-gold); color: var(--dowh-dark); }
+  [data-v="b"] .btn-secondary { background: #fff; border: 1px solid var(--dowh-dark); color: var(--dowh-dark); }
+  [data-v="b"] .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  [data-v="b"] .card {
+    background: #fff; border: 1px solid #d8d8d8; border-left: 4px solid var(--dowh-gold);
+    border-radius: 6px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  [data-v="b"] .card-title { font-size: 13.5px; font-weight: 700; margin: 0 0 5px; color: var(--dowh-dark); text-transform: uppercase; }
+  [data-v="b"] .card-meta { font-size: 10.5px; color: #8a8a8a; margin: 0 0 8px; font-weight: 600; }
+  [data-v="b"] .card-body { font-size: 12.5px; color: #555; line-height: 1.5; margin: 0; }
+  [data-v="b"] .badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
+  [data-v="b"] .badge-urgent { background: #cc0000; color: #fff; }
+  [data-v="b"] .badge-action { background: var(--dowh-gold); color: var(--dowh-dark); }
+  [data-v="b"] .badge-info { background: #e8e8e8; color: #555; }
+
+  /* VARIANT C: dark console */
+  [data-v="c"] .canvas { padding: 0; }
+  [data-v="c"] .console-rail {
+    background: var(--dowh-dark); padding: 10px 20px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 2px solid var(--dowh-gold);
+  }
+  [data-v="c"] .console-rail .mark { color: var(--dowh-gold); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  [data-v="c"] .console-rail .dim { color: #8a8a8a; font-size: 11px; margin-left: auto; }
+  [data-v="c"] .console-body { padding: 26px 32px 30px; }
+  [data-v="c"] h1.demo-h { font-size: 19px; font-weight: 600; letter-spacing: -0.1px; margin: 0 0 4px; color: var(--dowh-dark); }
+  [data-v="c"] .btn { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 20px; cursor: pointer; }
+  [data-v="c"] .btn-primary { background: var(--dowh-gold); border: 1px solid var(--dowh-gold); color: var(--dowh-dark); }
+  [data-v="c"] .btn-secondary { background: none; border: 1px solid var(--dowh-dark); color: var(--dowh-dark); }
+  [data-v="c"] .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  [data-v="c"] .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px 16px; }
+  [data-v="c"] .card-title-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  [data-v="c"] .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  [data-v="c"] .card-title { font-size: 13.5px; font-weight: 600; margin: 0; color: var(--dowh-dark); }
+  [data-v="c"] .card-meta { font-size: 10.5px; color: #999; margin: 0 0 7px; }
+  [data-v="c"] .card-body { font-size: 12.5px; color: #555; line-height: 1.5; margin: 0; }
+  [data-v="c"] .badge { font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+  [data-v="c"] .badge-urgent { color: #b02a1c; }
+  [data-v="c"] .badge-urgent .dot { background: #cc0000; }
+  [data-v="c"] .badge-action { color: #8a6d00; }
+  [data-v="c"] .badge-action .dot { background: var(--dowh-gold); }
+  [data-v="c"] .badge-info { color: #6b6b6b; }
+  [data-v="c"] .badge-info .dot { background: #999; }
+
+  .variant { display: none; }
+  .variant.is-active { display: block; }
+
+  .dt-switcher {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    background: var(--dowh-dark); color: #fff; border-radius: 999px; padding: 8px 8px 8px 16px;
+    display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.28);
+    font-size: 12.5px; z-index: 50;
+  }
+  .dt-switcher button {
+    width: 30px; height: 30px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.14); color: inherit; cursor: pointer; font-size: 14px;
+  }
+  .dt-switcher button:hover { background: rgba(255,255,255,.26); }
+  .dt-switcher .label { min-width: 168px; text-align: center; }
+</style>
+
+<div class="proto-banner">
+    <h2>🎨 Design Tokens &amp; Component Restyle</h2>
+    <p>Ticket <a href="https://github.com/Amesi/dohw-intranet/issues/19" style="color:#FFBF00;" target="_blank" rel="noopener">#19</a> — three directions, grounded in frappe.io research (<a href="https://github.com/Amesi/dohw-intranet/issues/15" style="color:#FFBF00;" target="_blank" rel="noopener">#15</a>).</p>
+</div>
+
+<div class="dt-meta">
+  <p class="dt-eyebrow">UI/UX Revamp map &middot; Design tokens &amp; component restyle</p>
+  <h1 class="dt-title">Three directions for restyling DoWH's components in frappe.io's idiom</h1>
+  <p class="dt-desc">
+    Same content, same DoWH Gold/dark/Inter identity, three takes on how far to carry frappe.io's restraint —
+    dense 13&ndash;15px type, a loose 4px spacing scale, flat/near-shadowless surfaces, color held back as a rare accent.
+  </p>
+</div>
+
+<div class="variant-frame">
+
+  <div class="variant" data-v="a">
+    <div class="variant-label-row">
+      <div>
+        <h2>A &mdash; Frappe.io literal</h2>
+        <p>Near-monochrome surfaces, bare text-link actions, chromeless list-style cards, hollow outline badges. Gold appears only as a 2px underline accent.</p>
+      </div>
+      <span class="variant-key">?variant=a</span>
+    </div>
+    <div class="canvas" data-v="a">
+      <div class="block">
+        <h1 class="demo-h">Staff Circulars</h1>
+        <p style="font-size:12.5px;color:#7c7c7c;margin:0 0 14px;">Highways Wing &middot; 3 published this week</p>
+        <div style="display:flex; gap:18px;">
+          <button class="btn btn-primary" type="button">View all circulars &rarr;</button>
+          <button class="btn btn-secondary" type="button">Export list</button>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Classification</p>
+        <div style="display:flex; gap:8px;">
+          <span class="badge badge-urgent">Urgent</span>
+          <span class="badge badge-action">For action</span>
+          <span class="badge badge-info">For information</span>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Circulars</p>
+        <div class="card-grid">
+          <div class="card">
+            <p class="card-title">HW-2026-014 &mdash; Highways Wing road maintenance schedule</p>
+            <p class="card-meta">Highways Wing &middot; 4 Aug 2026 &middot; For action</p>
+            <p class="card-body">Resurfacing works on the Boroko&ndash;Waigani corridor begin 18 Aug; wing staff to coordinate detour signage with Traffic Section.</p>
+          </div>
+          <div class="card">
+            <p class="card-title">CS-2026-009 &mdash; Corporate Services policy update</p>
+            <p class="card-meta">Corporate Services Wing &middot; 2 Aug 2026 &middot; For information</p>
+            <p class="card-body">Revised leave application procedure takes effect 1 Sep; see attached circular for the updated approval chain.</p>
+          </div>
+          <div class="card">
+            <p class="card-title">WK-2026-021 &mdash; Works Wing site safety advisory</p>
+            <p class="card-meta">Works Wing &middot; 30 Jul 2026 &middot; Urgent</p>
+            <p class="card-body">All site supervisors must confirm PPE compliance logs before Friday close of business.</p>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Filter</p>
+        <div class="filter-bar">
+          <input type="text" placeholder="Search circulars&hellip;">
+          <select><option>All wings</option><option>Highways</option><option>Works</option><option>Corporate Services</option></select>
+          <button class="btn btn-secondary" type="button">Apply</button>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Type scale (Inter)</p>
+        <div class="type-row"><span class="type-tag">page-title / 20 / 600</span><span style="font-size:20px;font-weight:600;">DoWH Staff Intranet</span></div>
+        <div class="type-row"><span class="type-tag">card-title / 14.5 / 600</span><span style="font-size:14.5px;font-weight:600;">HW-2026-014</span></div>
+        <div class="type-row"><span class="type-tag">body / 13 / 400</span><span style="font-size:13px;">Resurfacing works begin 18 August.</span></div>
+        <div class="type-row"><span class="type-tag">caption / 11.5 / 400</span><span style="font-size:11.5px;color:#999;">Highways Wing &middot; 4 Aug 2026</span></div>
+      </div>
+      <div class="block">
+        <p class="section-label">Spacing scale (px)</p>
+        <div class="space-row">
+          <div class="space-col"><div class="space-block" style="width:4px;height:4px;"></div><div class="space-label">4</div></div>
+          <div class="space-col"><div class="space-block" style="width:8px;height:8px;"></div><div class="space-label">8</div></div>
+          <div class="space-col"><div class="space-block" style="width:12px;height:12px;"></div><div class="space-label">12</div></div>
+          <div class="space-col"><div class="space-block" style="width:16px;height:16px;"></div><div class="space-label">16</div></div>
+          <div class="space-col"><div class="space-block" style="width:20px;height:20px;"></div><div class="space-label">20</div></div>
+          <div class="space-col"><div class="space-block" style="width:24px;height:24px;"></div><div class="space-label">24</div></div>
+          <div class="space-col"><div class="space-block" style="width:32px;height:32px;"></div><div class="space-label">32</div></div>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Palette</p>
+        <div class="swatch-row">
+          <div class="swatch"><div class="swatch-chip" style="background:#171717;"></div><div class="swatch-name">Ink</div><div class="swatch-hex">#171717</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#525252;"></div><div class="swatch-name">Secondary</div><div class="swatch-hex">#525252</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#999999;"></div><div class="swatch-name">Muted</div><div class="swatch-hex">#999999</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#ededed;"></div><div class="swatch-name">Border</div><div class="swatch-hex">#ededed</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#fff;"></div><div class="swatch-name">Surface</div><div class="swatch-hex">#ffffff</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#FFBF00;"></div><div class="swatch-name">Gold accent</div><div class="swatch-hex">#FFBF00</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="b">
+    <div class="variant-label-row">
+      <div>
+        <h2>B &mdash; Institutional bridge</h2>
+        <p>Keeps more of the current "government bulletin" weight: filled Gold primary buttons, bordered cards with a soft shadow and gold accent stripe, solid classification badges.</p>
+      </div>
+      <span class="variant-key">?variant=b</span>
+    </div>
+    <div class="canvas" data-v="b">
+      <div class="block">
+        <h1 class="demo-h">Staff Circulars</h1>
+        <p style="font-size:12.5px;color:#8a8a8a;margin:0 0 14px; font-weight:600;">HIGHWAYS WING &middot; 3 PUBLISHED THIS WEEK</p>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary" type="button">View all circulars</button>
+          <button class="btn btn-secondary" type="button">Export list</button>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Classification</p>
+        <div style="display:flex; gap:8px;">
+          <span class="badge badge-urgent">Urgent</span>
+          <span class="badge badge-action">For action</span>
+          <span class="badge badge-info">For information</span>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Circulars</p>
+        <div class="card-grid">
+          <div class="card"><p class="card-title">HW-2026-014</p><p class="card-meta">HIGHWAYS WING &middot; 4 AUG 2026</p><p class="card-body">Road maintenance schedule &mdash; resurfacing begins 18 Aug.</p></div>
+          <div class="card"><p class="card-title">CS-2026-009</p><p class="card-meta">CORPORATE SERVICES &middot; 2 AUG 2026</p><p class="card-body">Policy update &mdash; revised leave procedure effective 1 Sep.</p></div>
+          <div class="card"><p class="card-title">WK-2026-021</p><p class="card-meta">WORKS WING &middot; 30 JUL 2026</p><p class="card-body">Site safety advisory &mdash; confirm PPE logs by Friday.</p></div>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Filter</p>
+        <div class="filter-bar">
+          <input type="text" placeholder="Search circulars&hellip;">
+          <select><option>All wings</option><option>Highways</option><option>Works</option><option>Corporate Services</option></select>
+          <button class="btn btn-primary" type="button">Apply</button>
+        </div>
+      </div>
+      <div class="block">
+        <p class="section-label">Palette</p>
+        <div class="swatch-row">
+          <div class="swatch"><div class="swatch-chip" style="background:#1A1A1A;"></div><div class="swatch-name">DoWH Dark</div><div class="swatch-hex">#1A1A1A</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#FFBF00;"></div><div class="swatch-name">DoWH Gold</div><div class="swatch-hex">#FFBF00</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#d8d8d8;"></div><div class="swatch-name">Border</div><div class="swatch-hex">#d8d8d8</div></div>
+          <div class="swatch"><div class="swatch-chip" style="background:#cc0000;"></div><div class="swatch-name">Urgent</div><div class="swatch-hex">#cc0000</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="c">
+    <div class="variant-label-row">
+      <div>
+        <h2>C &mdash; Dark console</h2>
+        <p>Leans into DoWH Dark as the dominant chrome color &mdash; a slim dark rail with the gold hairline, light content canvas, Gold reserved for high-contrast primary actions and status dots.</p>
+      </div>
+      <span class="variant-key">?variant=c</span>
+    </div>
+    <div class="canvas" data-v="c">
+      <div class="console-rail">
+        <span class="mark">DoWH Intranet</span>
+        <span class="dim">Sidebar nav intentionally simplified here &mdash; decided in #20</span>
+      </div>
+      <div class="console-body">
+        <div class="block">
+          <h1 class="demo-h">Staff Circulars</h1>
+          <p style="font-size:12.5px;color:#999;margin:0 0 14px;">Highways Wing &middot; 3 published this week</p>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" type="button">View all circulars</button>
+            <button class="btn btn-secondary" type="button">Export list</button>
+          </div>
+        </div>
+        <div class="block">
+          <p class="section-label">Classification</p>
+          <div style="display:flex; gap:16px;">
+            <span class="badge badge-urgent"><span class="dot"></span>Urgent</span>
+            <span class="badge badge-action"><span class="dot"></span>For action</span>
+            <span class="badge badge-info"><span class="dot"></span>For information</span>
+          </div>
+        </div>
+        <div class="block">
+          <p class="section-label">Circulars</p>
+          <div class="card-grid">
+            <div class="card"><div class="card-title-row"><span class="dot" style="background:#cc0000;"></span><p class="card-title">WK-2026-021</p></div><p class="card-meta">Works Wing &middot; 30 Jul 2026</p><p class="card-body">Site safety advisory &mdash; confirm PPE logs by Friday.</p></div>
+            <div class="card"><div class="card-title-row"><span class="dot" style="background:#FFBF00;"></span><p class="card-title">HW-2026-014</p></div><p class="card-meta">Highways Wing &middot; 4 Aug 2026</p><p class="card-body">Road maintenance schedule &mdash; resurfacing begins 18 Aug.</p></div>
+            <div class="card"><div class="card-title-row"><span class="dot" style="background:#999;"></span><p class="card-title">CS-2026-009</p></div><p class="card-meta">Corporate Services &middot; 2 Aug 2026</p><p class="card-body">Policy update &mdash; revised leave procedure effective 1 Sep.</p></div>
+          </div>
+        </div>
+        <div class="block">
+          <p class="section-label">Filter</p>
+          <div class="filter-bar">
+            <input type="text" placeholder="Search circulars&hellip;">
+            <select><option>All wings</option><option>Highways</option><option>Works</option><option>Corporate Services</option></select>
+            <button class="btn btn-primary" type="button">Apply</button>
+          </div>
+        </div>
+        <div class="block">
+          <p class="section-label">Palette</p>
+          <div class="swatch-row">
+            <div class="swatch"><div class="swatch-chip" style="background:#1A1A1A;"></div><div class="swatch-name">Rail / Dark</div><div class="swatch-hex">#1A1A1A</div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:#FFBF00;"></div><div class="swatch-name">Gold accent</div><div class="swatch-hex">#FFBF00</div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:#e0e0e0;"></div><div class="swatch-name">Card border</div><div class="swatch-hex">#e0e0e0</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+        ← Back to Prototypes
+    </a>
+</div>
+
+<div class="dt-switcher" role="group" aria-label="Variant switcher">
+  <button type="button" id="dtPrev" aria-label="Previous variant">&larr;</button>
+  <span class="label" id="dtLabel"></span>
+  <button type="button" id="dtNext" aria-label="Next variant">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  var variants = [
+    { key: 'a', name: 'Frappe.io literal' },
+    { key: 'b', name: 'Institutional bridge' },
+    { key: 'c', name: 'Dark console' }
+  ];
+  function currentIndex() {
+    var params = new URLSearchParams(location.search);
+    var v = params.get('variant');
+    var idx = variants.findIndex(function (x) { return x.key === v; });
+    return idx === -1 ? 0 : idx;
+  }
+  function render(idx) {
+    idx = ((idx % variants.length) + variants.length) % variants.length;
+    document.querySelectorAll('.variant').forEach(function (el) {
+      el.classList.toggle('is-active', el.getAttribute('data-v') === variants[idx].key);
+    });
+    document.getElementById('dtLabel').textContent = String.fromCharCode(65 + idx) + ' — ' + variants[idx].name;
+    var params = new URLSearchParams(location.search);
+    params.set('variant', variants[idx].key);
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  }
+  var idx = currentIndex();
+  render(idx);
+  document.getElementById('dtPrev').addEventListener('click', function () { idx--; render(idx); });
+  document.getElementById('dtNext').addEventListener('click', function () { idx++; render(idx); });
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+    if (e.key === 'ArrowLeft') { idx--; render(idx); }
+    if (e.key === 'ArrowRight') { idx++; render(idx); }
+  });
+})();
+</script>
+{% endblock %}
