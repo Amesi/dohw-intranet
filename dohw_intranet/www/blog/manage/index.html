@@ -1,0 +1,214 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }} — Blog — DoWH{% endblock %}
+
+{% block page_content %}
+<div class="mng-page">
+
+{% if view == "dashboard" %}
+
+<div class="mng-block">
+    <p class="dt-caption"><a href="/blog">&larr; Back to Blog</a></p>
+    <h1 class="dt-page-title">Blog</h1>
+    <p class="dt-caption">Blog Author workspace</p>
+</div>
+
+<div class="mng-block">
+    <a href="/blog/manage?compose=new" class="dt-btn-primary">+ New post</a>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">My drafts</p>
+    <div class="dt-card-list">
+        {% for d in drafts %}
+        <a href="/blog/manage?compose={{ d.route }}" class="dt-card mng-row">
+            <span class="dt-card-title">{{ d.title }}</span>
+            <span class="dt-caption">Updated {{ frappe.utils.pretty_date(d.modified) }}</span>
+        </a>
+        {% endfor %}
+        {% if not drafts %}<div class="mng-empty"><p class="dt-body">No drafts.</p></div>{% endif %}
+    </div>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">Pending review <span class="mng-count">{{ pending_review | length }}</span></p>
+    <div class="dt-card-list">
+        {% for p in pending_review %}
+        <a href="/blog/manage?review={{ p.route }}" class="dt-card mng-row">
+            <span class="dt-card-title">{{ p.title }}</span>
+            <span class="dt-caption">By {{ p.author_name }} &middot; submitted {{ frappe.utils.pretty_date(p.modified) }}</span>
+        </a>
+        {% endfor %}
+        {% if not pending_review %}<div class="mng-empty"><p class="dt-body">Nothing waiting on you.</p></div>{% endif %}
+    </div>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">Published</p>
+    <div class="dt-card-list">
+        {% for p in published %}
+        <a href="/blog/{{ p.route }}" class="dt-card mng-row">
+            <span class="dt-card-title">{{ p.title }}</span>
+            <span class="dt-caption">{{ frappe.utils.format_date(p.published_date) }}</span>
+        </a>
+        {% endfor %}
+        {% if not published %}<div class="mng-empty"><p class="dt-body">Nothing published yet.</p></div>{% endif %}
+    </div>
+</div>
+
+{% elif view == "compose" %}
+
+<div class="mng-block">
+    <p class="dt-caption cmp-crumb"><a href="/blog/manage">&larr; Back to Blog manage</a></p>
+    <h1 class="dt-page-title">{{ title }}</h1>
+</div>
+
+<div class="mng-block">
+    <form method="POST" action="/blog/manage" class="cmp-form" id="composeForm">
+        {% if post %}<input type="hidden" name="post_route" value="{{ post.route }}">{% endif %}
+
+        <div class="cmp-row">
+            <label class="dt-caption">Title</label>
+            <input type="text" name="post_title" required class="dt-input" value="{{ post.title if post else '' }}" placeholder="Post title">
+        </div>
+
+        <div class="cmp-row">
+            <label class="dt-caption">Category</label>
+            <select name="post_category" class="dt-select" required>
+                {% for c in categories %}
+                <option value="{{ c }}" {% if post and post.category == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="cmp-row">
+            <label class="dt-caption">Excerpt</label>
+            <textarea name="post_excerpt" class="dt-textarea" placeholder="One or two sentences for the listing card">{{ post.excerpt if post else '' }}</textarea>
+        </div>
+
+        <div class="cmp-row">
+            <label class="dt-caption">Content</label>
+            <div class="cmp-editor">
+                <div class="cmp-toolbar">
+                    <button type="button" class="cmp-tb" data-cmd="bold"><b>B</b></button>
+                    <button type="button" class="cmp-tb" data-cmd="italic"><i>I</i></button>
+                    <button type="button" class="cmp-tb" data-cmd="underline"><u>U</u></button>
+                    <span class="cmp-tb-sep"></span>
+                    <button type="button" class="cmp-tb" data-cmd="createlink">&#128279;</button>
+                    <button type="button" class="cmp-tb" data-cmd="insertUnorderedList">&bull;&mdash;</button>
+                    <button type="button" class="cmp-tb" data-cmd="insertOrderedList">1.</button>
+                    <span class="cmp-tb-sep"></span>
+                    <button type="button" class="cmp-tb" data-cmd="formatBlock" data-arg="blockquote">&ldquo;&rdquo;</button>
+                </div>
+                <div class="cmp-editor-body" id="editorBody" contenteditable="true" data-placeholder="Post content">{{ post.content | safe if post else '' }}</div>
+            </div>
+            <textarea name="post_content" id="editorSource" class="cmp-hidden-source" required></textarea>
+        </div>
+
+        <div class="mng-form-actions">
+            <button type="submit" name="save_draft" value="1" class="dt-btn-secondary">Save draft</button>
+            <button type="submit" name="save_draft" value="1" class="dt-btn-primary" onclick="document.getElementById('submitAfter').value='1'">Save &amp; submit for review &rarr;</button>
+            <input type="hidden" name="submit_after_save" id="submitAfter" value="">
+        </div>
+    </form>
+</div>
+
+{% elif view == "review" %}
+
+<div class="mng-block">
+    <p class="dt-caption"><a href="/blog/manage">&larr; Back to Blog manage</a></p>
+    <h1 class="dt-page-title">{{ post.title }}</h1>
+    <p class="dt-caption">By {{ post_author_name }} &middot; submitted {{ frappe.utils.pretty_date(post.modified) }}</p>
+</div>
+
+<div class="mng-block mng-review-body dt-body">
+    {{ post.content | safe }}
+</div>
+
+<div class="mng-block">
+    <form method="POST" action="/blog/manage" class="mng-review-actions">
+        <input type="hidden" name="post_route" value="{{ post.route }}">
+        <button type="submit" name="do_approve" value="1" class="dt-btn-primary">Approve &amp; publish</button>
+        <button type="button" class="dt-btn-secondary mng-reject-toggle" id="rejectToggle">Reject</button>
+    </form>
+    <form method="POST" action="/blog/manage" class="mng-reject-form" id="rejectForm" hidden>
+        <input type="hidden" name="post_route" value="{{ post.route }}">
+        <textarea name="reject_reason" class="dt-textarea" placeholder="Reason — sent back to the author as feedback" required></textarea>
+        <button type="submit" name="do_reject" value="1" class="dt-btn-secondary">Send back to Draft</button>
+    </form>
+</div>
+
+{% endif %}
+
+</div>
+
+<script>
+(function () {
+    var body = document.getElementById('editorBody');
+    var source = document.getElementById('editorSource');
+    var form = document.getElementById('composeForm');
+    if (body) {
+        document.querySelectorAll('.cmp-tb').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                body.focus();
+                document.execCommand(btn.dataset.cmd, false, btn.dataset.arg || null);
+            });
+        });
+        form.addEventListener('submit', function () { source.value = body.innerHTML; });
+    }
+    var rejectToggle = document.getElementById('rejectToggle');
+    if (rejectToggle) {
+        rejectToggle.addEventListener('click', function () {
+            var f = document.getElementById('rejectForm');
+            f.hidden = !f.hidden;
+        });
+    }
+})();
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+.mng-page { max-width: 640px; }
+.mng-block { }
+.mng-block + .mng-block { margin-top: var(--space-6, 24px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+.mng-count { color: var(--dowh-dark, #171717); background: var(--dowh-gold); border-radius: 10px; padding: 0 6px; font-size: 10px; margin-left: 4px; }
+
+.mng-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; color: inherit; }
+.mng-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.mng-empty { padding: 24px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+.mng-empty p { margin: 0; }
+
+.cmp-crumb a { color: var(--ink-muted, #7c7c7c); text-decoration: none; }
+.cmp-form { display: flex; flex-direction: column; gap: 14px; }
+.cmp-row { display: flex; flex-direction: column; gap: 4px; }
+.cmp-editor { border: 1px solid #dcdcdc; border-radius: 6px; overflow: hidden; }
+.cmp-toolbar { display: flex; gap: 2px; padding: 5px 6px; background: #fafafa; border-bottom: 1px solid var(--border, #ededed); }
+.cmp-tb {
+    width: 26px; height: 26px; border: none; background: none; border-radius: 4px;
+    color: var(--ink-secondary, #666); font-size: 12px; cursor: pointer; font-family: var(--font-sans);
+}
+.cmp-tb:hover { background: #eee; color: var(--ink, #171717); }
+.cmp-tb-sep { width: 1px; background: #e0e0e0; margin: 3px 4px; }
+.cmp-editor-body {
+    min-height: 200px; padding: 10px 12px; font-family: var(--font-sans); font-size: 13px;
+    color: var(--ink-secondary, #444); line-height: 1.6; outline: none;
+}
+.cmp-editor-body:empty:before { content: attr(data-placeholder); color: var(--ink-muted, #bbb); }
+.cmp-editor-body blockquote { margin: 0; padding-left: 12px; border-left: 2px solid var(--border, #ddd); color: var(--ink-muted, #777); }
+.cmp-hidden-source { display: none; }
+
+.mng-form-actions { display: flex; gap: 12px; align-items: center; }
+
+.mng-review-body { line-height: 1.7; padding-top: var(--space-4, 16px); border-top: 1px solid var(--border, #ededed); }
+.mng-review-actions { display: flex; gap: 14px; align-items: center; }
+.mng-review-actions button.dt-btn-secondary { background: none; border: none; font: inherit; padding: 0; cursor: pointer; }
+.mng-reject-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border, #ededed); }
+.mng-reject-form textarea { min-height: 60px; }
+</style>
+{% endblock %}
