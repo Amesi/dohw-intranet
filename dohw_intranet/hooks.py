@@ -36,6 +36,12 @@ page_renderer = ["dohw_intranet.wiki_document_renderer.WikiDocumentRenderer"]
 
 # Fixtures — schema additions this app depends on, reproducible on any site
 # via `bench migrate` rather than living only as a manual DB change.
+# One fixture entry per doctype file: `bench export-fixtures` writes one
+# output file per (doctype, filter) pair to a name derived from the doctype
+# alone, so two separate "Custom Field" entries clobber each other rather
+# than merging — hence a single filter here scoped by fieldname (specific
+# enough not to collide with unrelated custom fields, e.g. HRMS's own
+# Employee fields) rather than by dt.
 fixtures = [
-    {"doctype": "Custom Field", "filters": [["dt", "=", "Event"]]},
+    {"doctype": "Custom Field", "filters": [["fieldname", "in", ["wing", "content_manager", "blog_author"]]]},
 ]
