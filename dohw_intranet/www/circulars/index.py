@@ -1,4 +1,9 @@
-"""DoWH Circulars listing + detail page — /circulars"""
+"""DoWH Circulars listing — /circulars
+
+Detail view is inline (a <details> expand per row in the template, no
+separate route) per docs/design/circulars.md — the old ?name= driven
+detail page has been retired.
+"""
 
 import frappe
 
@@ -29,16 +34,7 @@ def get_context(context):
         circular.insert(ignore_permissions=True)
         context.posted = True
 
-    # Detail view — specific circular by name
-    circular_name = frappe.form_dict.get("name")
-    context.debug_name = circular_name  # DEBUG
-    if circular_name:
-        context.circular = frappe.get_doc("Announcement", circular_name)
-        context.title = context.circular.title
-        return context
-
-    # Listing view
-    context.title = "Staff Circulars & Announcements"
+    context.title = "Staff Circulars"
 
     wing_filter = frappe.form_dict.get("wing")
     class_filter = frappe.form_dict.get("classification")
@@ -79,5 +75,11 @@ def get_context(context):
             for t in a.tags.split(","):
                 tag_set.add(t.strip().lower())
     context.all_tags = sorted(tag_set)
+
+    context.stats = {
+        "total": frappe.db.count("Announcement", {"published": 1}),
+        "urgent": frappe.db.count("Announcement", {"published": 1, "classification": "Urgent"}),
+        "action": frappe.db.count("Announcement", {"published": 1, "classification": "For Action"}),
+    }
 
     return context
