@@ -1,0 +1,216 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Blog — Prototype{% endblock %}
+
+{% block page_content %}
+<div class="proto-meta">
+    <p class="dt-caption proto-eyebrow">Prototype — issue #45</p>
+    <h1 class="dt-page-title">Blog listing — 3 variants</h1>
+    <p class="dt-caption proto-desc">
+        Mock data, no live doctype yet. Proposed nav placement: a new "Blog" sidebar item,
+        between Documents and Links &amp; Forms. Article view: <a href="/prototypes/blog/post?variant={{ variant }}">/prototypes/blog/post</a>.
+        Compose/manage area: <a href="/prototypes/blog/manage">/prototypes/blog/manage</a>.
+    </p>
+</div>
+
+<div class="proto-canvas" data-v="{{ variant }}">
+
+    <div class="blog-header">
+        <h2 class="dt-page-title">Blog</h2>
+        <p class="dt-caption">Stories from around the department</p>
+    </div>
+
+    <div class="blog-filter-row">
+        <a href="?variant={{ variant }}" class="blog-cat-chip active">All</a>
+        <a href="?variant={{ variant }}&cat=Project+Updates" class="blog-cat-chip">Project Updates</a>
+        <a href="?variant={{ variant }}&cat=Staff+Spotlight" class="blog-cat-chip">Staff Spotlight</a>
+        <a href="?variant={{ variant }}&cat=Department+News" class="blog-cat-chip">Department News</a>
+        <a href="?variant={{ variant }}&cat=ICT+%26+Systems" class="blog-cat-chip">ICT &amp; Systems</a>
+    </div>
+
+    {% if variant == 'c' %}
+    <a href="/prototypes/blog/post?variant=c" class="blog-featured">
+        {% set p = posts[0] %}
+        <div class="blog-featured-media"><span class="blog-img-ph">{{ p.title[0] }}</span></div>
+        <div class="blog-featured-body">
+            <span class="blog-cat-label">{{ p.category }}</span>
+            <h3 class="blog-featured-title">{{ p.title }}</h3>
+            <p class="dt-body blog-featured-excerpt">{{ p.excerpt }}</p>
+            <p class="dt-caption">By {{ p.author }} &middot; {{ p.date }}</p>
+        </div>
+    </a>
+    <p class="dash-section-label blog-rest-label">More posts</p>
+    {% endif %}
+
+    {% if variant == 'b' %}
+    <div class="blog-grid">
+        {% for p in posts %}
+        {% if not (variant == 'c' and loop.first) %}
+        <a href="/prototypes/blog/post?variant=b" class="blog-card">
+            {% if p.image %}
+            <div class="blog-card-media"><span class="blog-img-ph">{{ p.title[0] }}</span></div>
+            {% else %}
+            <div class="blog-card-media blog-card-media-empty"></div>
+            {% endif %}
+            <div class="blog-card-body">
+                <span class="dt-badge dt-badge-info">{{ p.category }}</span>
+                <h3 class="dt-card-title blog-card-title">{{ p.title }}</h3>
+                <p class="dt-caption blog-card-excerpt">{{ p.excerpt }}</p>
+                <div class="blog-card-byline">
+                    <span class="blog-avatar">{{ p.author.split()[0][0] }}{{ p.author.split()[-1][0] }}</span>
+                    <span class="dt-caption">{{ p.author }} &middot; {{ p.date }}</span>
+                </div>
+            </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="dt-card-list blog-list">
+        {% for p in posts %}
+        {% if not (variant == 'c' and loop.first) %}
+        <a href="/prototypes/blog/post?variant={{ variant }}" class="dt-card blog-row">
+            {% if variant == 'a' and p.image %}
+            <div class="blog-row-thumb"><span class="blog-img-ph blog-img-ph-sm">{{ p.title[0] }}</span></div>
+            {% endif %}
+            <div class="blog-row-body">
+                <span class="dt-card-title">{{ p.title }}</span>
+                <p class="dt-caption blog-row-excerpt">{{ p.excerpt }}</p>
+                <p class="dt-caption blog-row-meta">In {{ p.category }} by {{ p.author }} &middot; {{ p.date }}</p>
+            </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<div class="proto-switcher" id="proto-switcher">
+    <a href="#" class="proto-sw-arrow" id="proto-sw-prev">&larr;</a>
+    <span class="proto-sw-label" id="proto-sw-label"></span>
+    <a href="#" class="proto-sw-arrow" id="proto-sw-next">&rarr;</a>
+</div>
+
+<script>
+(function () {
+    var variants = [
+        {key: 'a', name: 'Reading List — frappe.io literal'},
+        {key: 'b', name: 'Card Grid'},
+        {key: 'c', name: 'Featured + List'}
+    ];
+    var current = {{ variant | tojson }};
+    var idx = variants.findIndex(function (v) { return v.key === current; });
+    if (idx < 0) idx = 0;
+
+    function label() {
+        document.getElementById('proto-sw-label').textContent =
+            variants[idx].key.toUpperCase() + ' — ' + variants[idx].name;
+    }
+    function go(newIdx) {
+        var params = new URLSearchParams(window.location.search);
+        params.set('variant', variants[newIdx].key);
+        window.location.search = params.toString();
+    }
+    label();
+    document.getElementById('proto-sw-prev').addEventListener('click', function (e) {
+        e.preventDefault();
+        go((idx - 1 + variants.length) % variants.length);
+    });
+    document.getElementById('proto-sw-next').addEventListener('click', function (e) {
+        e.preventDefault();
+        go((idx + 1) % variants.length);
+    });
+    document.addEventListener('keydown', function (e) {
+        var el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+        if (e.key === 'ArrowLeft') go((idx - 1 + variants.length) % variants.length);
+        if (e.key === 'ArrowRight') go((idx + 1) % variants.length);
+    });
+})();
+</script>
+
+{% endblock %}
+
+{% block style %}
+<style>
+.proto-meta { max-width: 640px; margin-bottom: var(--space-6, 24px); }
+.proto-eyebrow { font-family: ui-monospace, monospace; }
+.proto-desc { max-width: 60ch; margin-top: 4px; }
+.proto-desc a { color: var(--ink-secondary, #666); }
+
+.proto-canvas { max-width: 900px; border-top: 1px solid var(--border, #ededed); padding-top: var(--space-6, 24px); }
+
+.blog-header { margin-bottom: var(--space-4, 16px); }
+.blog-filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--space-5, 20px); }
+.blog-cat-chip {
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; text-decoration: none;
+    font-weight: 600; background: #f2f2f2; color: var(--ink-muted, #999); font-family: var(--font-sans);
+}
+.blog-cat-chip.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+.blog-img-ph {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    background: #ededed; color: #b5b5b5; font-family: var(--font-sans); font-weight: 700; font-size: 22px;
+}
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+/* ---- Variant A: dense single-column reading list (frappe.io literal) ---- */
+[data-v="a"] .blog-list { max-width: 640px; }
+[data-v="a"] .blog-row { display: flex; gap: 14px; align-items: flex-start; text-decoration: none; color: inherit; }
+[data-v="a"] .blog-row-thumb { width: 92px; height: 52px; border-radius: 8px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border, #ededed); }
+[data-v="a"] .blog-img-ph-sm { font-size: 16px; }
+[data-v="a"] .blog-row-body { flex: 1; min-width: 0; }
+[data-v="a"] .blog-row-excerpt { margin: 4px 0; }
+[data-v="a"] .blog-row-meta { color: var(--ink-muted, #9a9a9a); }
+[data-v="a"] .blog-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* ---- Variant B: 2-col card grid ---- */
+[data-v="b"] .blog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5, 20px); }
+[data-v="b"] .blog-card { text-decoration: none; color: inherit; padding-bottom: var(--space-4, 16px); border-bottom: 1px solid var(--border, #ededed); }
+[data-v="b"] .blog-card-media { height: 140px; border-radius: 8px; overflow: hidden; margin-bottom: var(--space-3, 12px); border: 1px solid var(--border, #ededed); }
+[data-v="b"] .blog-card-media-empty { background: #f5f5f5; }
+[data-v="b"] .blog-card-title { display: block; margin: 8px 0 4px; }
+[data-v="b"] .blog-card:hover .blog-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+[data-v="b"] .blog-card-excerpt { margin: 0 0 10px; }
+[data-v="b"] .blog-card-byline { display: flex; align-items: center; gap: 8px; }
+[data-v="b"] .blog-avatar {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--dowh-dark, #1a1a1a); color: var(--dowh-gold);
+    display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; font-family: var(--font-sans); flex-shrink: 0;
+}
+@media (max-width: 700px) { [data-v="b"] .blog-grid { grid-template-columns: 1fr; } }
+
+/* ---- Variant C: featured post + list ---- */
+[data-v="c"] .blog-featured {
+    display: flex; gap: var(--space-5, 20px); text-decoration: none; color: inherit;
+    padding-bottom: var(--space-5, 20px); margin-bottom: var(--space-5, 20px); border-bottom: 1px solid var(--border, #ededed);
+}
+[data-v="c"] .blog-featured-media { width: 240px; height: 150px; border-radius: 10px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border, #ededed); }
+[data-v="c"] .blog-cat-label { font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #8a6d00; }
+[data-v="c"] .blog-featured-title { font-size: 20px; margin: 6px 0 8px; }
+[data-v="c"] .blog-featured:hover .blog-featured-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+[data-v="c"] .blog-featured-excerpt { max-width: 56ch; margin: 0 0 8px; }
+[data-v="c"] .blog-rest-label { margin-bottom: var(--space-3, 10px); }
+[data-v="c"] .blog-list { max-width: 100%; }
+[data-v="c"] .blog-row { display: block; text-decoration: none; color: inherit; }
+[data-v="c"] .blog-row-excerpt { margin: 4px 0; }
+[data-v="c"] .blog-row-meta { color: var(--ink-muted, #9a9a9a); }
+[data-v="c"] .blog-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+@media (max-width: 700px) { [data-v="c"] .blog-featured { flex-direction: column; } [data-v="c"] .blog-featured-media { width: 100%; height: 180px; } }
+
+/* ---- Floating variant switcher (prototype chrome, not part of the design) ---- */
+.proto-switcher {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px; background: #171717; color: #fff;
+    padding: 9px 16px; border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    font-family: var(--font-sans); font-size: 12.5px; z-index: 999;
+}
+.proto-sw-arrow { color: #fff; text-decoration: none; font-weight: 700; padding: 2px 6px; }
+.proto-sw-arrow:hover { color: var(--dowh-gold); }
+.proto-sw-label { font-weight: 600; white-space: nowrap; }
+</style>
+{% endblock %}

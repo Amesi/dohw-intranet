@@ -1,0 +1,104 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ post.title }} — Prototype{% endblock %}
+
+{% block page_content %}
+<div class="proto-meta">
+    <p class="dt-caption proto-eyebrow">Prototype — issue #45 — article view, variant {{ variant | upper }}</p>
+    <p class="dt-caption"><a href="/prototypes/blog?variant={{ variant }}">&larr; Back to listing</a></p>
+</div>
+
+<article class="blog-article" data-v="{{ variant }}">
+    {% if variant == 'b' %}
+    <div class="blog-article-hero"><span class="blog-img-ph">{{ post.title[0] }}</span></div>
+    {% endif %}
+
+    <div class="blog-article-head">
+        <span class="blog-cat-label">{{ post.category }}</span>
+        <h1 class="blog-article-title">{{ post.title }}</h1>
+        <p class="dt-body blog-article-dek">{{ post.excerpt }}</p>
+        <div class="blog-article-byline">
+            <span class="blog-avatar">{{ post.author.split()[0][0] }}{{ post.author.split()[-1][0] }}</span>
+            <span class="dt-caption">By <a href="/directory">{{ post.author }}</a> &middot; {{ post.date }} &middot; {{ post.read_time }}</span>
+        </div>
+    </div>
+
+    <div class="blog-article-body dt-body">
+        {{ post.content | safe }}
+    </div>
+</article>
+
+<div class="proto-switcher" id="proto-switcher">
+    <a href="#" class="proto-sw-arrow" id="proto-sw-prev">&larr;</a>
+    <span class="proto-sw-label" id="proto-sw-label"></span>
+    <a href="#" class="proto-sw-arrow" id="proto-sw-next">&rarr;</a>
+</div>
+
+<script>
+(function () {
+    var variants = [
+        {key: 'a', name: 'Reading List — frappe.io literal'},
+        {key: 'b', name: 'Card Grid'},
+        {key: 'c', name: 'Featured + List'}
+    ];
+    var current = {{ variant | tojson }};
+    var idx = variants.findIndex(function (v) { return v.key === current; });
+    if (idx < 0) idx = 0;
+    function label() {
+        document.getElementById('proto-sw-label').textContent =
+            variants[idx].key.toUpperCase() + ' — ' + variants[idx].name;
+    }
+    function go(newIdx) {
+        window.location.search = 'variant=' + variants[newIdx].key;
+    }
+    label();
+    document.getElementById('proto-sw-prev').addEventListener('click', function (e) { e.preventDefault(); go((idx - 1 + variants.length) % variants.length); });
+    document.getElementById('proto-sw-next').addEventListener('click', function (e) { e.preventDefault(); go((idx + 1) % variants.length); });
+    document.addEventListener('keydown', function (e) {
+        var el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+        if (e.key === 'ArrowLeft') go((idx - 1 + variants.length) % variants.length);
+        if (e.key === 'ArrowRight') go((idx + 1) % variants.length);
+    });
+})();
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+.proto-meta { max-width: 640px; margin-bottom: var(--space-6, 24px); }
+.proto-eyebrow { font-family: ui-monospace, monospace; }
+
+.blog-img-ph {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    background: #ededed; color: #b5b5b5; font-family: var(--font-sans); font-weight: 700; font-size: 22px;
+}
+.blog-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--dowh-dark, #1a1a1a); color: var(--dowh-gold);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--font-sans); vertical-align: middle;
+}
+.blog-cat-label { font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #8a6d00; }
+
+.blog-article { max-width: 640px; margin: 0 auto; border-top: 1px solid var(--border, #ededed); padding-top: var(--space-6, 24px); }
+.blog-article-hero { max-width: 100%; height: 280px; border-radius: 10px; overflow: hidden; margin-bottom: var(--space-6, 24px); border: 1px solid var(--border, #ededed); }
+.blog-article-head { text-align: center; margin-bottom: var(--space-6, 24px); }
+.blog-article-title { font-size: 28px; font-weight: 600; line-height: 1.25; margin: 8px 0 10px; font-family: var(--font-sans); color: var(--ink, #171717); }
+.blog-article-dek { font-size: 15.5px; color: var(--ink-secondary, #666); max-width: 52ch; margin: 0 auto 14px; }
+.blog-article-byline { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.blog-article-byline a { color: inherit; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 2px; }
+
+.blog-article-body { line-height: 1.7; }
+.blog-article-body h2 { font-family: var(--font-sans); font-size: 18px; color: var(--ink, #171717); margin: var(--space-6, 24px) 0 var(--space-2, 8px); }
+.blog-article-body p { margin: 0 0 var(--space-4, 16px); }
+
+.proto-switcher {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px; background: #171717; color: #fff;
+    padding: 9px 16px; border-radius: 999px; box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    font-family: var(--font-sans); font-size: 12.5px; z-index: 999;
+}
+.proto-sw-arrow { color: #fff; text-decoration: none; font-weight: 700; padding: 2px 6px; }
+.proto-sw-arrow:hover { color: var(--dowh-gold); }
+.proto-sw-label { font-weight: 600; white-space: nowrap; }
+</style>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Blog — Manage — Prototype{% endblock %}
+
+{% block page_content %}
+<div class="proto-meta">
+    <p class="dt-caption proto-eyebrow">Prototype — issue #45 — compose/manage area (not variant-switched)</p>
+    <p class="dt-caption"><a href="/prototypes/blog">&larr; Back to listing prototype</a></p>
+</div>
+
+<div class="mng-block">
+    <h1 class="dt-page-title">Blog</h1>
+    <p class="dt-caption">Blog Author workspace</p>
+</div>
+
+<div class="mng-block">
+    <a href="#" class="dt-btn-primary">+ New post</a>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">My drafts</p>
+    <div class="dt-card-list">
+        {% for d in drafts %}
+        <div class="dt-card mng-row">
+            <span class="dt-card-title">{{ d.title }}</span>
+            <span class="mng-row-actions">
+                <span class="dt-caption">Updated {{ d.updated }}</span>
+                <a href="#" class="dt-btn-secondary">Submit for review</a>
+            </span>
+        </div>
+        {% endfor %}
+        {% if not drafts %}
+        <div class="mng-empty"><p class="dt-body">No drafts.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">Pending review <span class="mng-count">{{ pending_review | length }}</span></p>
+    <div class="dt-card-list">
+        {% for p in pending_review %}
+        <div class="dt-card mng-review-row">
+            <div class="mng-review-top">
+                <span class="dt-card-title">{{ p.title }}</span>
+                <span class="dt-caption">By {{ p.author }} &middot; submitted {{ p.submitted }}</span>
+            </div>
+            <div class="mng-review-actions">
+                <a href="#" class="dt-btn-primary">Approve &amp; publish</a>
+                <button type="button" class="dt-btn-secondary mng-reject-toggle" data-target="reject-{{ loop.index }}">Reject</button>
+            </div>
+            <div class="mng-reject-form" id="reject-{{ loop.index }}" hidden>
+                <textarea class="dt-textarea" placeholder="Reason — sent back to the author as feedback"></textarea>
+                <a href="#" class="dt-btn-secondary">Send back to Draft</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not pending_review %}
+        <div class="mng-empty"><p class="dt-body">Nothing waiting on you.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mng-block">
+    <p class="dash-section-label">Published</p>
+    <div class="dt-card-list">
+        {% for p in published %}
+        <div class="dt-card mng-row">
+            <span class="dt-card-title">{{ p.title }}</span>
+            <span class="dt-caption">{{ p.date }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.mng-reject-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var target = document.getElementById(btn.dataset.target);
+        target.hidden = !target.hidden;
+    });
+});
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+.proto-meta { max-width: 640px; margin-bottom: var(--space-6, 24px); }
+.proto-eyebrow { font-family: ui-monospace, monospace; }
+
+.mng-block { max-width: 640px; }
+.mng-block + .mng-block { margin-top: var(--space-6, 24px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+.mng-count { color: var(--dowh-dark, #171717); background: var(--dowh-gold); border-radius: 10px; padding: 0 6px; font-size: 10px; margin-left: 4px; }
+
+.mng-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mng-row-actions { display: flex; align-items: center; gap: 12px; }
+
+.mng-review-row { display: flex; flex-direction: column; gap: 10px; }
+.mng-review-top { display: flex; flex-direction: column; gap: 2px; }
+.mng-review-actions { display: flex; gap: 14px; align-items: center; }
+.mng-review-actions button { background: none; border: none; font: inherit; padding: 0; cursor: pointer; }
+
+.mng-reject-form { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--border, #ededed); }
+.mng-reject-form textarea { min-height: 60px; }
+
+.mng-empty { padding: 24px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+.mng-empty p { margin: 0; }
+</style>
+{% endblock %}
