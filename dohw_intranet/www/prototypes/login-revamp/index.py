@@ -1,0 +1,8 @@
+"""Placeholder controller for prototype pages."""
+
+import frappe
+
+def get_context(context):
+    context.no_cache = 1
+    context.show_sidebar = 0
+    return context

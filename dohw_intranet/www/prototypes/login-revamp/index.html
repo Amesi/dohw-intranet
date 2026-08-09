@@ -1,0 +1,155 @@
+{% extends "templates/web.html" %}
+{% block title %}Login — Layout Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+  :root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+  .lg-meta { max-width: 1000px; margin: 0 auto 14px; }
+  .lg-eyebrow { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 6px; }
+  .lg-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; color: var(--dowh-dark); }
+  .lg-desc { font-size: 13px; color: #666; margin: 0 0 12px; max-width: 70ch; line-height: 1.55; }
+
+  .variant-frame { max-width: 1000px; margin: 0 auto; background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+  .variant-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }
+  .variant-label-row h2 { font-size: 14px; font-weight: 700; margin: 0; color: var(--dowh-dark); }
+  .variant-label-row p { font-size: 12px; color: #777; margin: 3px 0 0; max-width: 64ch; line-height: 1.5; }
+  .variant-key { font-family: ui-monospace, monospace; font-size: 11px; color: #999; white-space: nowrap; }
+
+  .frame { position: relative; height: 560px; background: #fff; color: #171717; overflow: hidden; }
+  .frame * { box-sizing: border-box; }
+
+  .form-box { display: flex; flex-direction: column; gap: 12px; width: 280px; }
+  .form-row label { display: block; font-size: 11.5px; color: #666; margin-bottom: 4px; }
+  .form-row input { width: 100%; font-size: 13px; padding: 9px 11px; border: 1px solid #dcdcdc; border-radius: 6px; }
+  .btn-primary { background: none; border: none; padding: 0; color: #171717; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; font-size: 13.5px; font-weight: 600; text-align: left; margin-top: 4px; }
+  .fine { font-size: 11px; color: #999; margin-top: 6px; }
+  .fine a { color: #7c7c7c; text-decoration: underline; }
+
+  .layout-a { display: flex; align-items: center; justify-content: center; height: 100%; }
+  .a-card { text-align: center; }
+  .a-mark { width: 44px; height: 44px; border-radius: 10px; background: var(--dowh-dark); color: var(--dowh-gold); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .a-title { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+  .a-sub { font-size: 11.5px; color: #999; margin: 0 0 24px; }
+  .a-card .form-box { text-align: left; margin: 0 auto; }
+
+  .layout-b { display: flex; height: 100%; }
+  .b-panel { width: 38%; background: var(--dowh-dark); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: 0 40px; border-right: 3px solid var(--dowh-gold); }
+  .b-mark { width: 40px; height: 40px; border-radius: 9px; background: var(--dowh-gold); color: var(--dowh-dark); font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+  .b-panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px; line-height: 1.4; }
+  .b-panel p { font-size: 11.5px; color: #aaa; line-height: 1.6; margin: 0; }
+  .b-form-col { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+  .layout-c { height: 100%; display: flex; flex-direction: column; align-items: center; }
+  .c-masthead { width: 100%; text-align: center; padding: 26px 0 18px; border-bottom: 3px solid var(--dowh-gold); }
+  .c-mark { width: 44px; height: 44px; border-radius: 50%; background: var(--dowh-dark); color: var(--dowh-gold); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+  .c-masthead h1 { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin: 0; color: var(--dowh-dark); }
+  .c-masthead h2 { font-size: 11px; font-weight: 600; letter-spacing: 1px; margin: 3px 0 0; color: #8a6d00; }
+  .c-card { margin-top: 36px; border: 1px solid #e2e2e2; border-radius: 8px; padding: 26px 30px; }
+
+  .variant { display: none; }
+  .variant.is-active { display: block; }
+
+  .lg-switcher { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--dowh-dark); color: #fff; border-radius: 999px; padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: 12.5px; z-index: 50; }
+  .lg-switcher button { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,.14); color: inherit; cursor: pointer; font-size: 14px; }
+  .lg-switcher button:hover { background: rgba(255,255,255,.26); }
+  .lg-switcher .label { min-width: 190px; text-align: center; }
+</style>
+
+<div class="proto-banner"><h2>🔐 Login — Layout Prototype</h2><p>Ticket <a href="https://github.com/Amesi/dohw-intranet/issues/26" style="color:#FFBF00;" target="_blank" rel="noopener">#26</a> — three directions.</p></div>
+
+<div class="lg-meta">
+  <p class="lg-eyebrow">UI/UX Revamp map &middot; Login page layout</p>
+  <h1 class="lg-title">Three directions for the login page</h1>
+  <p class="lg-desc">No sidebar (guest, logged out). Tokens (#19) still apply. This isn't a marketing hero — it's the one page a logged-out user lands on, so some brand presence is warranted.</p>
+</div>
+
+<div class="variant-frame">
+
+  <div class="variant" data-v="a">
+    <div class="variant-label-row"><div><h2>A — Minimal centered</h2><p>Plain white background, small mark, centered form.</p></div><span class="variant-key">?variant=a</span></div>
+    <div class="frame"><div class="layout-a"><div class="a-card">
+      <div class="a-mark">D</div>
+      <p class="a-title">DoWH Staff Intranet</p>
+      <p class="a-sub">Department of Works &amp; Highways</p>
+      <div class="form-box">
+        <div class="form-row"><label>Email</label><input type="text" placeholder="firstname.lastname@works.gov.pg"></div>
+        <div class="form-row"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <button class="btn-primary" type="button">Log in →</button>
+        <p class="fine">Forgot password? <a href="#">Reset it</a></p>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="variant" data-v="b">
+    <div class="variant-label-row"><div><h2>B — Split screen, dark brand panel</h2><p>Left panel in DoWH Dark with the seal and a gold divider; form on a plain white right panel.</p></div><span class="variant-key">?variant=b</span></div>
+    <div class="frame"><div class="layout-b">
+      <div class="b-panel">
+        <div class="b-mark">D</div>
+        <h2>DoWH Staff Intranet</h2>
+        <p>Circulars, directory, documents, and department tools for all ~1,437 staff across four Wings.</p>
+      </div>
+      <div class="b-form-col"><div class="form-box">
+        <div class="form-row"><label>Email</label><input type="text" placeholder="firstname.lastname@works.gov.pg"></div>
+        <div class="form-row"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <button class="btn-primary" type="button">Log in →</button>
+        <p class="fine">Forgot password? <a href="#">Reset it</a></p>
+      </div></div>
+    </div></div>
+  </div>
+
+  <div class="variant" data-v="c">
+    <div class="variant-label-row"><div><h2>C — Government bulletin masthead</h2><p>Formal masthead bar, bordered form card below.</p></div><span class="variant-key">?variant=c</span></div>
+    <div class="frame"><div class="layout-c">
+      <div class="c-masthead">
+        <div class="c-mark">D</div>
+        <h1>Department of Works &amp; Highways</h1>
+        <h2>Staff Intranet Portal</h2>
+      </div>
+      <div class="c-card"><div class="form-box">
+        <div class="form-row"><label>Email</label><input type="text" placeholder="firstname.lastname@works.gov.pg"></div>
+        <div class="form-row"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <button class="btn-primary" type="button">Log in →</button>
+        <p class="fine">Forgot password? <a href="#">Reset it</a></p>
+      </div></div>
+    </div></div>
+  </div>
+
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Prototypes</a>
+</div>
+
+<div class="lg-switcher" role="group" aria-label="Variant switcher">
+  <button type="button" id="lgPrev" aria-label="Previous variant">&larr;</button>
+  <span class="label" id="lgLabel"></span>
+  <button type="button" id="lgNext" aria-label="Next variant">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  var variants = [ { key:'a', name:'Minimal centered' }, { key:'b', name:'Split screen' }, { key:'c', name:'Gov. bulletin masthead' } ];
+  function currentIndex() {
+    var v = new URLSearchParams(location.search).get('variant');
+    var idx = variants.findIndex(function (x) { return x.key === v; });
+    return idx === -1 ? 0 : idx;
+  }
+  function render(idx) {
+    idx = ((idx % variants.length) + variants.length) % variants.length;
+    document.querySelectorAll('.variant').forEach(function (el) { el.classList.toggle('is-active', el.getAttribute('data-v') === variants[idx].key); });
+    document.getElementById('lgLabel').textContent = String.fromCharCode(65+idx) + ' — ' + variants[idx].name;
+    var params = new URLSearchParams(location.search); params.set('variant', variants[idx].key);
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  }
+  var idx = currentIndex(); render(idx);
+  document.getElementById('lgPrev').addEventListener('click', function () { idx--; render(idx); });
+  document.getElementById('lgNext').addEventListener('click', function () { idx++; render(idx); });
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+    if (e.key === 'ArrowLeft') { idx--; render(idx); }
+    if (e.key === 'ArrowRight') { idx++; render(idx); }
+  });
+})();
+</script>
+{% endblock %}
