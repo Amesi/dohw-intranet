@@ -1,0 +1,381 @@
+{% extends "templates/web.html" %}
+
+{% block navbar %}
+{% if show_language_picker %}
+    {{ super() }}
+{% endif %}
+{% endblock %}
+
+{% macro email_login_body() -%}
+{% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
+<div class="page-card-body">
+    <div class="login-error-banner">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <use href="#es-line-alert-triangle"></use>
+        </svg>
+        <span></span>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="login_email">{{ login_label or _("Email")}}</label>
+        <div class="email-field">
+            <input type="text" id="login_email" class="form-control"
+                placeholder="{% if login_name_placeholder %}{{ login_name_placeholder  }}{% else %}{{ _('jane@example.com') }}{% endif %}"
+                required autofocus autocomplete="username">
+            <svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <use class="es-lock" href="#es-line-email"></use>
+            </svg>
+        </div>
+        <p class="field-error"></p>
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="login_password">{{ _("Password") }}</label>
+        <div class="password-field">
+            <input type="password" id="login_password" class="form-control" placeholder="•••••"
+                autocomplete="current-password" required>
+            <svg class="field-icon password-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <use class="es-lock" href="#es-line-lock"></use>
+            </svg>
+            <svg toggle="#login_password" class="toggle-password" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <use href="#es-line-preview"></use>
+            </svg>
+        </div>
+        <p class="field-error"></p>
+        {% if not disable_user_pass_login %}
+        <p class="forgot-password-message">
+            <a href="#forgot">{{ _("Forgot password?") }}</a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+<div class="page-card-actions">
+    {% if not disable_user_pass_login %}
+    <button class="btn btn-sm btn-default btn-block btn-login" type="submit">
+        {{ _("Sign In") }}</button>
+    {% endif %}
+    {% if ldap_settings and ldap_settings.enabled %}
+    <button class="btn btn-sm {{ "btn-primary" if disable_user_pass_login else "btn-default" }} btn-block btn-login btn-ldap-login">
+        {{ _("Login with LDAP") }}</button>
+    {% endif %}
+    {% if login_with_email_link %}
+    <a href="#login-with-email-link"
+        class="btn btn-block btn-default btn-sm btn-login-option btn-login-with-email-link">
+        {{ _("Login with Email Link") }}</a>
+    {% endif %}
+    {% if social_login %}
+    <div class="social-logins text-center">
+        <div class="social-login-buttons">
+            {% for provider in provider_logins %}
+            <div class="login-button-wrapper">
+                <a href="{{ provider.auth_url }}"
+                    class="btn btn-block btn-default btn-sm btn-login-option btn-{{ provider.name }}">
+                    {% if provider.icon %}
+                        {{ provider.icon }}
+                    {% endif %}
+                    {{ _("Login with {0}").format(provider.provider_name) }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% block head_include %}
+{{ include_style('login.bundle.css') }}
+<style>
+    :root {
+        --dowh-gold: #FFBF00;
+        --dowh-dark: #1A1A1A;
+    }
+
+    body {
+        background: linear-gradient(160deg, var(--dowh-dark) 0%, #2d2d2d 50%, var(--dowh-dark) 100%);
+        min-height: 100vh;
+    }
+
+    /* DoWH header above card */
+    .dowh-header {
+        text-align: center;
+        padding: 40px 20px 20px;
+    }
+
+    .dowh-header img {
+        width: 130px;
+        height: auto;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+
+    .dowh-header .dept-name {
+        font-family: 'Inter', 'Arial', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--dowh-gold);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-top: 14px;
+    }
+
+    .dowh-header .tagline {
+        font-family: 'Inter', 'Arial', sans-serif;
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 1px;
+        margin-top: 4px;
+    }
+
+    /* Card restyling */
+    .page-card {
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 36px 32px 28px;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+        max-width: 420px;
+        margin: 0 auto 20px;
+    }
+
+    .page-card .app-logo { display: none; }
+
+    .page-card-head h4 {
+        font-family: 'Inter', 'Arial', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--dowh-dark);
+    }
+
+    .page-card-subtitle {
+        font-size: 13px;
+        color: #888;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dowh-dark);
+    }
+
+    .form-control {
+        border: 2px solid #e2e2e2;
+        border-radius: 8px;
+        padding: 12px 14px 12px 38px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: var(--dowh-gold);
+        box-shadow: 0 0 0 3px rgba(255,191,0,0.15);
+    }
+
+    .btn-login {
+        background: var(--dowh-gold) !important;
+        color: var(--dowh-dark) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: 0.5px;
+        transition: background 0.2s !important;
+    }
+
+    .btn-login:hover {
+        background: #e6ac00 !important;
+    }
+
+    .forgot-password-message a {
+        color: var(--dowh-dark);
+        font-weight: 500;
+    }
+
+    .forgot-password-message a:hover { color: var(--dowh-gold); }
+
+    .sign-up-message a {
+        color: var(--dowh-dark);
+        font-weight: 600;
+    }
+
+    .login-error-banner {
+        background: #fff5f5;
+        border: 1px solid #ffd4d4;
+        color: #cc0000;
+        border-radius: 8px;
+    }
+
+    /* Hide sections by default (JS controls visibility) */
+    .for-signup, .for-forgot, .for-login-with-email-link { display: none; }
+
+    /* Fix field icon positioning */
+    .email-field, .password-field { position: relative; }
+    .field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 2; }
+    .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2; cursor: pointer; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .dowh-header { padding: 28px 16px 12px; }
+        .dowh-header img { width: 100px; }
+        .page-card { padding: 28px 20px 20px; margin: 0 12px 20px; }
+    }
+</style>
+{% endblock %}
+
+{% macro logo_section(title=null, subtitle=null) %}
+<div class="page-card-head">
+    <img class="app-logo" src="{{ logo }}">
+    <div class="page-card-head-text">
+        {% if title %}
+        <h4>{{ _(title) }}</h4>
+        {% else %}
+        <h4>{{ _('Sign In') }}</h4>
+        {% endif %}
+        {% if subtitle %}
+        <p class="page-card-subtitle">{{ _(subtitle) }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% block page_content %}
+<div class="dowh-header">
+    <img src="/files/dowh-seal-fullcolor.svg" alt="Department of Works and Highways Seal">
+    <div class="dept-name">Department of Works &amp; Highways</div>
+    <div class="tagline">We Connect PNG Now to Build Our Future</div>
+</div>
+
+<div>
+    <noscript>
+        <div class="text-center my-5">
+            <h4>{{ _("Javascript is disabled on your browser") }}</h4>
+            <p class="text-muted">
+                {{ _("You need to enable JavaScript for your app to work.") }}<br>{{ _("To enable it follow the instructions in the following link: {0}").format("<a href='https://enable-javascript.com/'>enable-javascript.com</a></p>") }}
+            </p>
+        </div>
+    </noscript>
+
+    <section class='for-login'>
+        <div class="login-content page-card">
+            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            <form class="form-signin form-login" role="form" novalidate>
+                {{ email_login_body() }}
+            </form>
+            {%- if not disable_signup and not disable_user_pass_login -%}
+            <div class="text-center sign-up-message">
+                {{ _("Don't have an account?") }}
+                <a href="#signup">{{ _("Sign up") }}</a>
+            </div>
+            {%- endif -%}
+        </div>
+    </section>
+
+    {%- if social_login -%}
+    <section class='for-email-login'>
+        <div class="login-content page-card">
+            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            <form class="form-signin form-login" role="form" novalidate>
+            {{ email_login_body() }}
+            </form>
+            {%- if not disable_signup and not disable_user_pass_login -%}
+            <div class="text-center sign-up-message">
+                {{ _("Don't have an account?") }}
+                <a href="#signup">{{ _("Sign up") }}</a>
+            </div>
+            {%- endif -%}
+        </div>
+    </section>
+    {%- endif -%}
+
+    <section class='for-signup {{ "signup-disabled" if disable_signup else "" }}'>
+        <div class="login-content page-card">
+            {{ logo_section(_('Sign Up'), _("Let's setup your account.")) }}
+            {%- if not disable_signup -%}
+            {{ signup_form_template }}
+            {%- else -%}
+            <div class="signup-disabled-message">
+                <span class='indicator gray'>{{_("Signup Disabled")}}</span>
+                <p class="text-muted text-normal sign-up-message mt-1 mb-8">{{_("Signups have been disabled for this website.")}}</p>
+                <div><a href='/' class='btn btn-primary btn-md'>{{ _("Home") }}</a></div>
+            </div>
+            {%- endif -%}
+        </div>
+    </section>
+
+    <section class='for-forgot'>
+        <div class="login-content page-card">
+            {{ logo_section(_('Forgot Password?'), _("Please enter your email, we'll send you password reset link")) }}
+            <form class="form-signin form-forgot hide" role="form" novalidate>
+                <div class="page-card-body">
+                    <div class="form-group">
+                        <label class="form-label" for="forgot_email">{{ _("Email") }}</label>
+                        <div class="email-field">
+                            <input type="email" id="forgot_email" class="form-control"
+                                placeholder="{{ _('jane@example.com') }}" required autofocus autocomplete="username">
+                            <svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <use class="es-lock" href="#es-line-email"></use>
+                            </svg>
+                        </div>
+                        <p class="field-error"></p>
+                    </div>
+                </div>
+                <div class="page-card-actions">
+                    <button class="btn btn-sm btn-primary btn-block btn-signup btn-forgot"
+                        type="submit" disabled>{{ _("Send Link") }}</button>
+                </div>
+            </form>
+            <div class="text-center sign-up-message">
+                <a href="#login">{{ _("Back to sign in") }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class='for-login-with-email-link'>
+        <div class="login-content page-card">
+            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            <form class="form-signin form-login-with-email-link hide" role="form" novalidate>
+                <div class="page-card-body">
+                    <div class="login-success-banner">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <use href="#es-line-alert-circle"></use>
+                        </svg>
+                        <span>{{ _("Please check your email.") }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="login_with_email_link_email">{{ _("Email") }}</label>
+                        <div class="email-field">
+                            <input type="email" id="login_with_email_link_email" class="form-control"
+                                placeholder="{{ _('jane@example.com') }}" required autofocus autocomplete="username">
+                            <svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <use class="es-lock" href="#es-line-email"></use>
+                            </svg>
+                        </div>
+                        <p class="field-error"></p>
+                    </div>
+                </div>
+                <div class="page-card-actions">
+                    <p class="resend-link">
+                        {{ _("Didn't receive the link?") }} <a href="#" class="btn-resend-link">{{ _("Resend") }}</a>
+                    </p>
+                    <button class="btn btn-sm btn-primary btn-block btn-login btn-login-with-email-link"
+                        type="submit">{{ _("Send login link") }}</button>
+                    <a href="#login" class="btn btn-sm btn-default btn-block btn-login-option">
+                        {{ _("Login with password") }}</a>
+                </div>
+            </form>
+            {%- if not disable_signup -%}
+            <div class="text-center sign-up-message">
+                {{ _("Don't have an account?") }}
+                <a href="#signup">{{ _("Sign up") }}</a>
+            </div>
+            {%- endif -%}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>{% include "templates/includes/login/login.js" %}</script>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
