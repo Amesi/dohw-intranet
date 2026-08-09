@@ -3,108 +3,89 @@
 {% block title %}Links & Forms — DoWH{% endblock %}
 
 {% block page_content %}
-<div style="padding: 20px 0 40px 0;">
+<div class="links-page">
 
-<style>
-:root { --gold: #FFBF00; --dark: #1A1A1A; }
-
-.links-header { margin-bottom: 16px; }
-.links-header h2 { font-size: 19px; font-weight: 800; color: var(--dark); margin: 0; }
-.links-header p { font-size: 11px; color: #888; margin: 2px 0 0; }
-
-.links-filters { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
-.links-filters a {
-    padding: 3px 10px; border-radius: 12px; font-size: 10px; text-decoration: none;
-    font-weight: 600; background: #f0f0f0; color: #555; border: 1px solid #e0e0e0;
-}
-.links-filters a.active, .links-filters a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-
-.cat-section { margin-bottom: 20px; }
-.cat-title { font-size: 12px; font-weight: 800; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--gold); }
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
-
-.link-card {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
-    padding: 12px 14px; border-left: 3px solid var(--gold); text-decoration: none;
-    display: block; color: inherit; transition: box-shadow 0.15s;
-}
-.link-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.link-card .lname { font-size: 13px; font-weight: 700; color: var(--dark); }
-.link-card .ldesc { font-size: 10px; color: #888; margin-top: 2px; }
-.link-card .lwing { font-size: 9px; color: #aaa; margin-top: 2px; }
-.link-icon { display: inline-block; width: 16px; text-align: center; margin-right: 4px; }
-
-.links-empty { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 48px 24px; text-align: center; color: #888; font-size: 14px; }
-
-@media (max-width: 600px) {
-    .cat-grid { grid-template-columns: 1fr; }
-}
-</style>
-
-<div class="links-header">
-    <h2>🔗 Links &amp; Forms</h2>
-    <p>Quick access to government forms, internal systems, and policy documents</p>
+<div class="links-block">
+    <h1 class="dt-page-title">Links &amp; Forms Hub</h1>
+    <p class="dt-caption">Quick access to government forms, internal systems, and policy documents</p>
 </div>
 
-<!-- CATEGORY FILTERS -->
-<div class="links-filters">
-    <a href="/links{% if active_wing %}?wing={{ active_wing }}{% endif %}" class="{% if not active_category %}active{% endif %}">All</a>
-    {% for c in link_categories %}
-    <a href="/links?category={{ c }}{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if active_category == c %}active{% endif %}">{{ c }}</a>
-    {% endfor %}
+<div class="links-block">
+    <div class="links-filters">
+        <a href="/links{% if active_wing %}?wing={{ active_wing }}{% endif %}" class="{% if not active_category %}active{% endif %}">All categories</a>
+        {% for c in link_categories %}
+        <a href="/links?category={{ c }}{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if active_category == c %}active{% endif %}">{{ c }}</a>
+        {% endfor %}
+    </div>
+    <div class="links-filters">
+        <a href="/links{% if active_category %}?category={{ active_category }}{% endif %}" class="{% if not active_wing %}active{% endif %}">All wings</a>
+        {% for w in wings %}
+        <a href="/links?wing={{ w.name }}{% if active_category %}&category={{ active_category }}{% endif %}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+        {% endfor %}
+    </div>
 </div>
 
-<!-- WING FILTER -->
-<div class="links-filters">
-    <a href="/links{% if active_category %}?category={{ active_category }}{% endif %}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
-    {% for w in wings %}
-    <a href="/links?wing={{ w.name }}{% if active_category %}&category={{ active_category }}{% endif %}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
-    {% endfor %}
+{% macro link_group(cat, links) %}
+<div class="links-block links-group">
+    <p class="dash-section-label">{{ cat }}</p>
+    <div class="dt-card-list">
+        {% for l in links %}
+        <a href="{{ l.url }}" target="_blank" rel="noopener" class="dt-card links-row">
+            <span class="links-row-main">
+                <span class="dt-card-title">{{ l.title }}</span>
+                {% if l.description %}<span class="dt-caption">{{ l.description }}</span>{% endif %}
+                {% if l.wing %}<span class="dt-caption">{{ l.wing }}</span>{% endif %}
+            </span>
+            <span class="links-ext" aria-hidden="true">&#8599;</span>
+        </a>
+        {% endfor %}
+    </div>
 </div>
+{% endmacro %}
 
 {% if categories %}
-    {% if active_category %}
-    <!-- Single category view -->
     {% for cat, links in categories.items() %}
-    <div class="cat-section">
-        <div class="cat-title">{{ cat }}</div>
-        <div class="cat-grid">
-            {% for l in links %}
-            <a href="{{ l.url }}" class="link-card" target="_blank" rel="noopener">
-                <div class="lname">
-                    {% if cat == 'Government' %}🏛 {% elif cat == 'Internal' %}🏢 {% elif cat == 'External' %}🌐 {% elif cat == 'Policy' %}📜 {% else %}📎 {% endif %}
-                    {{ l.title }}
-                </div>
-                {% if l.description %}<div class="ldesc">{{ l.description }}</div>{% endif %}
-                {% if l.wing %}<div class="lwing">📍 {{ l.wing }}</div>{% endif %}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
+    {{ link_group(cat, links) }}
     {% endfor %}
-    {% else %}
-    <!-- All categories grouped -->
-    {% for cat, links in categories.items() %}
-    <div class="cat-section">
-        <div class="cat-title">{{ cat }}</div>
-        <div class="cat-grid">
-            {% for l in links %}
-            <a href="{{ l.url }}" class="link-card" target="_blank" rel="noopener">
-                <div class="lname">
-                    {% if cat == 'Government' %}🏛 {% elif cat == 'Internal' %}🏢 {% elif cat == 'External' %}🌐 {% elif cat == 'Policy' %}📜 {% else %}📎 {% endif %}
-                    {{ l.title }}
-                </div>
-                {% if l.description %}<div class="ldesc">{{ l.description }}</div>{% endif %}
-                {% if l.wing %}<div class="lwing">📍 {{ l.wing }}</div>{% endif %}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-    {% endif %}
 {% else %}
-<div class="links-empty">No links found for this view.</div>
+<div class="links-block">
+    <div class="links-empty"><p class="dt-body">No links found for this view.</p></div>
+</div>
 {% endif %}
 
 </div>
+{% endblock %}
+
+{% block style %}
+<style>
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation — see docs/design/new-pages.md for the decision record.
+   Restyle of an existing, already-functional page (built by a teammate,
+   commit 0bb517c) — moves from a bordered card grid to a chromeless
+   hairline-divided list per the decided design; index.py untouched. */
+
+.links-page { max-width: 640px; }
+.links-block { }
+.links-block + .links-block { margin-top: var(--space-6, 24px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+.links-filters { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.links-filters:last-child { margin-bottom: 0; }
+.links-filters a {
+    padding: 3px 10px; border-radius: 20px; font-size: 10px; text-decoration: none;
+    font-weight: 600; background: #f2f2f2; color: var(--ink-muted, #999); font-family: var(--font-sans);
+}
+.links-filters a.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+.links-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; color: inherit; }
+.links-row-main { display: flex; flex-direction: column; gap: 2px; }
+.links-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.links-ext { font-size: 13px; color: var(--ink-muted, #bbb); flex-shrink: 0; }
+
+.links-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+</style>
 {% endblock %}
