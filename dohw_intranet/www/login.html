@@ -86,143 +86,145 @@
 {% block head_include %}
 {{ include_style('login.bundle.css') }}
 <style>
+    /* Minimal centered — per docs/design/login.md (Variant A), applied to
+       the real multi-section login page rather than a static mockup.
+       See login.md's decision record for the visual spec this follows. */
     :root {
         --dowh-gold: #FFBF00;
         --dowh-dark: #1A1A1A;
     }
 
     body {
-        background: linear-gradient(160deg, var(--dowh-dark) 0%, #2d2d2d 50%, var(--dowh-dark) 100%);
+        background: #ffffff;
         min-height: 100vh;
     }
 
-    /* DoWH header above card */
-    .dowh-header {
-        text-align: center;
-        padding: 40px 20px 20px;
-    }
-
-    .dowh-header img {
-        width: 130px;
-        height: auto;
-        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-    }
-
-    .dowh-header .dept-name {
-        font-family: 'Inter', 'Arial', sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--dowh-gold);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin-top: 14px;
-    }
-
-    .dowh-header .tagline {
-        font-family: 'Inter', 'Arial', sans-serif;
-        font-size: 11px;
-        color: rgba(255,255,255,0.5);
-        letter-spacing: 1px;
-        margin-top: 4px;
-    }
-
-    /* Card restyling */
+    /* Card — plain, centered, no shadow/gradient chrome */
     .page-card {
-        background: #FFFFFF;
-        border-radius: 12px;
-        padding: 36px 32px 28px;
-        box-shadow: 0 16px 48px rgba(0,0,0,0.35);
-        max-width: 420px;
-        margin: 0 auto 20px;
+        background: #ffffff;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        max-width: 300px;
+        margin: 96px auto 20px;
+        padding: 0;
     }
 
-    .page-card .app-logo { display: none; }
+    /* Small mark — the real DoWH logo, sized down, replacing the hidden
+       default app-logo */
+    .page-card .app-logo {
+        display: block;
+        width: 52px;
+        height: auto;
+        margin: 0 auto 18px;
+    }
 
+    .page-card-head { text-align: center; }
     .page-card-head h4 {
-        font-family: 'Inter', 'Arial', sans-serif;
-        font-size: 22px;
-        font-weight: 800;
+        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
         color: var(--dowh-dark);
+        margin: 0 0 2px;
     }
 
     .page-card-subtitle {
-        font-size: 13px;
-        color: #888;
+        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
+        font-size: 11.5px;
+        color: #999999;
+        margin: 0 0 24px;
     }
 
     .form-label {
-        font-weight: 600;
-        color: var(--dowh-dark);
+        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #666666;
     }
 
     .form-control {
-        border: 2px solid #e2e2e2;
-        border-radius: 8px;
-        padding: 12px 14px 12px 38px;
-        font-size: 14px;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        padding: 9px 11px 9px 34px;
+        font-size: 13px;
         transition: border-color 0.2s;
     }
 
     .form-control:focus {
         border-color: var(--dowh-gold);
-        box-shadow: 0 0 0 3px rgba(255,191,0,0.15);
+        box-shadow: none;
     }
 
-    .btn-login {
-        background: var(--dowh-gold) !important;
+    /* Every action in the card — sign in, LDAP, email-link, forgot, signup —
+       gets the same restrained text-link treatment, gold underline as the
+       one accent, no filled buttons. */
+    .page-card-actions .btn {
+        background: none !important;
         color: var(--dowh-dark) !important;
         border: none !important;
-        border-radius: 8px !important;
-        padding: 12px !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        letter-spacing: 0.5px;
-        transition: background 0.2s !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin-top: 4px;
+        font-family: 'Inter', -apple-system, 'Arial', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 13.5px !important;
+        letter-spacing: normal !important;
+        text-align: left !important;
+        text-decoration: underline !important;
+        text-decoration-color: var(--dowh-gold) !important;
+        text-decoration-thickness: 2px !important;
+        text-underline-offset: 3px !important;
+        width: auto !important;
+        display: inline-flex !important;
     }
-
-    .btn-login:hover {
-        background: #e6ac00 !important;
-    }
+    .page-card-actions .btn:hover { color: var(--dowh-dark) !important; opacity: 0.75; }
+    .page-card-actions .btn[disabled] { opacity: 0.4; text-decoration-color: #ccc !important; }
 
     .forgot-password-message a {
-        color: var(--dowh-dark);
+        font-size: 11px;
+        color: #999999;
         font-weight: 500;
+        text-decoration: none;
     }
+    .forgot-password-message a:hover { color: var(--dowh-dark); }
 
-    .forgot-password-message a:hover { color: var(--dowh-gold); }
-
+    .sign-up-message {
+        font-size: 11px;
+        color: #999999;
+        margin-top: 16px;
+    }
     .sign-up-message a {
         color: var(--dowh-dark);
         font-weight: 600;
+        text-decoration: none;
     }
 
     .login-error-banner {
-        background: #fff5f5;
-        border: 1px solid #ffd4d4;
-        color: #cc0000;
-        border-radius: 8px;
+        background: #fdf2f2;
+        border: 1px solid #f0d0cc;
+        color: #c0392b;
+        border-radius: 6px;
+        font-size: 12px;
     }
 
     /* Hide sections by default (JS controls visibility) */
     .for-signup, .for-forgot, .for-login-with-email-link { display: none; }
 
-    /* Fix field icon positioning */
+    /* Field icons — kept in the DOM (the password-toggle JS depends on
+       them), just muted down to fit the restrained palette. */
     .email-field, .password-field { position: relative; }
-    .field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 2; }
-    .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2; cursor: pointer; }
+    .field-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 2; opacity: 0.4; }
+    .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 2; cursor: pointer; opacity: 0.4; }
 
-    /* Responsive */
     @media (max-width: 480px) {
-        .dowh-header { padding: 28px 16px 12px; }
-        .dowh-header img { width: 100px; }
-        .page-card { padding: 28px 20px 20px; margin: 0 12px 20px; }
+        .page-card { margin: 60px auto 20px; padding: 0 20px; }
     }
 </style>
 {% endblock %}
 
 {% macro logo_section(title=null, subtitle=null) %}
 <div class="page-card-head">
-    <img class="app-logo" src="{{ logo }}">
+    <img class="app-logo" src="/files/dowh-logo-original.svg" alt="Department of Works and Highways">
     <div class="page-card-head-text">
         {% if title %}
         <h4>{{ _(title) }}</h4>
@@ -237,12 +239,6 @@
 {% endmacro %}
 
 {% block page_content %}
-<div class="dowh-header">
-    <img src="/files/dowh-seal-fullcolor.svg" alt="Department of Works and Highways Seal">
-    <div class="dept-name">Department of Works &amp; Highways</div>
-    <div class="tagline">We Connect PNG Now to Build Our Future</div>
-</div>
-
 <div>
     <noscript>
         <div class="text-center my-5">
@@ -255,7 +251,7 @@
 
     <section class='for-login'>
         <div class="login-content page-card">
-            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            {{ logo_section(_('Sign In'), _('Department of Works &amp; Highways')) }}
             <form class="form-signin form-login" role="form" novalidate>
                 {{ email_login_body() }}
             </form>
@@ -271,7 +267,7 @@
     {%- if social_login -%}
     <section class='for-email-login'>
         <div class="login-content page-card">
-            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            {{ logo_section(_('Sign In'), _('Department of Works &amp; Highways')) }}
             <form class="form-signin form-login" role="form" novalidate>
             {{ email_login_body() }}
             </form>
@@ -331,7 +327,7 @@
 
     <section class='for-login-with-email-link'>
         <div class="login-content page-card">
-            {{ logo_section(_('Sign In'), _('ERPNext — Digital Works System')) }}
+            {{ logo_section(_('Sign In'), _('Department of Works &amp; Highways')) }}
             <form class="form-signin form-login-with-email-link hide" role="form" novalidate>
                 <div class="page-card-body">
                     <div class="login-success-banner">
