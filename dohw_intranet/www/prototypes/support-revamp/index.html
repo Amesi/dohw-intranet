@@ -1,0 +1,206 @@
+{% extends "templates/web.html" %}
+{% block title %}Support — Layout Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+  :root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+  .sp-meta { max-width: 1000px; margin: 0 auto 14px; }
+  .sp-eyebrow { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 6px; }
+  .sp-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; color: var(--dowh-dark); }
+  .sp-desc { font-size: 13px; color: #666; margin: 0 0 12px; max-width: 70ch; line-height: 1.55; }
+
+  .variant-frame { max-width: 1000px; margin: 0 auto; background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+  .variant-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }
+  .variant-label-row h2 { font-size: 14px; font-weight: 700; margin: 0; color: var(--dowh-dark); }
+  .variant-label-row p { font-size: 12px; color: #777; margin: 3px 0 0; max-width: 64ch; line-height: 1.5; }
+  .variant-key { font-family: ui-monospace, monospace; font-size: 11px; color: #999; white-space: nowrap; }
+
+  .frame { display: flex; height: 660px; background: #fff; color: #171717; }
+  .frame * { box-sizing: border-box; }
+  .sidebar { width: 200px; height: 100%; background: #f8f8f8; border-right: 1px solid #ededed; padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; overflow-y: auto; }
+  .sidebar .brand { padding: 6px 8px 14px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .sidebar .mark { width: 20px; height: 20px; border-radius: 5px; background: var(--dowh-dark); color: var(--dowh-gold); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar a { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 6px; font-size: 12.5px; color: #525252; text-decoration: none; }
+  .sidebar a:hover { background: #f0f0f0; color: #171717; }
+  .sidebar a.active { background: #f0f0f0; color: #171717; font-weight: 600; box-shadow: inset 2px 0 0 var(--dowh-gold); }
+  .sidebar .bottom { margin-top: auto; padding-top: 8px; border-top: 1px solid #ededed; }
+
+  .content-col { flex: 1; min-width: 0; overflow-y: auto; padding: 24px 28px 30px; }
+  .block + .block { margin-top: 22px; }
+  h1.page-h { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .page-sub { font-size: 12.5px; color: #7c7c7c; margin: 0; }
+  .section-label { font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 10px; }
+
+  .form-box { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
+  .form-row label { display: block; font-size: 11.5px; color: #666; margin-bottom: 4px; }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #dcdcdc; border-radius: 6px; }
+  .form-row textarea { resize: vertical; min-height: 70px; }
+  .btn-primary { background: none; border: none; padding: 0; color: #171717; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; font-size: 13.5px; font-weight: 500; align-self: flex-start; }
+
+  .issue-list { display: flex; flex-direction: column; }
+  .issue-row { padding: 10px 0; border-bottom: 1px solid #ededed; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+  .issue-row:last-child { border-bottom: none; }
+  .issue-row .meta { color: #999; font-size: 11px; white-space: nowrap; }
+  .status-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; border: 1px solid currentColor; }
+  .status-open { color: #8a6d00; } .status-closed { color: #7c7c7c; } .status-progress { color: #1a73e8; }
+
+  .layout-b { display: flex; gap: 24px; }
+  .layout-b .form-col { width: 300px; flex-shrink: 0; }
+  .layout-b .list-col { flex: 1; min-width: 0; }
+
+  .reveal-trigger { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #171717; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; background: none; border: none; padding: 0; }
+  .reveal-form { display: none; margin-top: 16px; padding: 16px; border: 1px solid #ededed; border-radius: 8px; background: #fafafa; }
+  .reveal-form.is-open { display: block; }
+
+  .variant { display: none; }
+  .variant.is-active { display: block; }
+
+  .sp-switcher { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--dowh-dark); color: #fff; border-radius: 999px; padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: 12.5px; z-index: 50; }
+  .sp-switcher button { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,.14); color: inherit; cursor: pointer; font-size: 14px; }
+  .sp-switcher button:hover { background: rgba(255,255,255,.26); }
+  .sp-switcher .label { min-width: 190px; text-align: center; }
+</style>
+
+<div class="proto-banner"><h2>🎧 Support — Layout Prototype</h2><p>Ticket <a href="https://github.com/Amesi/dohw-intranet/issues/25" style="color:#FFBF00;" target="_blank" rel="noopener">#25</a> — three layouts.</p></div>
+
+<div class="sp-meta">
+  <p class="sp-eyebrow">UI/UX Revamp map &middot; Support page layout</p>
+  <h1 class="sp-title">Three layouts for the Support page</h1>
+  <p class="sp-desc">Sidebar (#20) and tokens (#19) held fixed — the real question is which task is primary: submitting a new issue, or checking status of existing ones.</p>
+</div>
+
+<div class="variant-frame">
+
+  <div class="variant" data-v="a">
+    <div class="variant-label-row"><div><h2>A — Form-first, list below</h2><p>Submission form prominent at the top, issue history as a simple list below.</p></div><span class="variant-key">?variant=a</span></div>
+    <div class="frame">
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span>DoWH Intranet</div>
+        <a href="#">📊 Dashboard</a><a href="#">📢 Circulars</a><a href="#">👥 Directory</a>
+        <a href="#">📅 Calendar</a><a href="#">📁 Projects</a><a href="#">📖 Documents</a>
+        <a href="#">🔗 Links &amp; Forms</a><a href="#" class="active">🎧 Support</a>
+        <div class="bottom"><a href="#">🖥 Desk</a><a href="#">↩ Logout</a></div>
+      </div>
+      <div class="content-col">
+        <div class="block"><h1 class="page-h">Support</h1><p class="page-sub">Submit an issue or check the status of your requests</p></div>
+        <div class="block"><p class="section-label">New issue</p><div class="form-box">
+          <div class="form-row"><label>Subject</label><input type="text" placeholder="Brief summary of the issue"></div>
+          <div class="form-row"><label>Description</label><textarea placeholder="What's going wrong?"></textarea></div>
+          <div class="form-row"><label>Priority</label><select><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+          <button class="btn-primary" type="button">Submit issue →</button>
+        </div></div>
+        <div class="block"><p class="section-label">Your issues</p><div class="issue-list" id="list-a"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="b">
+    <div class="variant-label-row"><div><h2>B — Split, form always visible</h2><p>Form pinned in a left column, issue tracker on the right.</p></div><span class="variant-key">?variant=b</span></div>
+    <div class="frame">
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span>DoWH Intranet</div>
+        <a href="#">📊 Dashboard</a><a href="#">📢 Circulars</a><a href="#">👥 Directory</a>
+        <a href="#">📅 Calendar</a><a href="#">📁 Projects</a><a href="#">📖 Documents</a>
+        <a href="#">🔗 Links &amp; Forms</a><a href="#" class="active">🎧 Support</a>
+        <div class="bottom"><a href="#">🖥 Desk</a><a href="#">↩ Logout</a></div>
+      </div>
+      <div class="content-col">
+        <div class="block"><h1 class="page-h">Support</h1></div>
+        <div class="block layout-b">
+          <div class="form-col"><p class="section-label">New issue</p><div class="form-box">
+            <div class="form-row"><label>Subject</label><input type="text" placeholder="Brief summary"></div>
+            <div class="form-row"><label>Description</label><textarea placeholder="What's going wrong?"></textarea></div>
+            <div class="form-row"><label>Priority</label><select><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+            <button class="btn-primary" type="button">Submit issue →</button>
+          </div></div>
+          <div class="list-col"><p class="section-label">Your issues</p><div class="issue-list" id="list-b"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="c">
+    <div class="variant-label-row"><div><h2>C — Tracker-first, form on demand</h2><p>Leads with the issue history; a "Report a new issue" trigger reveals the form inline.</p></div><span class="variant-key">?variant=c</span></div>
+    <div class="frame">
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span>DoWH Intranet</div>
+        <a href="#">📊 Dashboard</a><a href="#">📢 Circulars</a><a href="#">👥 Directory</a>
+        <a href="#">📅 Calendar</a><a href="#">📁 Projects</a><a href="#">📖 Documents</a>
+        <a href="#">🔗 Links &amp; Forms</a><a href="#" class="active">🎧 Support</a>
+        <div class="bottom"><a href="#">🖥 Desk</a><a href="#">↩ Logout</a></div>
+      </div>
+      <div class="content-col">
+        <div class="block"><h1 class="page-h">Support</h1><p class="page-sub">3 open &middot; 1 in progress &middot; 8 closed</p></div>
+        <div class="block">
+          <button class="reveal-trigger" type="button" id="revealBtn">+ Report a new issue</button>
+          <div class="reveal-form" id="revealForm"><div class="form-box">
+            <div class="form-row"><label>Subject</label><input type="text" placeholder="Brief summary"></div>
+            <div class="form-row"><label>Description</label><textarea placeholder="What's going wrong?"></textarea></div>
+            <div class="form-row"><label>Priority</label><select><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+            <button class="btn-primary" type="button">Submit issue →</button>
+          </div></div>
+        </div>
+        <div class="block"><p class="section-label">Your issues</p><div class="issue-list" id="list-c"></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Prototypes</a>
+</div>
+
+<div class="sp-switcher" role="group" aria-label="Variant switcher">
+  <button type="button" id="spPrev" aria-label="Previous variant">&larr;</button>
+  <span class="label" id="spLabel"></span>
+  <button type="button" id="spNext" aria-label="Next variant">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  var ISSUES = [
+    { subj:'VPN not connecting from home network', status:'progress', date:'6 Aug' },
+    { subj:'Payslip PDF missing for July', status:'open', date:'3 Aug' },
+    { subj:'Cannot access shared drive — Highways Wing', status:'open', date:'29 Jul' },
+    { subj:'Printer offline, Level 2 Corporate Services', status:'closed', date:'20 Jul' },
+    { subj:'Email forwarding rule not saving', status:'closed', date:'12 Jul' }
+  ];
+  function pill(s) {
+    var map = { open:['status-open','Open'], progress:['status-progress','In progress'], closed:['status-closed','Closed'] };
+    return '<span class="status-pill ' + map[s][0] + '">' + map[s][1] + '</span>';
+  }
+  function rowHtml(i) { return '<div class="issue-row"><span>' + i.subj + '</span><span class="meta">' + pill(i.status) + ' &nbsp;' + i.date + '</span></div>'; }
+  document.getElementById('list-a').innerHTML = ISSUES.map(rowHtml).join('');
+  document.getElementById('list-b').innerHTML = ISSUES.map(rowHtml).join('');
+  document.getElementById('list-c').innerHTML = ISSUES.map(rowHtml).join('');
+
+  document.getElementById('revealBtn').addEventListener('click', function () {
+    document.getElementById('revealForm').classList.toggle('is-open');
+  });
+
+  var variants = [ { key:'a', name:'Form-first, list below' }, { key:'b', name:'Split, form persistent' }, { key:'c', name:'Tracker-first' } ];
+  function currentIndex() {
+    var v = new URLSearchParams(location.search).get('variant');
+    var idx = variants.findIndex(function (x) { return x.key === v; });
+    return idx === -1 ? 0 : idx;
+  }
+  function render(idx) {
+    idx = ((idx % variants.length) + variants.length) % variants.length;
+    document.querySelectorAll('.variant').forEach(function (el) { el.classList.toggle('is-active', el.getAttribute('data-v') === variants[idx].key); });
+    document.getElementById('spLabel').textContent = String.fromCharCode(65+idx) + ' — ' + variants[idx].name;
+    var params = new URLSearchParams(location.search); params.set('variant', variants[idx].key);
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  }
+  var idx = currentIndex(); render(idx);
+  document.getElementById('spPrev').addEventListener('click', function () { idx--; render(idx); });
+  document.getElementById('spNext').addEventListener('click', function () { idx++; render(idx); });
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+    if (e.key === 'ArrowLeft') { idx--; render(idx); }
+    if (e.key === 'ArrowRight') { idx++; render(idx); }
+  });
+})();
+</script>
+{% endblock %}
