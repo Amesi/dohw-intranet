@@ -1,0 +1,284 @@
+{% extends "templates/web.html" %}
+{% block title %}Navigation — IA & Sidebar Prototype{% endblock %}
+
+{% block page_content %}
+<style>
+  :root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
+
+  .nav-meta { max-width: 1000px; margin: 0 auto 14px; }
+  .nav-eyebrow { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 6px; }
+  .nav-title { font-size: 20px; font-weight: 700; margin: 0 0 6px; color: var(--dowh-dark); }
+  .nav-desc { font-size: 13px; color: #666; margin: 0 0 12px; max-width: 68ch; line-height: 1.55; }
+  .nav-desc a { color: #1a73e8; }
+
+  .device-toggle { display: inline-flex; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+  .device-toggle button { font-size: 12px; font-weight: 600; padding: 7px 14px; border: none; background: #fff; color: #777; cursor: pointer; }
+  .device-toggle button.active { background: var(--dowh-dark); color: #fff; }
+
+  .variant-frame { max-width: 1000px; margin: 16px auto 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+  .variant-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }
+  .variant-label-row h2 { font-size: 14px; font-weight: 700; margin: 0; color: var(--dowh-dark); }
+  .variant-label-row p { font-size: 12px; color: #777; margin: 3px 0 0; max-width: 64ch; line-height: 1.5; }
+  .variant-key { font-family: ui-monospace, monospace; font-size: 11px; color: #999; white-space: nowrap; }
+
+  .canvas-frame { position: relative; background: #fff; color: #171717; display: flex; height: 560px; overflow: hidden; }
+  .canvas-frame * { box-sizing: border-box; }
+
+  .sidebar { width: 220px; height: 100%; background: #f8f8f8; border-right: 1px solid #ededed; padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; overflow-y: auto; }
+  .sidebar .brand { padding: 6px 8px 14px; font-weight: 700; font-size: 13px; color: #171717; display: flex; align-items: center; gap: 8px; }
+  .sidebar .brand .mark { width: 20px; height: 20px; border-radius: 5px; background: var(--dowh-dark); color: var(--dowh-gold); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar a.nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 6px; font-size: 12.5px; color: #525252; text-decoration: none; }
+  .sidebar a.nav-item:hover { background: #f0f0f0; color: #171717; }
+  .sidebar a.nav-item.active { background: #f0f0f0; color: #171717; font-weight: 600; box-shadow: inset 2px 0 0 var(--dowh-gold); }
+  .sidebar .group-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.07em; color: #9a9a9a; padding: 14px 10px 4px; }
+  .sidebar .divider { height: 1px; background: #ededed; margin: 8px 4px; }
+  .sidebar .bottom { margin-top: auto; padding-top: 8px; border-top: 1px solid #ededed; }
+  .sidebar .more-toggle { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 6px; font-size: 12.5px; color: #7c7c7c; cursor: pointer; background: none; border: none; width: 100%; text-align: left; }
+  .sidebar .more-toggle:hover { background: #f0f0f0; color: #171717; }
+  .sidebar .more-group { display: none; flex-direction: column; gap: 2px; padding-left: 4px; }
+  .sidebar .more-group.is-open { display: flex; }
+  .sidebar .chev { margin-left: auto; font-size: 10px; transition: transform .15s ease; }
+  .sidebar .more-toggle.is-open .chev { transform: rotate(90deg); }
+
+  .mobile-topbar { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #ededed; background: #fff; }
+  .canvas-frame.is-mobile .mobile-topbar { display: flex; }
+  .mobile-topbar button.hamburger { width: 30px; height: 30px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+  .mobile-topbar .brand-sm { font-weight: 700; font-size: 12.5px; }
+
+  .canvas-frame.is-mobile .sidebar { position: absolute; left: -240px; top: 0; bottom: 0; z-index: 20; box-shadow: none; transition: left .2s ease; }
+  .canvas-frame.is-mobile.drawer-open .sidebar { left: 0; box-shadow: 4px 0 20px rgba(0,0,0,.18); }
+  .backdrop { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 15; }
+  .canvas-frame.is-mobile.drawer-open .backdrop { display: block; }
+  .canvas-frame:not(.is-mobile) .sidebar { position: relative; left: 0 !important; }
+
+  .content-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .canvas { flex: 1; overflow-y: auto; padding: 24px 28px 28px; }
+  .section-label { font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9a9a; margin: 0 0 10px; }
+  .block + .block { margin-top: 26px; }
+  h1.demo-h { font-size: 20px; font-weight: 600; letter-spacing: -0.1px; margin: 0 0 4px; }
+  .btn { font-size: 13.5px; font-weight: 500; }
+  .btn-primary { background: none; border: none; padding: 0; color: #171717; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; }
+  .btn-secondary { background: none; border: none; padding: 0; color: #7c7c7c; cursor: pointer; }
+  .card-grid { display: flex; flex-direction: column; }
+  .card { padding: 14px 0; border-bottom: 1px solid #ededed; }
+  .card:first-child { padding-top: 0; }
+  .card:last-child { border-bottom: none; }
+  .card-title { font-size: 14px; font-weight: 600; margin: 0 0 4px; color: #171717; }
+  .card-meta { font-size: 11px; color: #999999; margin: 0 0 5px; }
+  .card-body { font-size: 12.5px; color: #525252; line-height: 1.5; margin: 0; }
+  .badge { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: none; border: 1px solid currentColor; }
+  .badge-urgent { color: #c0392b; } .badge-action { color: #8a6d00; } .badge-info { color: #7c7c7c; }
+
+  .variant { display: none; }
+  .variant.is-active { display: block; }
+
+  .nav-switcher {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    background: var(--dowh-dark); color: #fff; border-radius: 999px; padding: 8px 8px 8px 16px;
+    display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: 12.5px; z-index: 50;
+  }
+  .nav-switcher button { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,.14); color: inherit; cursor: pointer; font-size: 14px; }
+  .nav-switcher button:hover { background: rgba(255,255,255,.26); }
+  .nav-switcher .label { min-width: 190px; text-align: center; }
+</style>
+
+<div class="proto-banner">
+    <h2>🧭 Navigation — IA &amp; Sidebar Prototype</h2>
+    <p>Ticket <a href="https://github.com/Amesi/dohw-intranet/issues/20" style="color:#FFBF00;" target="_blank" rel="noopener">#20</a> — three sidebar structures, styled with the Design Tokens Variant A system (<a href="https://github.com/Amesi/dohw-intranet/issues/19" style="color:#FFBF00;" target="_blank" rel="noopener">#19</a>).</p>
+</div>
+
+<div class="nav-meta">
+  <p class="nav-eyebrow">UI/UX Revamp map &middot; Navigation IA</p>
+  <h1 class="nav-title">Three ways to structure the sidebar's 8 sections</h1>
+  <p class="nav-desc">Left sidebar per #17. Content canvas stays fixed (the Circulars page) — only the sidebar structure changes. Use the device toggle to see the confirmed frappe.io mobile behavior: an off-canvas drawer with backdrop under 1023px.</p>
+  <div class="device-toggle" role="group" aria-label="Preview device width">
+    <button type="button" id="btnDesktop" class="active">Desktop</button>
+    <button type="button" id="btnMobile">Mobile</button>
+  </div>
+</div>
+
+<div class="variant-frame">
+
+  <div class="variant" data-v="a">
+    <div class="variant-label-row">
+      <div><h2>A — Flat list</h2><p>All 8 sections in one flat column, ordered by usage frequency. Mirrors frappe.io's own dominant pattern most literally.</p></div>
+      <span class="variant-key">?variant=a</span>
+    </div>
+    <div class="canvas-frame" data-frame="a">
+      <div class="backdrop" data-backdrop></div>
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span> DoWH Intranet</div>
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <a href="#" class="nav-item">📢 Circulars</a>
+        <a href="#" class="nav-item">👥 Directory</a>
+        <a href="#" class="nav-item">📅 Calendar</a>
+        <a href="#" class="nav-item">📁 Projects</a>
+        <a href="#" class="nav-item">📖 Documents</a>
+        <a href="#" class="nav-item">🔗 Links &amp; Forms</a>
+        <a href="#" class="nav-item">🎧 Support</a>
+        <div class="bottom">
+          <a href="#" class="nav-item">🖥 Desk</a>
+          <a href="#" class="nav-item">↩ Logout</a>
+        </div>
+      </div>
+      <div class="content-col">
+        <div class="mobile-topbar"><button class="hamburger" type="button" data-hamburger aria-label="Open navigation">☰</button><span class="brand-sm">DoWH Intranet</span></div>
+        <div class="canvas" data-canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="b">
+    <div class="variant-label-row">
+      <div><h2>B — Grouped by function</h2><p>Dashboard pinned; the rest under labeled groups — Communicate, Work, Resources.</p></div>
+      <span class="variant-key">?variant=b</span>
+    </div>
+    <div class="canvas-frame" data-frame="b">
+      <div class="backdrop" data-backdrop></div>
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span> DoWH Intranet</div>
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <p class="group-label">Communicate</p>
+        <a href="#" class="nav-item">📢 Circulars</a>
+        <a href="#" class="nav-item">👥 Directory</a>
+        <p class="group-label">Work</p>
+        <a href="#" class="nav-item">📁 Projects</a>
+        <a href="#" class="nav-item">📅 Calendar</a>
+        <a href="#" class="nav-item">🔗 Links &amp; Forms</a>
+        <p class="group-label">Resources</p>
+        <a href="#" class="nav-item">📖 Documents</a>
+        <a href="#" class="nav-item">🎧 Support</a>
+        <div class="bottom">
+          <a href="#" class="nav-item">🖥 Desk</a>
+          <a href="#" class="nav-item">↩ Logout</a>
+        </div>
+      </div>
+      <div class="content-col">
+        <div class="mobile-topbar"><button class="hamburger" type="button" data-hamburger aria-label="Open navigation">☰</button><span class="brand-sm">DoWH Intranet</span></div>
+        <div class="canvas" data-canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant" data-v="c">
+    <div class="variant-label-row">
+      <div><h2>C — Pinned + collapsible</h2><p>Only the 3 most-used sections pinned; everything else behind a "More" toggle.</p></div>
+      <span class="variant-key">?variant=c</span>
+    </div>
+    <div class="canvas-frame" data-frame="c">
+      <div class="backdrop" data-backdrop></div>
+      <div class="sidebar">
+        <div class="brand"><span class="mark">D</span> DoWH Intranet</div>
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <a href="#" class="nav-item">📢 Circulars</a>
+        <a href="#" class="nav-item">👥 Directory</a>
+        <button type="button" class="more-toggle" data-more-toggle>More <span class="chev">›</span></button>
+        <div class="more-group" data-more-group>
+          <a href="#" class="nav-item">📅 Calendar</a>
+          <a href="#" class="nav-item">📁 Projects</a>
+          <a href="#" class="nav-item">📖 Documents</a>
+          <a href="#" class="nav-item">🔗 Links &amp; Forms</a>
+          <a href="#" class="nav-item">🎧 Support</a>
+        </div>
+        <div class="bottom">
+          <a href="#" class="nav-item">🖥 Desk</a>
+          <a href="#" class="nav-item">↩ Logout</a>
+        </div>
+      </div>
+      <div class="content-col">
+        <div class="mobile-topbar"><button class="hamburger" type="button" data-hamburger aria-label="Open navigation">☰</button><span class="brand-sm">DoWH Intranet</span></div>
+        <div class="canvas" data-canvas></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+    <a href="/prototypes" style="color: var(--dowh-gold); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Prototypes</a>
+</div>
+
+<div class="nav-switcher" role="group" aria-label="Variant switcher">
+  <button type="button" id="navPrev" aria-label="Previous variant">&larr;</button>
+  <span class="label" id="navLabel"></span>
+  <button type="button" id="navNext" aria-label="Next variant">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  var CIRCULARS_HTML = ''
+    + '<div class="block">'
+    + '  <h1 class="demo-h">Staff Circulars</h1>'
+    + '  <p style="font-size:12px;color:#7c7c7c;margin:0 0 12px;">Highways Wing &middot; 3 published this week</p>'
+    + '  <div style="display:flex; gap:16px;"><button class="btn btn-primary" type="button">View all circulars &rarr;</button><button class="btn btn-secondary" type="button">Export list</button></div>'
+    + '</div>'
+    + '<div class="block"><p class="section-label">Classification</p><div style="display:flex; gap:8px;">'
+    + '  <span class="badge badge-urgent">Urgent</span><span class="badge badge-action">For action</span><span class="badge badge-info">For information</span>'
+    + '</div></div>'
+    + '<div class="block"><p class="section-label">Circulars</p><div class="card-grid">'
+    + '  <div class="card"><p class="card-title">HW-2026-014 — Highways Wing road maintenance schedule</p><p class="card-meta">Highways Wing · 4 Aug 2026 · For action</p><p class="card-body">Resurfacing works on the Boroko–Waigani corridor begin 18 Aug.</p></div>'
+    + '  <div class="card"><p class="card-title">CS-2026-009 — Corporate Services policy update</p><p class="card-meta">Corporate Services Wing · 2 Aug 2026 · For information</p><p class="card-body">Revised leave application procedure takes effect 1 Sep.</p></div>'
+    + '  <div class="card"><p class="card-title">WK-2026-021 — Works Wing site safety advisory</p><p class="card-meta">Works Wing · 30 Jul 2026 · Urgent</p><p class="card-body">All site supervisors must confirm PPE compliance logs by Friday.</p></div>'
+    + '</div></div>';
+
+  document.querySelectorAll('[data-canvas]').forEach(function (el) { el.innerHTML = CIRCULARS_HTML; });
+
+  document.querySelectorAll('.canvas-frame').forEach(function (frame) {
+    frame.querySelector('[data-hamburger]').addEventListener('click', function () { frame.classList.toggle('drawer-open'); });
+    frame.querySelector('[data-backdrop]').addEventListener('click', function () { frame.classList.remove('drawer-open'); });
+    var moreToggle = frame.querySelector('[data-more-toggle]');
+    if (moreToggle) {
+      moreToggle.addEventListener('click', function () {
+        moreToggle.classList.toggle('is-open');
+        frame.querySelector('[data-more-group]').classList.toggle('is-open');
+      });
+    }
+  });
+
+  var btnDesktop = document.getElementById('btnDesktop');
+  var btnMobile = document.getElementById('btnMobile');
+  function setDevice(mobile) {
+    document.querySelectorAll('.canvas-frame').forEach(function (f) {
+      f.classList.toggle('is-mobile', mobile);
+      if (!mobile) f.classList.remove('drawer-open');
+    });
+    btnDesktop.classList.toggle('active', !mobile);
+    btnMobile.classList.toggle('active', mobile);
+  }
+  btnDesktop.addEventListener('click', function () { setDevice(false); });
+  btnMobile.addEventListener('click', function () { setDevice(true); });
+
+  var variants = [
+    { key: 'a', name: 'Flat list' },
+    { key: 'b', name: 'Grouped by function' },
+    { key: 'c', name: 'Pinned + collapsible' }
+  ];
+  function currentIndex() {
+    var params = new URLSearchParams(location.search);
+    var v = params.get('variant');
+    var idx = variants.findIndex(function (x) { return x.key === v; });
+    return idx === -1 ? 0 : idx;
+  }
+  function render(idx) {
+    idx = ((idx % variants.length) + variants.length) % variants.length;
+    document.querySelectorAll('.variant').forEach(function (el) {
+      el.classList.toggle('is-active', el.getAttribute('data-v') === variants[idx].key);
+    });
+    document.getElementById('navLabel').textContent = String.fromCharCode(65 + idx) + ' — ' + variants[idx].name;
+    var params = new URLSearchParams(location.search);
+    params.set('variant', variants[idx].key);
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  }
+  var idx = currentIndex();
+  render(idx);
+  document.getElementById('navPrev').addEventListener('click', function () { idx--; render(idx); });
+  document.getElementById('navNext').addEventListener('click', function () { idx++; render(idx); });
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+    if (e.key === 'ArrowLeft') { idx--; render(idx); }
+    if (e.key === 'ArrowRight') { idx++; render(idx); }
+  });
+})();
+</script>
+{% endblock %}
