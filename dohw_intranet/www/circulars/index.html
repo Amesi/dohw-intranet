@@ -4,173 +4,190 @@
 
 {% block page_content %}
 
-{% if circular %}
-{# DETAIL VIEW #}
-<div class="circ-card" style="border-left-color: var(--gold);">
-    <div class="circ-top">
-        <span class="circ-number">{{ circular.circular_number or '' }}</span>
-        <span class="circ-badge badge-{% if circular.classification == 'For Action' %}action{% elif circular.classification == 'Urgent' %}urgent{% else %}info{% endif %}">{{ circular.classification or 'For Information' }}</span>
-    </div>
-    <div class="circ-date">{{ frappe.utils.format_date(circular.date) }}{% if circular.wing %} · {{ circular.wing }}{% endif %}</div>
-    <h3 class="circ-title" style="font-size:16px;">{{ circular.title }}</h3>
-    <div style="font-size:13px; line-height:1.7; color:#333; margin:12px 0;">{{ circular.content }}</div>
-    {% if circular.attachment %}
-    <div class="circ-attachment">📎 <a href="{{ circular.attachment }}" target="_blank" download>{{ circular.attachment.split('/')[-1] }}</a></div>
-    {% endif %}
-    <div class="circ-tags">
-        {% if circular.wing %}<a href="/circulars?wing={{ circular.wing }}" class="wing-pill">{{ circular.wing.split(' - ')[0] }}</a>{% endif %}
-        {% if circular.tags %}
-        {% for tag in circular.tags.split(',') %}
-        <a href="/circulars?tag={{ tag.strip() }}" class="tag-link">{{ tag.strip() }}</a>
-        {% endfor %}
-        {% endif %}
-    </div>
-    <div style="margin-top:16px;"><a href="/circulars" style="color:var(--gold); font-weight:600; text-decoration:none;">← Back to Circulars</a></div>
-</div>
-
-{% else %}
-{# LISTING VIEW #}
-<div class="circ-masthead">
-    <img src="/files/dowh-logo-original.svg" alt="DoWH Seal" class="circ-seal">
-    <h1>Department of Works &amp; Highways</h1>
-    <h2>Staff Circulars &amp; Announcements</h2>
+<div class="circ-block">
+    <h1 class="dt-page-title">Staff Circulars</h1>
+    <p class="dt-caption circ-stats">{{ stats.total }} total &middot; {{ stats.urgent }} urgent &middot; {{ stats.action }} for action</p>
 </div>
 
 {% if is_content_manager %}
-{% if posted %}
-<div style="background:#d4edda; color:#155724; padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:12px;">✅ Circular posted successfully.</div>
-{% endif %}
-<details style="margin-bottom:14px;">
-    <summary style="cursor:pointer; padding:6px 14px; background:var(--gold); color:var(--dark); border-radius:6px; font-size:12px; font-weight:700; display:inline-block;">✚ New Circular</summary>
-    <form method="POST" action="/circulars" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px; margin-top:8px;">
-        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Title *</label>
-        <input type="text" name="new_title" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box;" placeholder="Circular title...">
-        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Content *</label>
-        <textarea name="new_content" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box; height:80px; resize:vertical;" placeholder="Circular content..."></textarea>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-            <div style="flex:1; min-width:120px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Classification</label>
-                <select name="new_classification" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
-                    <option value="For Information">For Information</option>
-                    <option value="For Action">For Action</option>
-                    <option value="Urgent">Urgent</option>
-                </select>
+<div class="circ-block">
+    {% if posted %}
+    <div class="circ-posted-ok">Circular posted successfully.</div>
+    {% endif %}
+    <details class="circ-composer">
+        <summary class="dt-btn-primary">+ New circular</summary>
+        <form method="POST" action="/circulars" class="circ-composer-form">
+            <div class="circ-form-row">
+                <label class="dt-caption">Title</label>
+                <input type="text" name="new_title" required class="dt-input" placeholder="Circular title">
             </div>
-            <div style="flex:1; min-width:120px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Tags</label>
-                <input type="text" name="new_tags" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;" placeholder="e.g. ict, security">
+            <div class="circ-form-row">
+                <label class="dt-caption">Content</label>
+                <textarea name="new_content" required class="dt-textarea" placeholder="Circular content"></textarea>
             </div>
-        </div>
-        <input type="hidden" name="submit_circular" value="1">
-        <button type="submit" style="padding:7px 20px; background:var(--gold); color:var(--dark); border:none; border-radius:4px; font-weight:700; font-size:12px; cursor:pointer;">Post Circular</button>
-    </form>
-</details>
+            <div class="circ-form-row-split">
+                <div class="circ-form-row">
+                    <label class="dt-caption">Classification</label>
+                    <select name="new_classification" class="dt-select">
+                        <option value="For Information">For information</option>
+                        <option value="For Action">For action</option>
+                        <option value="Urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="circ-form-row">
+                    <label class="dt-caption">Tags</label>
+                    <input type="text" name="new_tags" class="dt-input" placeholder="e.g. ict, security">
+                </div>
+            </div>
+            <input type="hidden" name="submit_circular" value="1">
+            <button type="submit" class="dt-btn-primary">Publish &rarr;</button>
+        </form>
+    </details>
+</div>
 {% endif %}
 
-<div class="circ-filters">
-    <select onchange="location=this.value" class="circ-select">
-        <option value="/circulars">All Wings</option>
-        {% for w in wings %}
-        <option value="/circulars?wing={{ w.name }}" {% if active_wing == w.name %}selected{% endif %}>{{ w.department_name }}</option>
+<div class="circ-block">
+    <div class="circ-filter-bar">
+        <select onchange="location=this.value" class="dt-select">
+            <option value="/circulars">All wings</option>
+            {% for w in wings %}
+            <option value="/circulars?wing={{ w.name }}" {% if active_wing == w.name %}selected{% endif %}>{{ w.department_name }}</option>
+            {% endfor %}
+        </select>
+        <select onchange="location=this.value" class="dt-select">
+            <option value="/circulars{% if active_wing %}?wing={{ active_wing }}{% endif %}">All classifications</option>
+            <option value="/circulars?classification=For+Information{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Information' %}selected{% endif %}>For information</option>
+            <option value="/circulars?classification=For+Action{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Action' %}selected{% endif %}>For action</option>
+            <option value="/circulars?classification=Urgent{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'Urgent' %}selected{% endif %}>Urgent</option>
+        </select>
+        {% if active_wing or active_class or active_tags %}
+        <a href="/circulars" class="circ-clear dt-btn-secondary">Clear filters</a>
+        {% endif %}
+        {% if all_tags %}
+        <div class="circ-tag-row">
+            {% for tag in all_tags %}
+            <a href="/circulars?tag={{ tag }}{% if active_wing %}&wing={{ active_wing }}{% endif %}{% if active_class %}&classification={{ active_class }}{% endif %}" class="circ-tag-chip {% if tag in active_tags %}active{% endif %}">#{{ tag }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="circ-block">
+    {% if circulars %}
+    <div class="dt-card-list">
+        {% for c in circulars %}
+        <details class="dt-card circ-row">
+            <summary class="circ-summary">
+                <span class="circ-summary-top">
+                    <span class="dt-card-title">{% if c.circular_number %}{{ c.circular_number }} &mdash; {% endif %}{{ c.title }}</span>
+                    <span class="dt-badge {% if c.classification == 'For Action' %}dt-badge-action{% elif c.classification == 'Urgent' %}dt-badge-urgent{% else %}dt-badge-info{% endif %}">{{ c.classification or "For information" }}</span>
+                </span>
+                <span class="dt-caption">{{ frappe.utils.format_date(c.date) }}{% if c.wing %} &middot; {{ c.wing }}{% endif %}</span>
+                {% if c.wing or c.tags %}
+                <span class="circ-tag-row">
+                    {% if c.wing %}<a href="/circulars?wing={{ c.wing }}" class="circ-wing-pill">{{ c.wing.split(' - ')[0] }}</a>{% endif %}
+                    {% if c.tags %}
+                    {% for tag in c.tags.split(',') %}
+                    <a href="/circulars?tag={{ tag.strip() }}" class="circ-tag-chip">#{{ tag.strip() }}</a>
+                    {% endfor %}
+                    {% endif %}
+                </span>
+                {% endif %}
+            </summary>
+            <div class="circ-detail dt-body">
+                {{ c.content }}
+                {% if c.attachment %}
+                <div class="circ-attachment"><a href="{{ c.attachment }}" target="_blank" download>&#128206; {{ c.attachment.split("/")[-1] }}</a></div>
+                {% endif %}
+            </div>
+        </details>
         {% endfor %}
-    </select>
-    <select onchange="location=this.value" class="circ-select">
-        <option value="/circulars{% if active_wing %}?wing={{ active_wing }}{% endif %}">All Types</option>
-        <option value="/circulars?classification=For+Information{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Information' %}selected{% endif %}>For Information</option>
-        <option value="/circulars?classification=For+Action{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'For Action' %}selected{% endif %}>For Action</option>
-        <option value="/circulars?classification=Urgent{% if active_wing %}&wing={{ active_wing }}{% endif %}" {% if active_class == 'Urgent' %}selected{% endif %}>Urgent</option>
-    </select>
-    {% if active_wing or active_class or active_tags %}
-    <a href="/circulars" class="circ-clear">✕ Clear all</a>
-    {% endif %}
-    {% if all_tags %}
-    <div class="circ-tags-inline">
-        {% for tag in all_tags %}
-        <a href="/circulars?tag={{ tag }}{% if active_wing %}&wing={{ active_wing }}{% endif %}{% if active_class %}&classification={{ active_class }}{% endif %}" class="circ-tag-pill {% if tag in active_tags %}active{% endif %}">{{ tag }}</a>
-        {% endfor %}
+    </div>
+    {% else %}
+    <div class="circ-empty">
+        <p class="dt-body">No circulars found</p>
+        <p class="dt-caption">Try adjusting your filters or check back later.</p>
     </div>
     {% endif %}
 </div>
-
-{% if circulars %}
-    {% for c in circulars %}
-    <div class="circ-card">
-        <div class="circ-top">
-            <span class="circ-number">{% if c.circular_number %}{{ c.circular_number }}{% endif %}</span>
-            <span class="circ-badge {% if c.classification == 'For Action' %}badge-action{% elif c.classification == 'Urgent' %}badge-urgent{% else %}badge-info{% endif %}">{{ c.classification or "For Information" }}</span>
-        </div>
-        <div class="circ-date">{{ frappe.utils.format_date(c.date) }}{% if c.wing %} · {{ c.wing }}{% endif %}</div>
-        <h3 class="circ-title"><a href="/circulars?name={{ c.name }}">{{ c.title }}</a></h3>
-        <div class="circ-excerpt">{{ c.content | striptags | truncate(250) }}</div>
-        {% if c.attachment %}
-        <div class="circ-attachment">📎 <a href="{{ c.attachment }}" target="_blank" download>{{ c.attachment.split("/")[-1] }}</a></div>
-        {% endif %}
-        <div class="circ-tags">
-            {% if c.wing %}<a href="/circulars?wing={{ c.wing }}" class="wing-pill">{{ c.wing.split(' - ')[0] }}</a>{% endif %}
-            {% if c.tags %}
-            {% for tag in c.tags.split(',') %}
-            <a href="/circulars?tag={{ tag.strip() }}" class="tag-link">{{ tag.strip() }}</a>
-            {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
-{% else %}
-    <div class="circ-empty"><p>No Circulars Found</p><span>Try adjusting your filters or check back later.</span></div>
-{% endif %}
-{% endif %}
 
 {% endblock %}
 
 {% block style %}
 <style>
-:root { --gold: #FFBF00; --dark: #1A1A1A; }
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation — see docs/design/circulars.md for the decision record. */
 
-.circ-masthead { text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 3px solid var(--gold); }
-.circ-masthead .circ-seal { height: 44px; margin-bottom: 4px; }
-.circ-masthead h1 { font-size: 12px; font-weight: 800; color: var(--dark); letter-spacing: 1.5px; text-transform: uppercase; margin: 0; }
-.circ-masthead h2 { font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; margin: 2px 0 0; }
+.circ-block { max-width: 720px; }
+.circ-block + .circ-block { margin-top: var(--space-6, 24px); }
 
-.circ-filters { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 10px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.circ-select { padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; background: #fff; }
-.circ-clear { color: #cc0000; text-decoration: none; font-size: 10px; font-weight: 600; white-space: nowrap; }
-.circ-tags-inline { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 3px; }
-.circ-tag-pill { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; text-decoration: none; background: #eee; color: #555; }
-.circ-tag-pill.active, .circ-tag-pill:hover { background: var(--gold); color: var(--dark); }
+.circ-stats { margin-top: 4px; }
 
-.circ-card { background: #fff; border: 1px solid #d0d0d0; border-left: 4px solid var(--gold); padding: 14px 16px; margin-bottom: 10px; }
-.circ-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 6px; flex-wrap: wrap; }
-.circ-number { font-weight: 700; font-size: 10px; color: var(--dark); }
-.circ-badge { padding: 2px 7px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-info { background: #e8e8e8; color: #555; }
-.badge-action { background: var(--gold); color: var(--dark); }
-.badge-urgent { background: #cc0000; color: #fff; }
-.circ-date { font-size: 10px; color: #888; margin-bottom: 4px; }
-.circ-title { font-size: 13px; font-weight: 700; color: var(--dark); margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2; }
-.circ-title a { color: var(--dark); text-decoration: none; }
-.circ-title a:hover { color: var(--gold); }
-.circ-excerpt { font-size: 11px; line-height: 1.4; color: #555; max-height: 44px; overflow: hidden; margin-bottom: 6px; }
-.circ-attachment { margin: 4px 0 6px; font-size: 10px; }
-.circ-attachment a { color: var(--dark); text-decoration: none; font-weight: 600; }
+.circ-posted-ok {
+    background: #f4f9f4;
+    border: 1px solid #cfe8cf;
+    color: #2e6b2e;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
 
-.circ-tags { display: flex; flex-wrap: wrap; gap: 3px; padding-top: 6px; border-top: 1px solid #eee; }
-.wing-pill { padding: 1px 6px; background: #f0f0f0; border-radius: 8px; font-size: 9px; color: #666; text-decoration: none; }
-.wing-pill:hover { background: var(--gold); color: var(--dark); }
-.tag-link { padding: 1px 6px; background: #e8f0fe; border-radius: 8px; font-size: 9px; color: #1a73e8; text-decoration: none; }
-.tag-link:hover { background: var(--gold); color: var(--dark); }
+.circ-composer summary { cursor: pointer; list-style: none; }
+.circ-composer summary::-webkit-details-marker { display: none; }
+.circ-composer-form {
+    margin-top: 14px;
+    padding: 16px;
+    background: #fafafa;
+    border: 1px solid var(--border, #ededed);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.circ-form-row { display: flex; flex-direction: column; gap: 4px; }
+.circ-form-row-split { display: flex; gap: 12px; }
+.circ-form-row-split .circ-form-row { flex: 1; }
 
-.circ-empty { background: #fff; border: 1px solid #e0e0e0; padding: 40px 20px; text-align: center; border-radius: 6px; }
-.circ-empty p { font-size: 15px; color: #888; margin: 0 0 4px; }
-.circ-empty span { font-size: 11px; color: #aaa; }
+.circ-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.circ-clear { flex-shrink: 0; }
+
+.circ-tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.circ-tag-chip, .circ-wing-pill {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #f2f2f2;
+    color: var(--ink-muted, #999);
+    text-decoration: none;
+}
+.circ-tag-chip:hover, .circ-wing-pill:hover { background: #e8e8e8; color: var(--ink, #171717); }
+.circ-tag-chip.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+.circ-row summary { cursor: pointer; list-style: none; }
+.circ-row summary::-webkit-details-marker { display: none; }
+.circ-summary { display: flex; flex-direction: column; gap: 4px; }
+.circ-summary-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.circ-summary:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.circ-detail { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border, #ededed); white-space: pre-wrap; }
+.circ-attachment { margin-top: 8px; font-size: 11.5px; }
+.circ-attachment a { color: var(--ink-muted, #7c7c7c); text-decoration: none; }
+.circ-attachment a:hover { color: var(--ink, #171717); }
+
+.circ-empty {
+    padding: 40px 20px;
+    text-align: center;
+    border: 1px solid var(--border, #ededed);
+    border-radius: 6px;
+}
+.circ-empty p { margin: 0 0 4px; }
 
 @media (max-width: 600px) {
-    .circ-masthead h1 { font-size: 10px; }
-    .circ-masthead h2 { font-size: 9px; }
-    .circ-masthead .circ-seal { height: 32px; }
-    .circ-filters { padding: 6px 8px; gap: 4px; }
-    .circ-select { font-size: 10px; max-width: 100%; }
-    .circ-card { padding: 10px 12px; }
-    .circ-title { font-size: 12px; }
+    .circ-form-row-split { flex-direction: column; }
 }
 </style>
 {% endblock %}
