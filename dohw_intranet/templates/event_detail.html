@@ -1,0 +1,97 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ event.subject }} — Events — DoWH{% endblock %}
+
+{% block page_content %}
+<div class="ev-detail-crumb">
+    <p class="dt-caption"><a href="/events">&larr; Back to Events</a></p>
+</div>
+
+<div class="ev-detail">
+    <div class="ev-detail-main">
+        <h1 class="dt-page-title">{{ event.subject }}</h1>
+        {% if event.description %}<p class="dt-body ev-detail-desc">{{ event.description }}</p>{% endif %}
+
+        <div class="ev-rsvp-block">
+            <p class="dash-section-label">Your RSVP</p>
+            <form method="POST" action="/events/{{ event.name }}" class="ev-rsvp-buttons">
+                <button type="submit" name="rsvp_status" value="Yes" class="{% if my_rsvp == 'Yes' %}dt-btn-primary{% else %}dt-btn-secondary{% endif %}">Yes</button>
+                <button type="submit" name="rsvp_status" value="No" class="{% if my_rsvp == 'No' %}dt-btn-primary{% else %}dt-btn-secondary{% endif %}">No</button>
+                <button type="submit" name="rsvp_status" value="Maybe" class="{% if my_rsvp == 'Maybe' %}dt-btn-primary{% else %}dt-btn-secondary{% endif %}">Maybe</button>
+            </form>
+        </div>
+
+        <div class="ev-attendees-block">
+            <p class="dash-section-label">Who's going <span class="ev-count">{{ going_count }}</span></p>
+            {% if attendees %}
+            <div class="ev-attendee-list">
+                {% for a in attendees %}
+                <div class="ev-attendee-row">
+                    <span class="ev-avatar">{{ a.employee_name.split()[0][0] }}{{ a.employee_name.split()[-1][0] if a.employee_name.split()|length > 1 else '' }}</span>
+                    <span class="dt-body">{{ a.employee_name }}</span>
+                    <span class="dt-badge {% if a.attending == 'Yes' %}dt-badge-info{% else %}dt-badge-action{% endif %}">{{ a.attending }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="dt-caption">No responses yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <aside class="ev-sidebar">
+        <div class="ev-side-item">
+            <p class="dash-section-label">When</p>
+            <p class="dt-body">{{ frappe.utils.format_date(event.starts_on) }}</p>
+            <p class="dt-caption">{{ frappe.utils.format_time(event.starts_on) }}</p>
+        </div>
+        {% if event.location %}
+        <div class="ev-side-item">
+            <p class="dash-section-label">Where</p>
+            <p class="dt-body">{{ event.location }}</p>
+        </div>
+        {% endif %}
+        <div class="ev-side-item">
+            <p class="dash-section-label">Hosted by</p>
+            <p class="dt-body">{{ host_name }}</p>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+.ev-detail-crumb { max-width: 900px; margin-bottom: var(--space-5, 20px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+.ev-detail { display: flex; gap: var(--space-6, 24px); max-width: 900px; align-items: flex-start; }
+.ev-detail-main { flex: 1; min-width: 0; }
+.ev-detail-desc { max-width: 60ch; margin: var(--space-3, 12px) 0 var(--space-6, 24px); line-height: 1.65; white-space: pre-wrap; }
+
+.ev-rsvp-block { margin-bottom: var(--space-6, 24px); padding-bottom: var(--space-5, 20px); border-bottom: 1px solid var(--border, #ededed); }
+.ev-rsvp-buttons { display: flex; gap: 10px; }
+.ev-rsvp-buttons button { cursor: pointer; border: none; font: inherit; }
+.ev-rsvp-buttons .dt-btn-secondary { background: none; }
+
+.ev-count { color: var(--dowh-dark, #171717); background: var(--dowh-gold); border-radius: 10px; padding: 0 6px; font-size: 10px; margin-left: 4px; }
+.ev-attendee-list { display: flex; flex-direction: column; gap: 10px; }
+.ev-attendee-row { display: flex; align-items: center; gap: 10px; }
+.ev-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--dowh-dark, #1a1a1a); color: var(--dowh-gold);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--font-sans); flex-shrink: 0;
+}
+.ev-attendee-row .dt-body { flex: 1; }
+
+.ev-sidebar { width: 220px; flex-shrink: 0; border-left: 1px solid var(--border, #ededed); padding-left: var(--space-5, 20px); }
+.ev-side-item + .ev-side-item { margin-top: var(--space-4, 16px); }
+
+@media (max-width: 700px) {
+    .ev-detail { flex-direction: column; }
+    .ev-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border, #ededed); padding-left: 0; padding-top: var(--space-4, 16px); }
+}
+</style>
+{% endblock %}
