@@ -3,6 +3,10 @@
 Detail view is inline (a <details> expand per row in the template, no
 separate route) per docs/design/circulars.md — the old ?name= driven
 detail page has been retired.
+
+New-circular submission moved to the dedicated /circulars/new compose
+page (see new.py) per docs/design/content-mgmt.md — this controller
+no longer handles POST at all, just the listing.
 """
 
 import frappe
@@ -12,27 +16,12 @@ def get_context(context):
     context.no_cache = 1
     context.show_sidebar = 0
 
-    # Check if user is a content manager
+    # Check if user is a content manager (controls whether the "+ New
+    # circular" link to /circulars/new is shown)
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user},
                                    ["name", "department", "designation", "content_manager"], as_dict=1)
     context.is_content_manager = bool(employee and employee.content_manager)
     context.user_department = employee.department if employee else None
-
-    # Handle new circular submission
-    if frappe.form_dict.get("submit_circular") and context.is_content_manager:
-        wing = frappe.form_dict.get("wing_override") or context.user_department
-        circular = frappe.get_doc({
-            "doctype": "Announcement",
-            "title": frappe.form_dict.get("new_title"),
-            "content": frappe.form_dict.get("new_content"),
-            "wing": wing,
-            "classification": frappe.form_dict.get("new_classification", "For Information"),
-            "tags": frappe.form_dict.get("new_tags", ""),
-            "published": 1,
-            "date": frappe.utils.nowdate(),
-        })
-        circular.insert(ignore_permissions=True)
-        context.posted = True
 
     context.title = "Staff Circulars"
 

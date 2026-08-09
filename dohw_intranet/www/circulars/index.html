@@ -11,38 +11,7 @@
 
 {% if is_content_manager %}
 <div class="circ-block">
-    {% if posted %}
-    <div class="circ-posted-ok">Circular posted successfully.</div>
-    {% endif %}
-    <details class="circ-composer">
-        <summary class="dt-btn-primary">+ New circular</summary>
-        <form method="POST" action="/circulars" class="circ-composer-form">
-            <div class="circ-form-row">
-                <label class="dt-caption">Title</label>
-                <input type="text" name="new_title" required class="dt-input" placeholder="Circular title">
-            </div>
-            <div class="circ-form-row">
-                <label class="dt-caption">Content</label>
-                <textarea name="new_content" required class="dt-textarea" placeholder="Circular content"></textarea>
-            </div>
-            <div class="circ-form-row-split">
-                <div class="circ-form-row">
-                    <label class="dt-caption">Classification</label>
-                    <select name="new_classification" class="dt-select">
-                        <option value="For Information">For information</option>
-                        <option value="For Action">For action</option>
-                        <option value="Urgent">Urgent</option>
-                    </select>
-                </div>
-                <div class="circ-form-row">
-                    <label class="dt-caption">Tags</label>
-                    <input type="text" name="new_tags" class="dt-input" placeholder="e.g. ict, security">
-                </div>
-            </div>
-            <input type="hidden" name="submit_circular" value="1">
-            <button type="submit" class="dt-btn-primary">Publish &rarr;</button>
-        </form>
-    </details>
+    <a href="/circulars/new" class="dt-btn-primary">+ New circular</a>
 </div>
 {% endif %}
 
@@ -124,33 +93,6 @@
 
 .circ-stats { margin-top: 4px; }
 
-.circ-posted-ok {
-    background: #f4f9f4;
-    border: 1px solid #cfe8cf;
-    color: #2e6b2e;
-    font-family: var(--font-sans);
-    font-size: 12px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-}
-
-.circ-composer summary { cursor: pointer; list-style: none; }
-.circ-composer summary::-webkit-details-marker { display: none; }
-.circ-composer-form {
-    margin-top: 14px;
-    padding: 16px;
-    background: #fafafa;
-    border: 1px solid var(--border, #ededed);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.circ-form-row { display: flex; flex-direction: column; gap: 4px; }
-.circ-form-row-split { display: flex; gap: 12px; }
-.circ-form-row-split .circ-form-row { flex: 1; }
-
 .circ-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .circ-clear { flex-shrink: 0; }
 
@@ -186,8 +128,5 @@
 }
 .circ-empty p { margin: 0 0 4px; }
 
-@media (max-width: 600px) {
-    .circ-form-row-split { flex-direction: column; }
-}
 </style>
 {% endblock %}
