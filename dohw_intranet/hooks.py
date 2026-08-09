@@ -27,3 +27,9 @@ web_include_css = [
 website_context = {
     "favicon": "/files/dowh-favicon.png",
 }
+
+# Fixtures — schema additions this app depends on, reproducible on any site
+# via `bench migrate` rather than living only as a manual DB change.
+fixtures = [
+    {"doctype": "Custom Field", "filters": [["dt", "=", "Event"]]},
+]
