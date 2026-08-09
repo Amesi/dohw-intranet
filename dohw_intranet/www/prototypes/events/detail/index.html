@@ -1,0 +1,125 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ event.title }} — Prototype{% endblock %}
+
+{% block page_content %}
+<div class="proto-meta">
+    <p class="dt-caption proto-eyebrow">Prototype — issue #53 — detail view, variant {{ variant | upper }} (not variant-switched — same across all three)</p>
+    <p class="dt-caption"><a href="/prototypes/events?variant={{ variant }}">&larr; Back to listing</a></p>
+</div>
+
+<div class="ev-detail">
+    <div class="ev-detail-main">
+        <h1 class="dt-page-title">{{ event.title }}</h1>
+        <p class="dt-body ev-detail-desc">{{ event.description }}</p>
+
+        <div class="ev-rsvp-block">
+            <p class="dash-section-label">Your RSVP</p>
+            <div class="ev-rsvp-buttons">
+                <button type="button" class="dt-btn-primary">Yes</button>
+                <button type="button" class="dt-btn-secondary">No</button>
+                <button type="button" class="dt-btn-secondary">Maybe</button>
+            </div>
+        </div>
+
+        <div class="ev-attendees-block">
+            <p class="dash-section-label">Who's going <span class="ev-count">{{ event.attendees | length }}</span></p>
+            <div class="ev-attendee-list">
+                {% for a in event.attendees %}
+                <div class="ev-attendee-row">
+                    <span class="ev-avatar">{{ a.name.split()[0][0] }}{{ a.name.split()[-1][0] }}</span>
+                    <span class="dt-body">{{ a.name }}</span>
+                    <span class="dt-badge {% if a.status == 'Yes' %}dt-badge-info{% else %}dt-badge-action{% endif %}">{{ a.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <aside class="ev-sidebar">
+        <div class="ev-side-item">
+            <p class="dash-section-label">When</p>
+            <p class="dt-body">{{ event.date }}</p>
+            <p class="dt-caption">{{ event.time }}</p>
+        </div>
+        <div class="ev-side-item">
+            <p class="dash-section-label">Where</p>
+            <p class="dt-body">{{ event.venue }}</p>
+        </div>
+        <div class="ev-side-item">
+            <p class="dash-section-label">Hosted by</p>
+            <p class="dt-body">{{ event.host }}</p>
+        </div>
+    </aside>
+</div>
+
+<div class="proto-switcher" id="proto-switcher">
+    <a href="#" class="proto-sw-arrow" id="proto-sw-prev">&larr;</a>
+    <span class="proto-sw-label" id="proto-sw-label"></span>
+    <a href="#" class="proto-sw-arrow" id="proto-sw-next">&rarr;</a>
+</div>
+
+<script>
+(function () {
+    var variants = [
+        {key: 'a', name: 'Split by weight — frappe.io literal'},
+        {key: 'b', name: 'Uniform card grid'},
+        {key: 'c', name: 'Uniform list'}
+    ];
+    var current = {{ variant | tojson }};
+    var idx = variants.findIndex(function (v) { return v.key === current; });
+    if (idx < 0) idx = 0;
+    function label() {
+        document.getElementById('proto-sw-label').textContent =
+            variants[idx].key.toUpperCase() + ' — ' + variants[idx].name;
+    }
+    function go(newIdx) { window.location.search = 'variant=' + variants[newIdx].key; }
+    label();
+    document.getElementById('proto-sw-prev').addEventListener('click', function (e) { e.preventDefault(); go((idx - 1 + variants.length) % variants.length); });
+    document.getElementById('proto-sw-next').addEventListener('click', function (e) { e.preventDefault(); go((idx + 1) % variants.length); });
+    document.addEventListener('keydown', function (e) {
+        var el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+        if (e.key === 'ArrowLeft') go((idx - 1 + variants.length) % variants.length);
+        if (e.key === 'ArrowRight') go((idx + 1) % variants.length);
+    });
+})();
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+.proto-meta { max-width: 900px; margin-bottom: var(--space-6, 24px); }
+.proto-eyebrow { font-family: ui-monospace, monospace; }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+.ev-detail { display: flex; gap: var(--space-6, 24px); max-width: 900px; align-items: flex-start; }
+.ev-detail-main { flex: 1; min-width: 0; }
+.ev-detail-desc { max-width: 60ch; margin: var(--space-3, 12px) 0 var(--space-6, 24px); line-height: 1.65; }
+
+.ev-rsvp-block { margin-bottom: var(--space-6, 24px); padding-bottom: var(--space-5, 20px); border-bottom: 1px solid var(--border, #ededed); }
+.ev-rsvp-buttons { display: flex; gap: 10px; }
+.ev-rsvp-buttons button { cursor: pointer; }
+
+.ev-count { color: var(--dowh-dark, #171717); background: var(--dowh-gold); border-radius: 10px; padding: 0 6px; font-size: 10px; margin-left: 4px; }
+.ev-attendee-list { display: flex; flex-direction: column; gap: 10px; }
+.ev-attendee-row { display: flex; align-items: center; gap: 10px; }
+.ev-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--dowh-dark, #1a1a1a); color: var(--dowh-gold);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--font-sans); flex-shrink: 0;
+}
+.ev-attendee-row .dt-body { flex: 1; }
+
+.ev-sidebar { width: 220px; flex-shrink: 0; border-left: 1px solid var(--border, #ededed); padding-left: var(--space-5, 20px); }
+.ev-side-item + .ev-side-item { margin-top: var(--space-4, 16px); }
+
+@media (max-width: 700px) {
+    .ev-detail { flex-direction: column; }
+    .ev-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border, #ededed); padding-left: 0; padding-top: var(--space-4, 16px); }
+}
+</style>
+{% endblock %}

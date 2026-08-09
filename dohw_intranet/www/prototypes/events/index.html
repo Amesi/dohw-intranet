@@ -1,0 +1,165 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Events — Prototype{% endblock %}
+
+{% block page_content %}
+<div class="proto-meta">
+    <p class="dt-caption proto-eyebrow">Prototype — issue #53</p>
+    <h1 class="dt-page-title">Events listing — 3 variants</h1>
+    <p class="dt-caption proto-desc">
+        Mock data, no live doctype changes — reuses ERPNext's existing Event doctype per #52.
+        Proposed nav placement: a new "Events" sidebar item, right after Calendar.
+        Detail view: <a href="/prototypes/events/detail?variant={{ variant }}">/prototypes/events/detail</a>.
+    </p>
+</div>
+
+<div class="proto-canvas" data-v="{{ variant }}">
+
+    <div class="ev-header">
+        <h2 class="dt-page-title">Events</h2>
+        <p class="dt-caption">Department-wide happenings — training, launches, ceremonies</p>
+    </div>
+
+    {% if variant == 'b' %}
+    <div class="ev-grid">
+        {% for e in events %}
+        <a href="/prototypes/events/detail?variant=b" class="ev-card">
+            {% if e.image %}
+            <div class="ev-card-media"><span class="ev-img-ph">{{ e.title[0] }}</span></div>
+            {% else %}
+            <div class="ev-card-media ev-card-media-empty"><span class="ev-img-ph-empty">{{ e.title[0] }}</span></div>
+            {% endif %}
+            <div class="ev-card-body">
+                <h3 class="dt-card-title ev-card-title">{{ e.title }}</h3>
+                <p class="dt-caption ev-card-meta">&#128197; {{ e.date }} &middot; {{ e.time }}</p>
+                <p class="dt-caption ev-card-meta">&#128205; {{ e.venue }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% elif variant == 'c' %}
+    <div class="dt-card-list ev-list">
+        {% for e in events %}
+        <a href="/prototypes/events/detail?variant=c" class="dt-card ev-row">
+            <div class="ev-row-body">
+                <span class="dt-card-title">{{ e.title }}</span>
+                <p class="dt-caption ev-row-desc">{{ e.description }}</p>
+                <p class="dt-caption ev-row-meta">&#128197; {{ e.date }} &middot; {{ e.time }} &middot; &#128205; {{ e.venue }}</p>
+            </div>
+            <span class="dt-caption ev-row-going">{{ e.going }} going</span>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="ev-mixed">
+        {% for e in events %}
+        {% if e.image %}
+        <a href="/prototypes/events/detail?variant=a" class="ev-featured-row">
+            <div class="ev-featured-media"><span class="ev-img-ph">{{ e.title[0] }}</span></div>
+            <div class="ev-featured-body">
+                <h3 class="dt-card-title ev-featured-title">{{ e.title }}</h3>
+                <p class="dt-caption ev-row-meta">&#128197; {{ e.date }} &middot; &#128205; {{ e.venue }}</p>
+            </div>
+        </a>
+        {% else %}
+        <a href="/prototypes/events/detail?variant=a" class="dt-card ev-row">
+            <div class="ev-row-body">
+                <span class="dt-card-title">{{ e.title }}</span>
+                <p class="dt-caption ev-row-desc">{{ e.description }}</p>
+                <p class="dt-caption ev-row-meta">&#128197; {{ e.date }} &middot; {{ e.time }} &middot; &#128205; {{ e.venue }}</p>
+            </div>
+            <span class="dt-caption ev-row-going">{{ e.going }} going</span>
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<div class="proto-switcher" id="proto-switcher">
+    <a href="#" class="proto-sw-arrow" id="proto-sw-prev">&larr;</a>
+    <span class="proto-sw-label" id="proto-sw-label"></span>
+    <a href="#" class="proto-sw-arrow" id="proto-sw-next">&rarr;</a>
+</div>
+
+<script>
+(function () {
+    var variants = [
+        {key: 'a', name: 'Split by weight — frappe.io literal'},
+        {key: 'b', name: 'Uniform card grid'},
+        {key: 'c', name: 'Uniform list'}
+    ];
+    var current = {{ variant | tojson }};
+    var idx = variants.findIndex(function (v) { return v.key === current; });
+    if (idx < 0) idx = 0;
+    function label() {
+        document.getElementById('proto-sw-label').textContent =
+            variants[idx].key.toUpperCase() + ' — ' + variants[idx].name;
+    }
+    function go(newIdx) {
+        var params = new URLSearchParams(window.location.search);
+        params.set('variant', variants[newIdx].key);
+        window.location.search = params.toString();
+    }
+    label();
+    document.getElementById('proto-sw-prev').addEventListener('click', function (e) { e.preventDefault(); go((idx - 1 + variants.length) % variants.length); });
+    document.getElementById('proto-sw-next').addEventListener('click', function (e) { e.preventDefault(); go((idx + 1) % variants.length); });
+    document.addEventListener('keydown', function (e) {
+        var el = document.activeElement;
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+        if (e.key === 'ArrowLeft') go((idx - 1 + variants.length) % variants.length);
+        if (e.key === 'ArrowRight') go((idx + 1) % variants.length);
+    });
+})();
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+.proto-meta { max-width: 640px; margin-bottom: var(--space-6, 24px); }
+.proto-eyebrow { font-family: ui-monospace, monospace; }
+.proto-desc { max-width: 60ch; margin-top: 4px; }
+.proto-desc a { color: var(--ink-secondary, #666); }
+
+.proto-canvas { max-width: 900px; border-top: 1px solid var(--border, #ededed); padding-top: var(--space-6, 24px); }
+.ev-header { margin-bottom: var(--space-5, 20px); }
+
+.ev-img-ph, .ev-img-ph-empty {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    background: #ededed; color: #b5b5b5; font-family: var(--font-sans); font-weight: 700; font-size: 22px;
+}
+
+/* shared row styles used by list-row treatment across variants */
+.ev-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; text-decoration: none; color: inherit; }
+.ev-row-body { flex: 1; min-width: 0; }
+.ev-row-desc { margin: 4px 0; }
+.ev-row-meta { color: var(--ink-muted, #9a9a9a); }
+.ev-row-going { flex-shrink: 0; font-weight: 600; color: var(--ink-secondary, #666); }
+.ev-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* Variant A: split by weight */
+[data-v="a"] .ev-mixed { max-width: 640px; display: flex; flex-direction: column; gap: 14px; }
+[data-v="a"] .ev-featured-row { display: flex; gap: 14px; align-items: center; text-decoration: none; color: inherit; padding-bottom: 14px; border-bottom: 1px solid var(--border, #ededed); }
+[data-v="a"] .ev-featured-media { width: 100px; height: 64px; border-radius: 8px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border, #ededed); }
+[data-v="a"] .ev-featured-title { margin: 0 0 4px; }
+[data-v="a"] .ev-featured-row:hover .ev-featured-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+[data-v="a"] .ev-row { padding-bottom: 14px; border-bottom: 1px solid var(--border, #ededed); }
+
+/* Variant B: uniform card grid */
+[data-v="b"] .ev-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5, 20px); }
+[data-v="b"] .ev-card { text-decoration: none; color: inherit; padding-bottom: var(--space-4, 16px); border-bottom: 1px solid var(--border, #ededed); }
+[data-v="b"] .ev-card-media { height: 130px; border-radius: 8px; overflow: hidden; margin-bottom: var(--space-3, 12px); border: 1px solid var(--border, #ededed); }
+[data-v="b"] .ev-card-media-empty { background: #fafafa; }
+[data-v="b"] .ev-img-ph-empty { background: transparent; color: #d8d8d8; }
+[data-v="b"] .ev-card-title { display: block; margin: 0 0 6px; }
+[data-v="b"] .ev-card:hover .ev-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+[data-v="b"] .ev-card-meta { margin: 2px 0; }
+@media (max-width: 700px) { [data-v="b"] .ev-grid { grid-template-columns: 1fr; } }
+
+/* Variant C: uniform list */
+[data-v="c"] .ev-list { max-width: 640px; }
+</style>
+{% endblock %}
