@@ -1,0 +1,44 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ doc.title }} — Blog — DoWH{% endblock %}
+
+{% block page_content %}
+<div class="blog-article-crumb">
+    <p class="dt-caption"><a href="/blog">&larr; Back to Blog</a></p>
+</div>
+
+<article class="blog-article">
+    <div class="blog-article-head">
+        <span class="blog-cat-label">{{ doc.category }}</span>
+        <h1 class="blog-article-title">{{ doc.title }}</h1>
+        {% if doc.excerpt %}<p class="dt-body blog-article-dek">{{ doc.excerpt }}</p>{% endif %}
+        <p class="dt-caption blog-article-byline">
+            By <a href="/directory?search={{ author_name | urlencode }}">{{ author_name }}</a>
+            &middot; {{ frappe.utils.format_date(doc.published_date) }}
+            &middot; {{ read_time }}
+        </p>
+    </div>
+
+    <div class="blog-article-body dt-body">
+        {{ doc.content | safe }}
+    </div>
+</article>
+{% endblock %}
+
+{% block style %}
+<style>
+.blog-article-crumb { max-width: 640px; margin: 0 auto var(--space-5, 20px); }
+
+.blog-cat-label { font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #8a6d00; }
+
+.blog-article { max-width: 640px; margin: 0 auto; border-top: 1px solid var(--border, #ededed); padding-top: var(--space-6, 24px); }
+.blog-article-head { text-align: center; margin-bottom: var(--space-6, 24px); }
+.blog-article-title { font-size: 28px; font-weight: 600; line-height: 1.25; margin: 8px 0 10px; font-family: var(--font-sans); color: var(--ink, #171717); }
+.blog-article-dek { font-size: 15.5px; color: var(--ink-secondary, #666); max-width: 52ch; margin: 0 auto 14px; }
+.blog-article-byline a { color: inherit; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 2px; }
+
+.blog-article-body { line-height: 1.7; }
+.blog-article-body h1, .blog-article-body h2, .blog-article-body h3 { font-family: var(--font-sans); font-size: 18px; color: var(--ink, #171717); margin: var(--space-6, 24px) 0 var(--space-2, 8px); }
+.blog-article-body p { margin: 0 0 var(--space-4, 16px); }
+</style>
+{% endblock %}

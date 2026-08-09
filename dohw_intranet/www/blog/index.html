@@ -1,0 +1,69 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Blog — DoWH{% endblock %}
+
+{% block page_content %}
+
+<div class="blog-block">
+    <h1 class="dt-page-title">Blog</h1>
+    <p class="dt-caption">Stories from around the department</p>
+</div>
+
+<div class="blog-block">
+    <div class="blog-filter-row">
+        <a href="/blog" class="blog-cat-chip{% if not active_category %} active{% endif %}">All</a>
+        {% for c in categories %}
+        <a href="/blog?category={{ c | urlencode }}" class="blog-cat-chip{% if active_category == c %} active{% endif %}">{{ c }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="blog-block">
+    {% if posts %}
+    <div class="dt-card-list blog-list">
+        {% for p in posts %}
+        <a href="/blog/{{ p.route }}" class="dt-card blog-row">
+            {% if p.featured_image %}
+            <div class="blog-row-thumb"><img src="{{ p.featured_image }}" alt=""></div>
+            {% endif %}
+            <div class="blog-row-body">
+                <span class="dt-card-title">{{ p.title }}</span>
+                {% if p.excerpt %}<p class="dt-caption blog-row-excerpt">{{ p.excerpt }}</p>{% endif %}
+                <p class="dt-caption blog-row-meta">In {{ p.category }} by {{ p.author_name }} &middot; {{ frappe.utils.format_date(p.published_date) }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="blog-empty">
+        <p class="dt-body">No posts published{% if active_category %} in this category{% endif %} yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block style %}
+<style>
+.blog-block { max-width: 640px; }
+.blog-block + .blog-block { margin-top: var(--space-5, 20px); }
+
+.blog-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.blog-cat-chip {
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; text-decoration: none;
+    font-weight: 600; background: #f2f2f2; color: var(--ink-muted, #999); font-family: var(--font-sans);
+}
+.blog-cat-chip.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+.blog-list { }
+.blog-row { display: flex; gap: 14px; align-items: flex-start; text-decoration: none; color: inherit; }
+.blog-row-thumb { width: 92px; height: 52px; border-radius: 8px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border, #ededed); }
+.blog-row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.blog-row-body { flex: 1; min-width: 0; }
+.blog-row-excerpt { margin: 4px 0; }
+.blog-row-meta { color: var(--ink-muted, #9a9a9a); }
+.blog-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.blog-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+</style>
+{% endblock %}
