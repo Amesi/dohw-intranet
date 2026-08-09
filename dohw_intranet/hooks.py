@@ -28,11 +28,13 @@ website_context = {
     "favicon": "/files/dowh-favicon.png",
 }
 
-# Custom page_renderer for /wiki content — see dohw_intranet/wiki_document_renderer.py
-# for why this exists instead of relying on the wiki app's own renderer. Must be
-# installed (hence listed) before "wiki" so it claims these routes first — see
-# frappe.get_hooks()'s install-order merge, and the app's own docstring for detail.
-page_renderer = ["dohw_intranet.wiki_document_renderer.WikiDocumentRenderer"]
+# Custom page_renderers for per-record routes that a normal www/ controller
+# can't serve (Wiki Document and Blog Post routes are per-record slugs, not
+# fixed pages) — see each renderer module's own docstring for detail.
+page_renderer = [
+    "dohw_intranet.wiki_document_renderer.WikiDocumentRenderer",
+    "dohw_intranet.blog_post_renderer.BlogPostRenderer",
+]
 
 # Fixtures — schema additions this app depends on, reproducible on any site
 # via `bench migrate` rather than living only as a manual DB change.
