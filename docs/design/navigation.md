@@ -30,6 +30,10 @@ Pinned at the bottom, visually separated by a divider: **Desk** (link to ERPNext
 - Active state: light gray background (`#f0f0f0`) + a `2px` inset left border in DoWH Gold — the token system's one sanctioned use of Gold as an interactive-state indicator, never a fill.
 - Brand mark at top: small dark square with a gold "D" mark + "DoWH Intranet" wordmark, `13px/700`.
 
+## Mini-rail mode (added by wiki.md)
+
+Inside `/wiki`, the sidebar collapses to a slim icon-only rail (~44px, no labels) rather than showing the full 220px list — see [wiki.md](./wiki.md) for why. This is the one page-specific exception to "the sidebar looks the same everywhere."
+
 ## Mobile / responsive behavior
 
 Mirrors frappe.io's own confirmed behavior (per [#15 research](https://github.com/Amesi/dohw-intranet/blob/research/frappe-io-patterns/docs/agents/research/frappe-io-design-patterns.md#5-mega-menu-navigation-structure--behavior)):
@@ -39,7 +43,7 @@ Mirrors frappe.io's own confirmed behavior (per [#15 research](https://github.co
 
 ## What this doesn't cover (still fog on the map)
 
-- Whether/how the sidebar itself changes per-page (e.g. contextual sub-items when inside a section) — not raised during this ticket, out of scope unless it resurfaces
+- Whether/how the sidebar changes per-page beyond the `/wiki` mini-rail case above (e.g. contextual sub-items elsewhere) — not raised during this ticket, out of scope unless it resurfaces
 - Exact icon set (prototype uses emoji as stand-ins) — a real icon system is an implementation detail for the build phase, not decided here
 
 ## Source
