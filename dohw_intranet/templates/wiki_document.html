@@ -1,0 +1,138 @@
+{% extends "templates/web.html" %}
+
+{% macro tree_nodes(nodes, current_route) %}
+{% for n in nodes %}
+<a href="/{{ n.route }}" class="wiki-tree-item{% if n.route == current_route %} active{% endif %}">{{ n.title }}</a>
+{% if n.children %}
+<div class="wiki-tree-children">
+    {{ tree_nodes(n.children, current_route) }}
+</div>
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% block title %}{{ title }} — Wiki — DoWH{% endblock %}
+
+{% block page_content %}
+
+<div class="wiki-block">
+    <p class="dt-caption wiki-breadcrumbs">
+        {% if spaces|length > 1 %}
+        {% for s in spaces %}
+        <a href="/{{ s.route }}" class="wiki-crumb{% if space and space.route == s.route %} active{% endif %}">{{ s.space_name }}</a>{% if not loop.last %}<span class="wiki-crumb-sep">/</span>{% endif %}
+        {% endfor %}
+        {% else %}
+        <a href="/{{ space.route }}" class="wiki-crumb">{{ space.space_name }}</a>
+        {% endif %}
+        {% for b in breadcrumbs %}
+        <span class="wiki-crumb-sep">/</span><a href="/{{ b.route }}" class="wiki-crumb">{{ b.title }}</a>
+        {% endfor %}
+    </p>
+    <h1 class="dt-page-title">{{ title }}</h1>
+</div>
+
+<div class="wiki-layout">
+    <nav class="wiki-tree" aria-label="Wiki pages">
+        {{ tree_nodes(tree, current_route) }}
+    </nav>
+
+    <div class="wiki-content">
+        {% if content_html %}
+        <div class="wiki-body dt-body">{{ content_html }}</div>
+        {% endif %}
+
+        {% if children %}
+        <div class="wiki-children{% if content_html %} wiki-children-spaced{% endif %}">
+            <p class="dash-section-label">Pages</p>
+            <div class="dt-card-list">
+                {% for c in children %}
+                <a href="/{{ c.route }}" class="dt-card wiki-child-row">
+                    <span class="dt-card-title">{{ c.title }}</span>
+                    {% if c.is_group %}<span class="dt-badge dt-badge-info">Section</span>{% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% elif not content_html %}
+        <div class="wiki-empty">
+            <p class="dt-body">No pages published here yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block style %}
+<style>
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation. Serves Wiki Document content (see dohw_intranet/dohw_intranet/
+   wiki_document_renderer.py for why this exists as a custom renderer rather
+   than the wiki app's own page_renderer). */
+
+.wiki-block { max-width: 900px; }
+
+.wiki-breadcrumbs { margin-bottom: 4px; }
+.wiki-crumb { color: var(--ink-muted, #9a9a9a); text-decoration: none; }
+.wiki-crumb:hover, .wiki-crumb.active { color: var(--ink-secondary, #666); }
+.wiki-crumb-sep { color: var(--ink-muted, #cfcfcf); margin: 0 4px; }
+
+.wiki-layout { display: flex; gap: var(--space-6, 24px); align-items: flex-start; max-width: 900px; margin-top: var(--space-5, 20px); }
+
+.wiki-tree {
+    width: 190px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border, #ededed);
+    padding-right: var(--space-4, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: sticky;
+    top: var(--space-5, 20px);
+}
+.wiki-tree-item {
+    padding: 5px 8px;
+    border-radius: 5px;
+    color: var(--ink-secondary, #525252);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: 13px;
+}
+.wiki-tree-item:hover { background: #f5f5f5; }
+.wiki-tree-item.active { background: #f5f5f5; color: var(--ink, #171717); font-weight: 600; box-shadow: inset 2px 0 0 var(--dowh-gold); }
+.wiki-tree-children { padding-left: 12px; display: flex; flex-direction: column; gap: 2px; }
+
+.wiki-content { flex: 1; min-width: 0; }
+
+.wiki-body { line-height: 1.65; }
+.wiki-body h1, .wiki-body h2, .wiki-body h3 { font-family: var(--font-sans); color: var(--ink, #171717); margin: var(--space-5, 20px) 0 var(--space-2, 8px); }
+.wiki-body h1 { font-size: 20px; }
+.wiki-body h2 { font-size: 17px; }
+.wiki-body h3 { font-size: 15px; }
+.wiki-body p { margin: 0 0 var(--space-3, 12px); }
+.wiki-body ul, .wiki-body ol { margin: 0 0 var(--space-3, 12px); padding-left: 22px; }
+.wiki-body img { max-width: 100%; border-radius: 6px; margin: var(--space-3, 12px) 0; }
+.wiki-body table { border-collapse: collapse; width: 100%; margin: 0 0 var(--space-4, 16px); font-size: 13px; }
+.wiki-body th, .wiki-body td { border: 1px solid var(--border, #ededed); padding: 6px 10px; text-align: left; }
+.wiki-body th { background: #fafafa; font-weight: 600; }
+.wiki-body code { background: #f5f5f5; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+.wiki-body pre { background: #f5f5f5; padding: var(--space-3, 12px); border-radius: 6px; overflow-x: auto; }
+.wiki-body pre code { background: none; padding: 0; }
+.wiki-body blockquote { border-left: 2px solid var(--dowh-gold); margin: 0 0 var(--space-3, 12px); padding-left: var(--space-3, 12px); color: var(--ink-secondary, #666); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+.wiki-children-spaced { margin-top: var(--space-6, 24px); padding-top: var(--space-5, 20px); border-top: 1px solid var(--border, #ededed); }
+.wiki-child-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; color: inherit; }
+.wiki-child-row:hover .dt-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.wiki-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+
+@media (max-width: 700px) {
+    .wiki-layout { flex-direction: column; }
+    .wiki-tree { width: 100%; border-right: none; border-bottom: 1px solid var(--border, #ededed); padding-right: 0; padding-bottom: var(--space-3, 12px); position: static; }
+}
+</style>
+{% endblock %}
