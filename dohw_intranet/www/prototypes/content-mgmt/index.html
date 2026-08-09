@@ -35,6 +35,15 @@
   .form-row label { display: block; font-size: 11.5px; color: #666; margin-bottom: 4px; }
   .form-row input, .form-row select, .form-row textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #dcdcdc; border-radius: 6px; }
   .form-row textarea { resize: vertical; min-height: 70px; }
+  .rich-editor { border: 1px solid #dcdcdc; border-radius: 6px; overflow: hidden; }
+  .rich-toolbar { display: flex; gap: 2px; padding: 5px 6px; background: #fafafa; border-bottom: 1px solid #ededed; }
+  .rich-toolbar button { width: 26px; height: 26px; border: none; background: none; border-radius: 4px; color: #666; font-size: 12px; cursor: pointer; }
+  .rich-toolbar button:hover { background: #eee; color: #171717; }
+  .rich-toolbar button.b { font-weight: 700; } .rich-toolbar button.i { font-style: italic; }
+  .rich-toolbar .rt-sep { width: 1px; background: #e0e0e0; margin: 3px 4px; }
+  .rich-body { min-height: 140px; padding: 10px 12px; font-size: 13px; color: #444; line-height: 1.6; }
+  .rich-body p { margin: 0 0 10px; }
+  .rich-body p:last-child { margin-bottom: 0; }
   .scope-lock { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 6px 10px; border: 1px solid #ededed; border-radius: 20px; background: #fafafa; color: #666; }
   .scope-lock .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dowh-gold); }
   .btn-primary { background: none; border: none; padding: 0; color: #171717; text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; font-size: 13.5px; font-weight: 500; align-self: flex-start; }
@@ -112,7 +121,21 @@
         <div class="block"><div class="form-box" style="max-width:560px;">
           <div class="scope-lock"><span class="dot"></span>Posting as Highways Wing (locked)</div>
           <div class="form-row"><label>Title</label><input type="text" placeholder="Circular title"></div>
-          <div class="form-row"><label>Content</label><textarea placeholder="Circular body" style="min-height:140px;"></textarea></div>
+          <div class="form-row"><label>Content</label>
+            <div class="rich-editor">
+              <div class="rich-toolbar">
+                <button type="button" class="b">B</button><button type="button" class="i">I</button><button type="button">U</button>
+                <div class="rt-sep"></div>
+                <button type="button">🔗</button><button type="button">•⁠—</button><button type="button">1.</button>
+                <div class="rt-sep"></div>
+                <button type="button">""</button><button type="button">&lt;/&gt;</button>
+              </div>
+              <div class="rich-body" contenteditable="true">
+                <p>Resurfacing works on the <strong>Boroko–Waigani corridor</strong> begin 18 Aug.</p>
+                <p>Wing staff to coordinate detour signage with Traffic Section.</p>
+              </div>
+            </div>
+          </div>
           <div class="form-row"><label>Classification</label><select><option>For information</option><option>For action</option><option>Urgent</option></select></div>
           <div class="form-row"><label>Tags</label><input type="text" placeholder="roadworks, safety…"></div>
           <div style="display:flex; gap:16px; margin-top:4px;">
