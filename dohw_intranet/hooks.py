@@ -19,6 +19,7 @@ home_page = "/circulars"
 # ticket migrates it off — do not remove until every page ticket has landed.
 web_include_css = [
     "/assets/dohw_intranet/css/tokens.css",
+    "/assets/dohw_intranet/css/navigation.css",
     "/assets/dohw_intranet/css/dohw_intranet.css",
 ]
 
