@@ -3,203 +3,93 @@
 {% block title %}Calendar — DoWH{% endblock %}
 
 {% block page_content %}
-<div style="padding: 20px 0 40px 0;">
+<div class="cal-page">
 
-<style>
-:root { --gold: #FFBF00; --dark: #1A1A1A; }
-
-/* Top bar: view toggle + wing filter */
-.cal-top {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px; gap: 10px; flex-wrap: wrap;
-}
-.cal-top h2 { font-size: 18px; font-weight: 800; color: var(--dark); margin: 0; }
-.cal-views { display: flex; gap: 2px; }
-.cal-views a {
-    padding: 5px 14px; border: 1px solid #ddd; font-size: 11px; text-decoration: none;
-    font-weight: 600; color: #555;
-}
-.cal-views a:first-child { border-radius: 4px 0 0 4px; }
-.cal-views a:last-child { border-radius: 0 4px 4px 0; }
-.cal-views a.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-.cal-views a:hover:not(.active) { background: #f5f5f5; }
-
-/* Nav row */
-.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-.cal-nav a { padding: 4px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; text-decoration: none; color: var(--dark); font-weight: 600; }
-.cal-nav a:hover { background: var(--gold); color: var(--dark); }
-.cal-nav .cal-date-label { font-size: 14px; font-weight: 700; color: var(--dark); }
-.cal-nav-group { display: flex; gap: 0; }
-.cal-nav-group a { border-radius: 0; }
-.cal-nav-group a:first-child { border-radius: 4px 0 0 4px; }
-.cal-nav-group a:last-child { border-radius: 0 4px 4px 0; }
-
-/* Wing filter */
-.cal-wing { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
-.cal-wing a {
-    padding: 3px 10px; border-radius: 12px; font-size: 10px; text-decoration: none;
-    font-weight: 600; background: #f0f0f0; color: #555; border: 1px solid #e0e0e0;
-}
-.cal-wing a.active, .cal-wing a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-
-/* Day view */
-.day-column { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
-.day-hour {
-    display: flex; border-bottom: 1px solid #f0f0f0; min-height: 48px;
-}
-.day-hour .hour-label {
-    width: 56px; padding: 8px 6px; font-size: 10px; color: #888; font-weight: 600;
-    text-align: right; flex-shrink: 0; border-right: 1px solid #f0f0f0;
-}
-.day-hour .hour-content { flex: 1; padding: 4px 8px; }
-.day-event {
-    padding: 4px 8px; border-radius: 4px; margin-bottom: 2px; font-size: 11px;
-    font-weight: 600; cursor: pointer; border-left: 3px solid var(--gold);
-    background: #fffde7;
-}
-.day-event:hover { background: #fff9c4; }
-
-/* Week view */
-.week-grid { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
-.week-row { display: grid; grid-template-columns: 60px repeat(7, 1fr); }
-.week-header { background: var(--dark); color: var(--gold); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.week-header .week-cell { padding: 6px 4px; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
-.week-header .time-label { padding: 6px 4px; }
-.week-cell { min-height: 40px; padding: 4px; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; font-size: 9px; }
-.week-cell:last-child { border-right: none; }
-.week-cell .time-label { font-size: 9px; color: #888; }
-.week-event {
-    padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; font-size: 8px;
-    cursor: pointer; border-left: 2px solid var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* Month grid */
-.cal-grid { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 24px; overflow: hidden; }
-.cal-row { display: grid; grid-template-columns: repeat(7, 1fr); }
-.cal-row.header { background: var(--dark); color: var(--gold); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.cal-cell { min-height: 70px; padding: 4px; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; font-size: 10px; }
-.cal-cell:last-child { border-right: none; }
-.cal-cell.empty { background: #fafafa; }
-.cal-cell .day-num { font-weight: 700; color: #aaa; margin-bottom: 2px; }
-.cal-cell.today .day-num { color: var(--dark); background: var(--gold); display: inline-block; padding: 2px 5px; border-radius: 10px; }
-.cal-event {
-    padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; font-size: 8px;
-    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    border-left: 2px solid var(--gold);
-}
-.cal-event:hover { background: #f5f5f5; }
-
-/* Upcoming */
-.upcoming-list { display: flex; flex-direction: column; gap: 6px; }
-.upcoming-item {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
-    padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-    border-left: 3px solid var(--gold); cursor: pointer; transition: box-shadow 0.15s;
-}
-.upcoming-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.upcoming-date { text-align: center; min-width: 44px; font-size: 10px; font-weight: 700; color: var(--dark); }
-.upcoming-date .d { font-size: 20px; line-height: 1; }
-.upcoming-info { flex: 1; min-width: 0; }
-.upcoming-info .t { font-size: 12px; font-weight: 700; color: var(--dark); }
-.upcoming-info .m { font-size: 10px; color: #888; }
-
-/* Modal */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center;
-    align-items: center; padding: 20px;
-}
-.modal-overlay.show { display: flex; }
-.modal-card {
-    background: #fff; border-radius: 10px; padding: 24px; max-width: 480px;
-    width: 100%; border-top: 4px solid var(--gold); position: relative;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.modal-close { position: absolute; top: 12px; right: 16px; font-size: 20px; cursor: pointer; color: #888; font-weight: 700; }
-.modal-card h3 { font-size: 16px; font-weight: 800; color: var(--dark); margin: 0 0 12px; padding-right: 24px; }
-.modal-row { font-size: 12px; color: #555; margin-bottom: 6px; display: flex; gap: 6px; align-items: baseline; }
-.modal-row .lbl { font-weight: 600; color: #888; min-width: 70px; }
-.modal-desc { font-size: 12px; color: #333; line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; white-space: pre-wrap; }
-
-@media (max-width: 600px) {
-    .cal-top { flex-direction: column; align-items: flex-start; }
-    .cal-cell { min-height: 44px; padding: 2px; font-size: 8px; }
-    .cal-event { font-size: 7px; }
-    .week-grid { font-size: 8px; }
-    .week-cell { min-height: 30px; }
-}
-</style>
-
-<!-- TOP BAR -->
-<div class="cal-top">
-    <div class="cal-views">
-        <a href="/calendar?view=day{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'day' %}active{% endif %}">Day</a>
-        <a href="/calendar?view=week{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'week' %}active{% endif %}">Week</a>
-        <a href="/calendar?view=month{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'month' %}active{% endif %}">Month</a>
-    </div>
+<div class="cal-block">
+    <h1 class="dt-page-title">Calendar</h1>
 </div>
 
-<!-- WING FILTER -->
-<div class="cal-wing">
-    <a href="/calendar?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All Wings</a>
-    {% for w in wings %}
-    <a href="/calendar?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
-    {% endfor %}
+<!-- TOP BAR: view toggle -->
+<div class="cal-block">
+    <div class="cal-top">
+        <div class="cal-views">
+            <a href="/calendar?view=day{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'day' %}active{% endif %}">Day</a>
+            <a href="/calendar?view=week{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'week' %}active{% endif %}">Week</a>
+            <a href="/calendar?view=month{% if active_wing %}&wing={{ active_wing }}{% endif %}" class="{% if view == 'month' %}active{% endif %}">Month</a>
+        </div>
+    </div>
+
+    <!-- WING FILTER -->
+    <div class="cal-wing">
+        <a href="/calendar?view={{ view }}" class="{% if not active_wing %}active{% endif %}">All wings</a>
+        {% for w in wings %}
+        <a href="/calendar?view={{ view }}&wing={{ w.name }}" class="{% if active_wing == w.name %}active{% endif %}">{{ w.department_name }}</a>
+        {% endfor %}
+    </div>
 </div>
 
 {% if is_content_manager %}
-{% if posted %}
-<div style="background:#d4edda; color:#155724; padding:10px 14px; border-radius:6px; margin-bottom:12px; font-size:12px;">✅ Event posted successfully.</div>
-{% endif %}
-<details style="margin-bottom:14px;">
-    <summary style="cursor:pointer; padding:6px 14px; background:var(--gold); color:var(--dark); border-radius:6px; font-size:12px; font-weight:700; display:inline-block;">✚ New Event</summary>
-    <form method="POST" action="/calendar" style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:16px; margin-top:8px;">
-        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Subject *</label>
-        <input type="text" name="ev_subject" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box;" placeholder="Event title...">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-            <div style="flex:1; min-width:120px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Category</label>
-                <select name="ev_category" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
-                    <option value="Event">Event</option><option value="Meeting">Meeting</option><option value="Other">Other</option>
-                </select>
+<div class="cal-block">
+    {% if posted %}
+    <div class="cal-posted-ok">Event posted successfully.</div>
+    {% endif %}
+    <details class="cal-composer">
+        <summary class="dt-btn-primary">+ New event</summary>
+        <form method="POST" action="/calendar" class="cal-composer-form">
+            <div class="cal-form-row">
+                <label class="dt-caption">Subject</label>
+                <input type="text" name="ev_subject" required class="dt-input" placeholder="Event title">
             </div>
-            <div style="flex:1; min-width:120px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Location</label>
-                <input type="text" name="ev_location" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;" placeholder="e.g. Mt Hagen">
+            <div class="cal-form-row-split">
+                <div class="cal-form-row">
+                    <label class="dt-caption">Category</label>
+                    <select name="ev_category" class="dt-select">
+                        <option value="Event">Event</option><option value="Meeting">Meeting</option><option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="cal-form-row">
+                    <label class="dt-caption">Location</label>
+                    <input type="text" name="ev_location" class="dt-input" placeholder="e.g. Mt Hagen">
+                </div>
             </div>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-            <div style="flex:1; min-width:140px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Starts *</label>
-                <input type="datetime-local" name="ev_starts" required style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
+            <div class="cal-form-row-split">
+                <div class="cal-form-row">
+                    <label class="dt-caption">Starts</label>
+                    <input type="datetime-local" name="ev_starts" required class="dt-input">
+                </div>
+                <div class="cal-form-row">
+                    <label class="dt-caption">Ends</label>
+                    <input type="datetime-local" name="ev_ends" class="dt-input">
+                </div>
             </div>
-            <div style="flex:1; min-width:140px;">
-                <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Ends</label>
-                <input type="datetime-local" name="ev_ends" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:11px;">
+            <div class="cal-form-row">
+                <label class="dt-caption">Description</label>
+                <textarea name="ev_description" class="dt-textarea" placeholder="Event details"></textarea>
             </div>
-        </div>
-        <label style="display:block; font-size:11px; font-weight:600; color:#555; margin-bottom:4px;">Description</label>
-        <textarea name="ev_description" style="width:100%; padding:6px 10px; border:1px solid #ddd; border-radius:4px; font-size:12px; margin-bottom:10px; box-sizing:border-box; height:60px; resize:vertical;" placeholder="Event details..."></textarea>
-        <input type="hidden" name="submit_event" value="1">
-        <button type="submit" style="padding:7px 20px; background:var(--gold); color:var(--dark); border:none; border-radius:4px; font-weight:700; font-size:12px; cursor:pointer;">Post Event</button>
-    </form>
-</details>
+            <input type="hidden" name="submit_event" value="1">
+            <button type="submit" class="dt-btn-primary">Publish &rarr;</button>
+        </form>
+    </details>
+</div>
 {% endif %}
 
 <!-- NAVIGATION -->
-<div class="cal-nav">
-    <span class="cal-date-label">
-        {% if view == 'day' %}{{ day_label }}
-        {% elif view == 'week' %}{{ week_start }} – {{ week_end }}
-        {% else %}📅 {{ month_name }}{% endif %}
-    </span>
-    <div class="cal-nav-group">
-        <a href="{{ prev_link }}">◀</a>
-        <a href="{{ today_link }}">Today</a>
-        <a href="{{ next_link }}">▶</a>
+<div class="cal-block">
+    <div class="cal-nav">
+        <span class="dt-card-title">
+            {% if view == 'day' %}{{ day_label }}
+            {% elif view == 'week' %}{{ week_start }} &ndash; {{ week_end }}
+            {% else %}{{ month_name }}{% endif %}
+        </span>
+        <div class="cal-nav-group">
+            <a href="{{ prev_link }}" class="dt-btn-secondary">&larr;</a>
+            <a href="{{ today_link }}" class="dt-btn-secondary">Today</a>
+            <a href="{{ next_link }}" class="dt-btn-secondary">&rarr;</a>
+        </div>
     </div>
 </div>
 
+<div class="cal-block">
 {% if view == 'day' %}
 <!-- DAY VIEW -->
 <div class="day-column">
@@ -209,7 +99,7 @@
         <div class="hour-content">
             {% for e in h.events %}
             <div class="day-event" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
-                {{ e.subject }} · {{ e.starts_on.strftime('%H:%M') }}
+                {{ e.subject }} &middot; {{ e.starts_on.strftime('%H:%M') }}
             </div>
             {% endfor %}
         </div>
@@ -261,7 +151,7 @@
             <div class="cal-event" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">{{ e.subject[:20] }}</div>
             {% endfor %}
             {% if cell.events|length > 3 %}
-            <div class="cal-event" style="border-left-color:#ccc;">+{{ cell.events|length - 3 }} more</div>
+            <div class="cal-event cal-event-more">+{{ cell.events|length - 3 }} more</div>
             {% endif %}
             {% endif %}
         </div>
@@ -270,33 +160,36 @@
     {% endfor %}
 </div>
 {% endif %}
+</div>
 
 <!-- UPCOMING -->
-<h3 style="font-size:14px; font-weight:700; color:var(--dark); margin:20px 0 10px;">📋 Upcoming Events</h3>
-{% if upcoming %}
-<div class="upcoming-list">
-    {% for e in upcoming %}
-    <div class="upcoming-item" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
-        <div class="upcoming-date"><div class="d">{{ e.starts_on.day }}</div>{{ e.starts_on.strftime('%b') }}</div>
-        <div class="upcoming-info"><div class="t">{{ e.subject }}</div><div class="m">{{ e.starts_on.strftime('%d %b %Y') }} · {{ e.event_category or 'Event' }}{% if e.location %} · 📍 {{ e.location }}{% endif %}</div></div>
+<div class="cal-block">
+    <p class="dash-section-label">Upcoming events</p>
+    {% if upcoming %}
+    <div class="upcoming-list">
+        {% for e in upcoming %}
+        <div class="upcoming-item" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
+            <div class="upcoming-date"><div class="d">{{ e.starts_on.day }}</div>{{ e.starts_on.strftime('%b') }}</div>
+            <div class="upcoming-info"><div class="t dt-card-title">{{ e.subject }}</div><div class="dt-caption">{{ e.starts_on.strftime('%d %b %Y') }} &middot; {{ e.event_category or 'Event' }}{% if e.location %} &middot; {{ e.location }}{% endif %}</div></div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+    {% else %}
+    <div class="cal-empty"><p class="dt-body">No upcoming events</p></div>
+    {% endif %}
 </div>
-{% else %}
-<div style="background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:32px; text-align:center; color:#888; font-size:13px;">No upcoming events</div>
-{% endif %}
 
 <!-- MODAL -->
 <div class="modal-overlay" id="eventModal" onclick="if(event.target==this)hideModal()">
     <div class="modal-card">
-        <span class="modal-close" onclick="hideModal()">✕</span>
-        <h3 id="modalTitle"></h3>
-        <div class="modal-row"><span class="lbl">Category</span><span id="modalCat"></span></div>
-        <div class="modal-row"><span class="lbl">When</span><span id="modalWhen"></span></div>
-        <div class="modal-row" id="modalEndRow" style="display:none;"><span class="lbl">Until</span><span id="modalEnd"></span></div>
-        <div class="modal-row" id="modalLocRow" style="display:none;"><span class="lbl">Location</span><span id="modalLoc"></span></div>
-        <div id="modalDesc" class="modal-desc" style="display:none;"></div>
-        <div id="modalAttach" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #eee;"></div>
+        <span class="modal-close" onclick="hideModal()">&times;</span>
+        <h3 id="modalTitle" class="dt-page-title"></h3>
+        <div class="modal-row"><span class="lbl dt-caption">Category</span><span id="modalCat" class="dt-body"></span></div>
+        <div class="modal-row"><span class="lbl dt-caption">When</span><span id="modalWhen" class="dt-body"></span></div>
+        <div class="modal-row" id="modalEndRow" style="display:none;"><span class="lbl dt-caption">Until</span><span id="modalEnd" class="dt-body"></span></div>
+        <div class="modal-row" id="modalLocRow" style="display:none;"><span class="lbl dt-caption">Location</span><span id="modalLoc" class="dt-body"></span></div>
+        <div id="modalDesc" class="modal-desc dt-body" style="display:none;"></div>
+        <div id="modalAttach" style="display:none;"></div>
     </div>
 </div>
 
@@ -316,4 +209,143 @@ function hideModal(){document.getElementById('eventModal').classList.remove('sho
 </script>
 
 </div>
+{% endblock %}
+
+{% block style %}
+<style>
+/* Page-specific layout not covered by the shared tokens.css/navigation.css
+   foundation — see docs/design/new-pages.md for the decision record.
+   Restyle of an existing, already-functional page (Day/Week/Month views,
+   content-manager composer, event detail modal) — only visual values
+   changed here, no markup/JS logic touched beyond class-vs-inline-style
+   cleanup on the composer form. */
+
+.cal-block { max-width: 900px; }
+.cal-block + .cal-block { margin-top: var(--space-6, 24px); }
+
+.dash-section-label {
+    font-family: var(--font-sans); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-muted, #9a9a9a); margin: 0 0 var(--space-3, 10px);
+}
+
+/* Top bar: view toggle */
+.cal-views { display: flex; gap: 2px; }
+.cal-views a {
+    padding: 5px 14px; border: 1px solid var(--border, #ececec); font-size: 11.5px; text-decoration: none;
+    font-weight: 500; color: var(--ink-secondary, #666); font-family: var(--font-sans);
+}
+.cal-views a:first-child { border-radius: 6px 0 0 6px; }
+.cal-views a:last-child { border-radius: 0 6px 6px 0; }
+.cal-views a.active { background: #f5f5f5; color: var(--ink, #171717); font-weight: 600; box-shadow: inset 0 2px 0 var(--dowh-gold); }
+.cal-views a:hover:not(.active) { background: #fafafa; }
+
+/* Wing filter — same chip pattern as Circulars/Directory */
+.cal-wing { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+.cal-wing a {
+    padding: 3px 10px; border-radius: 20px; font-size: 10px; text-decoration: none;
+    font-weight: 600; background: #f2f2f2; color: var(--ink-muted, #999); font-family: var(--font-sans);
+}
+.cal-wing a.active { border: 1px solid var(--dowh-gold); color: #8a6d00; background: none; }
+
+.cal-posted-ok {
+    background: #f4f9f4; border: 1px solid #cfe8cf; color: #2e6b2e;
+    font-family: var(--font-sans); font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;
+}
+.cal-composer summary { cursor: pointer; list-style: none; }
+.cal-composer summary::-webkit-details-marker { display: none; }
+.cal-composer-form {
+    margin-top: 14px; padding: 16px; background: #fafafa; border: 1px solid var(--border, #ededed);
+    border-radius: 8px; display: flex; flex-direction: column; gap: 10px;
+}
+.cal-form-row { display: flex; flex-direction: column; gap: 4px; }
+.cal-form-row-split { display: flex; gap: 12px; }
+.cal-form-row-split .cal-form-row { flex: 1; }
+
+/* Nav row */
+.cal-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.cal-nav-group { display: flex; gap: 14px; align-items: baseline; }
+
+/* Day view */
+.day-column { border: 1px solid var(--border, #ececec); border-radius: 8px; overflow: hidden; }
+.day-hour { display: flex; border-bottom: 1px solid var(--border, #f0f0f0); min-height: 44px; }
+.day-hour:last-child { border-bottom: none; }
+.day-hour .hour-label {
+    width: 56px; padding: 8px 6px; font-size: 10px; color: var(--ink-muted, #999); font-weight: 500;
+    text-align: right; flex-shrink: 0; border-right: 1px solid var(--border, #f0f0f0); font-family: var(--font-sans);
+}
+.day-hour .hour-content { flex: 1; padding: 4px 8px; }
+.day-event {
+    padding: 4px 8px; border-radius: 4px; margin-bottom: 2px; font-size: 11px; font-family: var(--font-sans);
+    font-weight: 500; cursor: pointer; border-left: 2px solid var(--dowh-gold); color: var(--ink, #171717);
+}
+.day-event:hover { background: #fafafa; }
+
+/* Week view */
+.week-grid { border: 1px solid var(--border, #ececec); border-radius: 8px; overflow: hidden; }
+.week-row { display: grid; grid-template-columns: 56px repeat(7, 1fr); }
+.week-header { background: #fafafa; font-size: 10px; font-weight: 600; color: var(--ink-muted, #999); text-transform: uppercase; }
+.week-header .week-cell { padding: 6px 4px; text-align: center; border-right: 1px solid var(--border, #f0f0f0); }
+.week-cell { min-height: 38px; padding: 4px; border-right: 1px solid var(--border, #f0f0f0); border-bottom: 1px solid var(--border, #f0f0f0); font-size: 9px; }
+.week-cell:last-child { border-right: none; }
+.week-cell .time-label { font-size: 9px; color: var(--ink-muted, #999); }
+.week-event {
+    padding: 1px 4px; border-radius: 2px; margin-bottom: 1px; font-size: 8px; font-family: var(--font-sans);
+    cursor: pointer; border-left: 2px solid var(--dowh-gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Month grid */
+.cal-grid { border: 1px solid var(--border, #ececec); border-radius: 8px; margin-bottom: var(--space-6, 24px); overflow: hidden; }
+.cal-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-row.header { background: #fafafa; font-size: 10px; font-weight: 600; color: var(--ink-muted, #999); text-transform: uppercase; }
+.cal-cell { min-height: 66px; padding: 4px; border-right: 1px solid var(--border, #f0f0f0); border-bottom: 1px solid var(--border, #f0f0f0); font-size: 10px; }
+.cal-cell:last-child { border-right: none; }
+.cal-cell.empty { background: #fafafa; }
+.cal-cell .day-num { font-weight: 600; color: var(--ink-muted, #bbb); margin-bottom: 2px; font-family: var(--font-sans); }
+.cal-cell.today .day-num { color: var(--ink, #171717); box-shadow: inset 0 -2px 0 var(--dowh-gold); display: inline-block; padding: 0 2px; }
+.cal-event {
+    padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; font-size: 8px; font-family: var(--font-sans);
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-left: 2px solid var(--dowh-gold); color: var(--ink, #171717);
+}
+.cal-event:hover { background: #fafafa; }
+.cal-event-more { border-left-color: #ccc; color: var(--ink-muted, #999); }
+
+/* Upcoming */
+.upcoming-list { display: flex; flex-direction: column; }
+.upcoming-item {
+    padding: 12px 0; border-bottom: 1px solid var(--border, #ededed);
+    display: flex; align-items: center; gap: 14px; cursor: pointer;
+}
+.upcoming-item:last-child { border-bottom: none; }
+.upcoming-item:hover .t { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.upcoming-date { text-align: center; min-width: 44px; font-family: var(--font-sans); font-size: 10px; font-weight: 600; color: var(--ink-muted, #999); }
+.upcoming-date .d { font-size: 18px; line-height: 1; color: var(--ink, #171717); font-weight: 700; }
+.upcoming-info { flex: 1; min-width: 0; }
+
+.cal-empty { padding: 32px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+
+/* Modal */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center;
+    align-items: center; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-card {
+    background: #fff; border-radius: 8px; padding: 24px; max-width: 440px;
+    width: 100%; border: 1px solid var(--border, #ededed); position: relative;
+}
+.modal-close { position: absolute; top: 14px; right: 18px; font-size: 20px; cursor: pointer; color: var(--ink-muted, #999); font-weight: 400; }
+.modal-card h3 { margin: 0 0 14px; padding-right: 24px; }
+.modal-row { font-size: 12.5px; margin-bottom: 6px; display: flex; gap: 8px; align-items: baseline; }
+.modal-row .lbl { min-width: 64px; }
+.modal-desc { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border, #eee); white-space: pre-wrap; }
+
+@media (max-width: 600px) {
+    .cal-cell { min-height: 44px; padding: 2px; font-size: 8px; }
+    .week-grid { font-size: 8px; }
+    .week-cell { min-height: 30px; }
+    .cal-form-row-split { flex-direction: column; }
+}
+</style>
 {% endblock %}

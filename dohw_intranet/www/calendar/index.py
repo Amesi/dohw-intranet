@@ -30,6 +30,7 @@ def get_context(context):
             "ends_on": frappe.form_dict.get("ev_ends") or None,
             "location": frappe.form_dict.get("ev_location", ""),
             "description": frappe.form_dict.get("ev_description", ""),
+            "wing": frappe.form_dict.get("ev_wing_override") or employee.department,
         })
         event.insert(ignore_permissions=True)
         context.posted = True
@@ -157,6 +158,8 @@ def _get_events(start_date, end_date, wing_filter=None):
         ["starts_on", "<=", end_date + " 23:59:59"],
         ["event_type", "=", "Public"],
     ]
+    if wing_filter:
+        filters.append(["wing", "=", wing_filter])
     return frappe.get_all(
         "Event",
         filters=filters,
@@ -169,13 +172,16 @@ def _get_events(start_date, end_date, wing_filter=None):
 def _get_upcoming(wing_filter=None):
     today_str = datetime.now().strftime("%Y-%m-%d")
     end_str = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+    filters = [
+        ["starts_on", ">=", today_str],
+        ["starts_on", "<=", end_str],
+        ["event_type", "=", "Public"],
+    ]
+    if wing_filter:
+        filters.append(["wing", "=", wing_filter])
     return frappe.get_all(
         "Event",
-        filters=[
-            ["starts_on", ">=", today_str],
-            ["starts_on", "<=", end_str],
-            ["event_type", "=", "Public"],
-        ],
+        filters=filters,
         fields=["name", "subject", "starts_on", "ends_on", "event_category", "location", "description", "all_day"],
         order_by="starts_on asc",
         limit=10,
