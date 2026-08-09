@@ -1,64 +1,49 @@
 {% extends "frappe/templates/web.html" %}
 
+{% macro nav_item(route, label) %}
+{%- set clean_route = route[1:] if route[0] == '/' else route -%}
+<a href="{{ route }}" class="dowh-nav-item{% if path == clean_route or path.startswith(clean_route ~ '/') %} active{% endif %}">{{ label }}</a>
+{%- endmacro %}
+
 {% block navbar %}
-<style>
-:root { --dowh-gold: #FFBF00; --dowh-dark: #1A1A1A; }
-</style>
-<nav class="dowh-nav">
-    <div class="dowh-nav-inner">
-        <img src="/files/dowh-logo-original.svg" alt="DoWH" class="dowh-nav-logo">
-        <span class="dowh-nav-brand">DoWH Intranet</span>
-        <div class="dowh-nav-links">
-            <a href="/circulars" class="dowh-nav-link">Circulars</a>
-            <a href="/directory" class="dowh-nav-link">Directory</a>
-            <a href="/links" class="dowh-nav-link">Links</a>
-            <a href="/wiki" class="dowh-nav-link">Documents</a>
-            <a href="/projects" class="dowh-nav-link">Projects</a>
-            <a href="/calendar" class="dowh-nav-link">Calendar</a>
-            <a href="/dashboard" class="dowh-nav-link">Dashboard</a>
-            <a href="/support" class="dowh-nav-link">Support</a>
-            <a href="/desk" class="dowh-nav-link dowh-nav-desk">Desk</a>
-        </div>
+<div class="dowh-mobile-topbar">
+    <button type="button" class="dowh-hamburger" id="dowh-sidebar-toggle" aria-label="Open navigation">&#9776;</button>
+    <span class="dowh-brand-sm">DoWH Intranet</span>
+</div>
+
+<div class="dowh-sidebar-backdrop" id="dowh-sidebar-backdrop"></div>
+
+<nav class="dowh-sidebar" id="dowh-sidebar">
+    <a href="/circulars" class="dowh-brand">
+        <span class="dowh-mark">D</span>
+        <span>DoWH Intranet</span>
+    </a>
+
+    {{ nav_item('/dashboard', 'Dashboard') }}
+    {{ nav_item('/circulars', 'Circulars') }}
+    {{ nav_item('/directory', 'Directory') }}
+    {{ nav_item('/calendar', 'Calendar') }}
+    {{ nav_item('/projects', 'Projects') }}
+    {{ nav_item('/wiki', 'Documents') }}
+    {{ nav_item('/links', 'Links & Forms') }}
+    {{ nav_item('/support', 'Support') }}
+
+    <div class="dowh-sidebar-bottom">
+        {{ nav_item('/desk', 'Desk') }}
+        <a href="/api/method/logout" class="dowh-nav-item">Logout</a>
     </div>
 </nav>
 
-<style>
-.dowh-nav {
-    background: var(--dowh-dark);
-    border-bottom: 3px solid var(--dowh-gold);
-    padding: 0 20px;
-    position: sticky; top: 0; z-index: 100;
-}
-.dowh-nav-inner {
-    max-width: 1100px; margin: 0 auto;
-    display: flex; align-items: center; gap: 12px;
-    height: 48px;
-}
-.dowh-nav-logo { height: 28px; flex-shrink: 0; }
-.dowh-nav-brand {
-    font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 1px;
-    text-transform: uppercase; white-space: nowrap; margin-right: auto;
-}
-.dowh-nav-links { display: flex; gap: 2px; }
-.dowh-nav-link {
-    padding: 6px 12px; border-radius: 6px; font-size: 11px;
-    font-weight: 600; color: #ccc; text-decoration: none; white-space: nowrap;
-    transition: background 0.15s;
-}
-.dowh-nav-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.dowh-nav-link.active { background: var(--dowh-gold); color: var(--dowh-dark); }
-.dowh-nav-desk { background: rgba(255,255,255,0.1); color: #fff; }
-
-@media (max-width: 768px) {
-    .dowh-nav { padding: 0 10px; overflow-x: auto; }
-    .dowh-nav-inner { height: 40px; gap: 6px; }
-    .dowh-nav-brand { font-size: 10px; }
-    .dowh-nav-logo { height: 22px; }
-    .dowh-nav-link { padding: 4px 8px; font-size: 10px; }
-}
-
-/* Remove sidebar — top nav replaces it */
-.web-sidebar, .sidebar-column, aside.sidebar, .col-sm-2 { display: none !important; flex: 0 0 0 !important; width: 0 !important; max-width: 0 !important; overflow: hidden; }
-.web-content, .content-column, .main-column, .col-sm-10 { max-width: 100% !important; flex: 1 1 100% !important; width: 100% !important; }
-</style>
+<script>
+(function () {
+    var toggle = document.getElementById('dowh-sidebar-toggle');
+    var backdrop = document.getElementById('dowh-sidebar-backdrop');
+    if (!toggle) return;
+    function closeDrawer() { document.body.classList.remove('dowh-drawer-open'); }
+    toggle.addEventListener('click', function () {
+        document.body.classList.toggle('dowh-drawer-open');
+    });
+    backdrop.addEventListener('click', closeDrawer);
+})();
+</script>
 {% endblock %}
