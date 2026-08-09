@@ -29,11 +29,12 @@ website_context = {
 }
 
 # Custom page_renderers for per-record routes that a normal www/ controller
-# can't serve (Wiki Document and Blog Post routes are per-record slugs, not
-# fixed pages) — see each renderer module's own docstring for detail.
+# can't serve (Wiki Document, Blog Post, and Event routes are per-record,
+# not fixed pages) — see each renderer module's own docstring for detail.
 page_renderer = [
     "dohw_intranet.wiki_document_renderer.WikiDocumentRenderer",
     "dohw_intranet.blog_post_renderer.BlogPostRenderer",
+    "dohw_intranet.event_renderer.EventRenderer",
 ]
 
 # Fixtures — schema additions this app depends on, reproducible on any site

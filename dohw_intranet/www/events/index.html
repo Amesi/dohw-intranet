@@ -1,0 +1,56 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Events — DoWH{% endblock %}
+
+{% block page_content %}
+
+<div class="ev-block">
+    <h1 class="dt-page-title">Events</h1>
+    <p class="dt-caption">Department-wide happenings — training, launches, ceremonies</p>
+</div>
+
+<div class="ev-block">
+    {% if events %}
+    <div class="ev-grid">
+        {% for e in events %}
+        <a href="/events/{{ e.name }}" class="ev-card">
+            <div class="ev-card-media"><span class="ev-img-ph">{{ e.subject[0] }}</span></div>
+            <div class="ev-card-body">
+                <h3 class="dt-card-title ev-card-title">{{ e.subject }}</h3>
+                <p class="dt-caption ev-card-meta">&#128197; {{ frappe.utils.format_date(e.starts_on) }}, {{ frappe.utils.format_time(e.starts_on) }}</p>
+                {% if e.location %}<p class="dt-caption ev-card-meta">&#128205; {{ e.location }}</p>{% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="ev-empty">
+        <p class="dt-body">No events scheduled yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block style %}
+<style>
+.ev-block { max-width: 900px; }
+.ev-block + .ev-block { margin-top: var(--space-5, 20px); }
+
+.ev-img-ph {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    background: #ededed; color: #b5b5b5; font-family: var(--font-sans); font-weight: 700; font-size: 22px;
+}
+
+.ev-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5, 20px); }
+.ev-card { text-decoration: none; color: inherit; padding-bottom: var(--space-4, 16px); border-bottom: 1px solid var(--border, #ededed); }
+.ev-card-media { height: 130px; border-radius: 8px; overflow: hidden; margin-bottom: var(--space-3, 12px); border: 1px solid var(--border, #ededed); }
+.ev-card-title { display: block; margin: 0 0 6px; }
+.ev-card:hover .ev-card-title { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ev-card-meta { margin: 2px 0; }
+
+.ev-empty { padding: 40px 20px; text-align: center; border: 1px solid var(--border, #ededed); border-radius: 6px; }
+
+@media (max-width: 700px) { .ev-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
