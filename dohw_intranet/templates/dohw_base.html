@@ -86,7 +86,7 @@
     <a href="/desk">ERP Desk</a>
     {% if frappe.session.user != "Guest" %}
     <span>{{ frappe.session.user }}</span>
-    <a href="/api/method/logout">Logout</a>
+    <a href="/api/method/logout" onclick="event.preventDefault(); fetch('/api/method/logout', {method: 'POST', headers: {'X-Frappe-CSRF-Token': frappe.csrf_token}}).then(function () { window.location.href = '/login'; }); return false;">Logout</a>
     {% endif %}
 </div>
 {% endblock %}
