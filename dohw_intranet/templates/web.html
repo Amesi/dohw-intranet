@@ -32,7 +32,9 @@
 
     <div class="dowh-sidebar-bottom">
         {{ nav_item('/desk', 'Desk') }}
+        {% if frappe.session.user != "Guest" %}
         <a href="/api/method/logout" class="dowh-nav-item" onclick="event.preventDefault(); fetch('/api/method/logout', {method: 'POST', headers: {'X-Frappe-CSRF-Token': frappe.csrf_token}}).then(function () { window.location.href = '/login'; }); return false;">Logout</a>
+        {% endif %}
     </div>
 </nav>
 
