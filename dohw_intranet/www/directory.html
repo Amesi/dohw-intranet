@@ -9,29 +9,7 @@
     <p class="dt-caption">{{ total_staff }} active staff across {{ wings|length }} Wings</p>
 </div>
 
-<div class="dir-layout">
-    <nav class="dir-tree" aria-label="Wing / Division / Section">
-        <a href="/directory" class="dir-tree-item{% if not active_wing %} active{% endif %}">All wings</a>
-        {% for w in wings %}
-        <a href="/directory?wing={{ w.name }}" class="dir-tree-item{% if active_wing == w.name and not active_division %} active{% endif %}">{{ w.department_name }}</a>
-        {% if active_wing == w.name and divisions %}
-        <div class="dir-tree-children">
-            {% for d in divisions %}
-            <a href="/directory?wing={{ active_wing }}&division={{ d.name }}" class="dir-tree-item{% if active_division == d.name and not active_section %} active{% endif %}">{{ d.department_name }}</a>
-            {% if active_division == d.name and sections %}
-            <div class="dir-tree-children">
-                {% for s in sections %}
-                <a href="/directory?wing={{ active_wing }}&division={{ active_division }}&section={{ s.name }}" class="dir-tree-item{% if active_section == s.name %} active{% endif %}">{{ s.department_name }}</a>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endfor %}
-    </nav>
-
-    <div class="dir-results">
+<div class="dir-results">
         <form method="GET" action="/directory" class="dir-search-row">
             <input type="text" name="search" value="{{ search }}" class="dt-input"
                 placeholder="{% if active_wing %}Search within {{ wings|selectattr('name','equalto',active_wing)|map(attribute='department_name')|first }}…{% else %}Search by name, department, or title…{% endif %}">
@@ -87,7 +65,6 @@
         </div>
         {% endif %}
     </div>
-</div>
 
 {% endblock %}
 
@@ -98,35 +75,7 @@
 
 .dir-block { max-width: 900px; margin-bottom: var(--space-6, 24px); }
 
-.dir-layout { display: flex; gap: var(--space-6, 24px); align-items: flex-start; }
-
-.dir-tree {
-    width: 190px;
-    flex-shrink: 0;
-    border-right: 1px solid var(--border, #ededed);
-    padding-right: var(--space-4, 16px);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 12.5px;
-}
-.dir-tree-item {
-    padding: 5px 8px;
-    border-radius: 5px;
-    color: var(--ink-secondary, #525252);
-    text-decoration: none;
-    font-family: var(--font-sans);
-}
-.dir-tree-item:hover { background: #f5f5f5; }
-.dir-tree-item.active {
-    background: #f5f5f5;
-    color: var(--ink, #171717);
-    font-weight: 600;
-    box-shadow: inset 2px 0 0 var(--dowh-gold);
-}
-.dir-tree-children { padding-left: 12px; display: flex; flex-direction: column; gap: 2px; }
-
-.dir-results { flex: 1; min-width: 0; }
+.dir-results { min-width: 0; }
 
 .dir-search-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: var(--space-5, 20px); }
 .dir-search-row .dt-input { flex: 1; min-width: 180px; }
@@ -197,9 +146,6 @@
 .org-node-inner .org-title { font-size: 10px; color: var(--ink-muted, #999); }
 
 @media (max-width: 768px) {
-    .dir-layout { flex-direction: column; }
-    .dir-tree { width: 100%; border-right: none; border-bottom: 1px solid var(--border, #ededed); padding-right: 0; padding-bottom: var(--space-3, 12px); flex-direction: row; flex-wrap: wrap; }
-    .dir-tree-children { padding-left: 0; flex-direction: row; flex-wrap: wrap; }
     .dir-emp-grid { grid-template-columns: 1fr; }
     .org-node-inner.level-2 { margin-left: 10px; }
     .org-node-inner.level-3 { margin-left: 18px; }
