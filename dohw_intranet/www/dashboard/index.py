@@ -14,9 +14,12 @@ def get_context(context):
     context.show_sidebar = 0
     context.title = "Dashboard"
 
-    # Greeting
+    # Greeting — fall back to a bare "Good morning" for generic/empty names
     fullname = frappe.db.get_value("User", frappe.session.user, "full_name") or ""
-    context.first_name = fullname.split(" ")[0] if fullname else ""
+    if fullname and fullname.strip().lower() not in ("administrator", "guest"):
+        context.first_name = fullname.split(" ")[0]
+    else:
+        context.first_name = ""
     context.today_long = datetime.date.today().strftime("%A, %d %B %Y")
 
     # Circular stats
@@ -44,6 +47,15 @@ def get_context(context):
     context.issues_open = frappe.db.count("Issue", {"status": "Open"})
     context.issues_total = frappe.db.count("Issue")
 
+    # Needs attention — urgent + for-action circulars surfaced first
+    context.needs_attention = frappe.get_all(
+        "Announcement",
+        filters={"published": 1, "classification": ["in", ["Urgent", "For Action"]]},
+        fields=["title", "date", "wing", "classification", "circular_number", "route"],
+        order_by="date desc",
+        limit=4,
+    )
+
     # Recent circulars
     context.recent = frappe.get_all(
         "Announcement",
@@ -52,5 +64,18 @@ def get_context(context):
         order_by="date desc",
         limit=6,
     )
+
+    # Upcoming events (for the "Coming up" rail)
+    upcoming = frappe.get_all(
+        "Event",
+        filters={"event_category": "Event", "starts_on": [">=", datetime.datetime.now()]},
+        fields=["subject", "starts_on", "location"],
+        order_by="starts_on asc",
+        limit=4,
+    )
+    for e in upcoming:
+        e.day = e.starts_on.strftime("%d")
+        e.month = e.starts_on.strftime("%b")
+    context.upcoming = upcoming
 
     return context
