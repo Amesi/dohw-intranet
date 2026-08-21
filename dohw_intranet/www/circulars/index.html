@@ -33,13 +33,6 @@
         {% if active_wing or active_class or active_tags %}
         <a href="/circulars" class="ed-chip">Clear filters</a>
         {% endif %}
-        {% if all_tags %}
-        <div class="ed-filter-bar" style="width:100%;">
-            {% for tag in all_tags %}
-            <a href="/circulars?tag={{ tag }}{% if active_wing %}&wing={{ active_wing }}{% endif %}{% if active_class %}&classification={{ active_class }}{% endif %}" class="ed-chip {% if tag in active_tags %}active{% endif %}">#{{ tag }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
 </div>
 

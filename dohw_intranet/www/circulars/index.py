@@ -57,14 +57,6 @@ def get_context(context):
         fields=["name", "department_name"],
     )
 
-    all_announcements = frappe.get_all("Announcement", filters={"published": 1}, fields=["tags"])
-    tag_set = set()
-    for a in all_announcements:
-        if a.tags:
-            for t in a.tags.split(","):
-                tag_set.add(t.strip().lower())
-    context.all_tags = sorted(tag_set)
-
     context.stats = {
         "total": frappe.db.count("Announcement", {"published": 1}),
         "urgent": frappe.db.count("Announcement", {"published": 1, "classification": "Urgent"}),
