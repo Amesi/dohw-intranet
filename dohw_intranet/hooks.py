@@ -18,10 +18,10 @@ home_page = "/circulars"
 # dohw_intranet.css is the pre-revamp stylesheet, kept until each page's own build
 # ticket migrates it off — do not remove until every page ticket has landed.
 web_include_css = [
-    "/assets/dohw_intranet/css/tokens.css",
-    "/assets/dohw_intranet/css/navigation.css",
+    "/assets/dohw_intranet/css/tokens.css?v=20260821",
+    "/assets/dohw_intranet/css/navigation.css?v=20260821",
     "/assets/dohw_intranet/css/dohw_intranet.css",
-    "/assets/dohw_intranet/css/editorial.css",
+    "/assets/dohw_intranet/css/editorial.css?v=20260821",
 ]
 
 # Portal settings hook
