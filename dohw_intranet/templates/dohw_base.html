@@ -60,6 +60,7 @@
     
     .dowh-main {
         flex: 1;
+        min-width: 0;
         padding: 32px 40px;
     }
     
@@ -74,6 +75,10 @@
     @media (max-width: 768px) {
         .dowh-sidebar { display: none; }
         .dowh-main { padding: 20px 16px; }
+        .dowh-navbar { flex-wrap: wrap; }
+        .dowh-navbar .dowh-nav-user { display: none; }
+        .ann-layout { flex-direction: column; }
+        .ann-rail { width: 100% !important; flex-shrink: 1 !important; }
     }
 </style>
 {% endblock %}
@@ -81,11 +86,11 @@
 {% block navbar %}
 <div class="dowh-navbar">
     <img src="/files/dowh-logo-original.svg" alt="DoWH">
-    <span class="brand">DoWH Staff Portal</span>
+    <span class="brand">DoWH</span>
     <div class="spacer"></div>
     <a href="/desk">ERP Desk</a>
     {% if frappe.session.user != "Guest" %}
-    <span>{{ frappe.session.user }}</span>
+    <span class="dowh-nav-user">{{ frappe.session.user }}</span>
     <a href="/api/method/logout" onclick="event.preventDefault(); fetch('/api/method/logout', {method: 'POST', headers: {'X-Frappe-CSRF-Token': frappe.csrf_token}}).then(function () { window.location.href = '/login'; }); return false;">Logout</a>
     {% endif %}
 </div>

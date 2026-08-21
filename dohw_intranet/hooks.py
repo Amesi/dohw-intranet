@@ -1,9 +1,9 @@
 """DoWH Intranet — Frappe app hooks."""
 
 app_name = "dohw_intranet"
-app_title = "DoWH Intranet"
+app_title = "DoWH Digital Portal"
 app_publisher = "Department of Works and Highways"
-app_description = "DoWH Staff Intranet Portal"
+app_description = "DoWH Digital Portal"
 app_email = "ict@works.gov.pg"
 app_license = "mit"
 
