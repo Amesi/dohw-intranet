@@ -6,6 +6,10 @@
    over the legacy dohw_intranet.css.
    ============================================ */
 
+/* Global — Montserrat everywhere, plus breathing room top/bottom */
+body { font-family: var(--font-sans) !important; }
+.page-content-wrapper { padding-top: 32px; padding-bottom: 40px; }
+
 /* Hero */
 .ed-hero { padding: 4px 0 28px; border-bottom: 1px solid var(--border, #ededed); margin-bottom: 28px; max-width: 980px; }
 .ed-hero .dt-display { font-size: 34px; }

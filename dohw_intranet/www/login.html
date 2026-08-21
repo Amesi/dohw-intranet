@@ -97,6 +97,7 @@
     body {
         background: #ffffff;
         min-height: 100vh;
+        padding-left: 0 !important;
     }
 
     /* Card — plain, centered, no shadow/gradient chrome */
@@ -112,16 +113,17 @@
 
     /* Small mark — the real DoWH logo, sized down, replacing the hidden
        default app-logo */
-    .page-card .app-logo {
+    .page-card-head img.app-logo {
         display: block;
-        width: 52px;
+        width: 96px;
         height: auto;
-        margin: 0 auto 18px;
+        max-height: none;
+        margin: 0 auto 20px;
     }
 
     .page-card-head { text-align: center; }
-    .page-card-head h4 {
-        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
+    .page-card-head h1 {
+        font-family: 'Montserrat', -apple-system, 'Arial', sans-serif;
         font-size: 15px;
         font-weight: 600;
         color: var(--dowh-dark);
@@ -129,14 +131,14 @@
     }
 
     .page-card-subtitle {
-        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
-        font-size: 11.5px;
-        color: #999999;
+        font-family: 'Montserrat', -apple-system, 'Arial', sans-serif;
+        font-size: 12.5px;
+        color: #666666;
         margin: 0 0 24px;
     }
 
     .form-label {
-        font-family: 'Inter', -apple-system, 'Arial', sans-serif;
+        font-family: 'Montserrat', -apple-system, 'Arial', sans-serif;
         font-size: 11.5px;
         font-weight: 500;
         color: #666666;
@@ -145,14 +147,23 @@
     .form-control {
         border: 1px solid #dcdcdc;
         border-radius: 6px;
-        padding: 9px 11px 9px 34px;
-        font-size: 13px;
+        padding: 12px 11px 12px 34px;
+        font-size: 14px;
+        min-height: 44px;
         transition: border-color 0.2s;
     }
 
     .form-control:focus {
         border-color: var(--dowh-gold);
         box-shadow: none;
+    }
+
+    /* Visible keyboard focus for every interactive element */
+    .form-control:focus-visible,
+    .page-card-actions .btn:focus-visible,
+    a:focus-visible {
+        outline: 2px solid var(--dowh-gold);
+        outline-offset: 2px;
     }
 
     /* Every action in the card — sign in, LDAP, email-link, forgot, signup —
@@ -165,7 +176,7 @@
         border-radius: 0 !important;
         padding: 0 !important;
         margin-top: 4px;
-        font-family: 'Inter', -apple-system, 'Arial', sans-serif !important;
+        font-family: 'Montserrat', -apple-system, 'Arial', sans-serif !important;
         font-weight: 600 !important;
         font-size: 13.5px !important;
         letter-spacing: normal !important;
@@ -180,23 +191,59 @@
     .page-card-actions .btn:hover { color: var(--dowh-dark) !important; opacity: 0.75; }
     .page-card-actions .btn[disabled] { opacity: 0.4; text-decoration-color: #ccc !important; }
 
+    /* Primary action ("Sign In", LDAP, "Send login link") — a filled gold
+       button so the main CTA reads as a button, not a text link. */
+    .page-card-actions .btn-login {
+        background: var(--dowh-gold) !important;
+        color: var(--dowh-dark) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 12px 16px !important;
+        margin-top: 8px;
+        font-family: 'Montserrat', -apple-system, 'Arial', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: 0.3px !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        width: 100% !important;
+        min-height: 44px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    .page-card-actions .btn-login:hover {
+        background: #e6ac00 !important;
+        color: var(--dowh-dark) !important;
+    }
+
     .forgot-password-message a {
-        font-size: 11px;
-        color: #999999;
+        font-size: 12.5px;
+        color: #525252;
         font-weight: 500;
         text-decoration: none;
     }
     .forgot-password-message a:hover { color: var(--dowh-dark); }
 
     .sign-up-message {
-        font-size: 11px;
-        color: #999999;
+        font-size: 12.5px;
+        color: #666666;
         margin-top: 16px;
     }
     .sign-up-message a {
         color: var(--dowh-dark);
         font-weight: 600;
         text-decoration: none;
+    }
+
+    /* Footer — bump "Powered by ERPNext" to the left end */
+    .web-footer { text-align: left; }
+    .web-footer .footer-info .footer-col-left { display: none; }
+    .web-footer .footer-info .footer-col-right {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        text-align: left !important;
     }
 
     .login-error-banner {
@@ -227,9 +274,9 @@
     <img class="app-logo" src="/files/dowh-logo-original.svg" alt="Department of Works and Highways">
     <div class="page-card-head-text">
         {% if title %}
-        <h4>{{ _(title) }}</h4>
+        <h1>{{ _(title) }}</h1>
         {% else %}
-        <h4>{{ _('Sign In') }}</h4>
+        <h1>{{ _('Sign In') }}</h1>
         {% endif %}
         {% if subtitle %}
         <p class="page-card-subtitle">{{ _(subtitle) }}</p>
