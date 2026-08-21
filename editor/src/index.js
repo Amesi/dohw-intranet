@@ -105,6 +105,7 @@ function insertImage(editor) {
   input.style.display = 'none'
   input.addEventListener('change', () => {
     const f = input.files && input.files[0]
+    input.remove()
     if (!f) return
     uploadFile(f)
       .then((url) => editor.chain().focus().setImage({ src: url }).run())
@@ -112,7 +113,6 @@ function insertImage(editor) {
   })
   document.body.appendChild(input)
   input.click()
-  input.remove()
 }
 
 function refreshActive(refreshables, editor) {
