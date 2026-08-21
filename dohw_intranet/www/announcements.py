@@ -6,13 +6,12 @@ def get_context(context):
         raise frappe.Redirect
 
     context.no_cache = 1
-    context.base_template = "dohw_intranet/templates/dohw_base.html"
-    context.title = "Staff Circulars &amp; Announcements"
+    context.show_sidebar = 0
+    context.title = "Announcements"
 
     # Active filters from URL
     wing_filter = frappe.form_dict.get("wing")
     class_filter = frappe.form_dict.get("classification")
-    tag_filter = frappe.form_dict.get("tag")
 
     filters = {"published": 1}
     if wing_filter:
@@ -23,47 +22,28 @@ def get_context(context):
     context.announcements = frappe.get_all(
         "Announcement",
         filters=filters,
-        fields=["title", "content", "date", "wing", "priority", "classification", "circular_number", "tags"],
+        fields=["name", "title", "content", "date", "wing", "classification", "circular_number", "route"],
         order_by="date desc",
-        limit=50
+        limit=50,
     )
-
-    # Tag filtering (client-side filter for comma-separated tags)
-    if tag_filter:
-        filtered = []
-        for a in context.announcements:
-            if a.tags and tag_filter.lower() in (a.tags or "").lower():
-                filtered.append(a)
-        context.announcements = filtered
 
     context.active_wing = wing_filter
     context.active_class = class_filter
-    context.active_tag = tag_filter
 
     # Wings for filter dropdown
     context.wings = frappe.get_all(
         "Department",
         filters={"company": "Department of Works and Highways", "is_group": 1},
-        fields=["name", "department_name"]
+        fields=["name", "department_name"],
     )
 
-    # All unique tags for tag cloud
-    all_announcements = frappe.get_all("Announcement", filters={"published": 1}, fields=["tags"])
-    tag_set = set()
-    for a in all_announcements:
-        if a.tags:
-            for t in a.tags.split(","):
-                tag_set.add(t.strip().lower())
-    context.all_tags = sorted(tag_set)
-
-    # Quick Stats
     context.stats = {
-        "total": len(frappe.get_all("Announcement", filters={"published": 1})),
-        "urgent": len(frappe.get_all("Announcement", filters={"published": 1, "classification": "Urgent"})),
-        "for_action": len(frappe.get_all("Announcement", filters={"published": 1, "classification": "For Action"})),
+        "total": frappe.db.count("Announcement", {"published": 1}),
+        "urgent": frappe.db.count("Announcement", {"published": 1, "classification": "Urgent"}),
+        "for_action": frappe.db.count("Announcement", {"published": 1, "classification": "For Action"}),
     }
 
-    # Upcoming Deadlines (For Action circulars from last 30 days)
+    # Action required — For Action circulars from the last 30 days
     from datetime import datetime, timedelta
     cutoff = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
     context.deadlines = frappe.get_all(
@@ -71,17 +51,17 @@ def get_context(context):
         filters={"published": 1, "classification": "For Action", "date": [">=", cutoff]},
         fields=["title", "date", "circular_number"],
         order_by="date desc",
-        limit=5
+        limit=5,
     )
 
-    # Recent Wiki Documents (from Wiki Page doctype if wiki is installed)
+    # Recent Wiki documents (if wiki is installed)
     try:
         context.recent_docs = frappe.get_all(
             "Wiki Page",
             filters={"published": 1},
             fields=["title", "route", "modified"],
             order_by="modified desc",
-            limit=5
+            limit=5,
         )
     except Exception:
         context.recent_docs = []
