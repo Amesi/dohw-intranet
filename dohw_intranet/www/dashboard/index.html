@@ -26,7 +26,7 @@
         </div>
         <div class="ed-list">
             {% for r in needs_attention %}
-            <a class="ed-row ed-{% if r.classification == 'Urgent' %}urgent{% else %}action{% endif %}" href="{{ r.route or '/circulars' }}">
+            <a class="ed-row" href="{{ r.route or '/circulars' }}">
                 <span class="ed-row__inner">
                     <span class="ed-row-index">{{ "%02d"|format(loop.index) }}</span>
                     <span class="ed-row-body">
@@ -49,7 +49,7 @@
         </div>
         <div class="ed-list">
             {% for r in recent %}
-            <a class="ed-row ed-{% if r.classification == 'Urgent' %}urgent{% elif r.classification == 'For Action' %}action{% else %}info{% endif %}" href="{{ r.route or '/circulars' }}">
+            <a class="ed-row" href="{{ r.route or '/circulars' }}">
                 <span class="ed-row__inner">
                     <span class="ed-row-index">{{ "%02d"|format(loop.index) }}</span>
                     <span class="ed-row-body">

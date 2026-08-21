@@ -38,13 +38,12 @@
 /* Gazette list rows — works for both <a> rows and <details> rows.
    Left color bar is the classification marker (always on). */
 .ed-list { max-width: 980px; }
-.ed-row { display: block; border-bottom: 1px solid var(--border); border-left: 3px solid #d9d9d9; text-decoration: none; position: relative; transition: background .15s ease; }
-.ed-row.ed-urgent { border-left-color: #e5484d; }
-.ed-row.ed-action { border-left-color: var(--dowh-gold, #FFBF00); }
-.ed-row.ed-info { border-left-color: #d9d9d9; }
+.ed-row { display: block; border-bottom: 1px solid var(--border); text-decoration: none; position: relative; transition: background .15s ease; }
+.ed-row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: transparent; transition: background .15s ease; }
 .ed-row:hover { background: var(--accent-soft, #fff7dd); }
-.ed-row__inner { display: flex; gap: 14px; padding: 18px 8px 18px 14px; transition: padding-left .15s ease; }
-.ed-row:hover .ed-row__inner { padding-left: 20px; }
+.ed-row:hover::before { background: var(--dowh-gold, #FFBF00); }
+.ed-row__inner { display: flex; gap: 14px; padding: 18px 8px 18px 0; transition: padding-left .15s ease; }
+.ed-row:hover .ed-row__inner { padding-left: 10px; }
 .ed-row summary { cursor: pointer; list-style: none; }
 .ed-row summary::-webkit-details-marker { display: none; }
 .ed-row summary:hover .dt-serif { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }

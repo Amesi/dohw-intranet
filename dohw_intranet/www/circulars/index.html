@@ -46,7 +46,7 @@
 <div class="ed-list">
     {% if circulars %}
     {% for c in circulars %}
-    <details class="ed-row ed-{% if c.classification == 'Urgent' %}urgent{% elif c.classification == 'For Action' %}action{% else %}info{% endif %}">
+    <details class="ed-row">
         <summary>
             <span class="ed-row__inner">
                 <span class="ed-row-index">{{ "%02d"|format(loop.index) }}</span>
