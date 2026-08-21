@@ -15,6 +15,8 @@ Desk); everything else in the data model is.
 
 import frappe
 
+from dohw_intranet.sanitize import sanitize_rich_html
+
 CATEGORIES = ["Project Updates", "Staff Spotlight", "Department News", "ICT & Systems"]
 
 
@@ -53,6 +55,7 @@ def get_context(context):
             if post.author != employee.name or post.status != "Draft":
                 frappe.local.flags.redirect_location = "/blog/manage"
                 raise frappe.Redirect
+            post.content = sanitize_rich_html(post.content or "")
             context.post = post
         return context
 
@@ -63,6 +66,7 @@ def get_context(context):
         if post.status != "In Review" or post.author == employee.name:
             frappe.local.flags.redirect_location = "/blog/manage"
             raise frappe.Redirect
+        post.content = sanitize_rich_html(post.content or "")
         context.post = post
         context.post_author_name = frappe.db.get_value("Employee", post.author, "employee_name")
         return context
@@ -99,7 +103,7 @@ def _handle_post(employee_name):
         post.title = frappe.form_dict.get("post_title")
         post.category = frappe.form_dict.get("post_category")
         post.excerpt = frappe.form_dict.get("post_excerpt")
-        post.content = frappe.form_dict.get("post_content")
+        post.content = sanitize_rich_html(frappe.form_dict.get("post_content") or "")
         if route:
             post.save(ignore_permissions=True)
         else:

@@ -64,13 +64,23 @@
             </div>
             <div class="cal-form-row">
                 <label class="dt-caption">Description</label>
-                <textarea name="ev_description" class="dt-textarea" placeholder="Event details"></textarea>
+                <div id="editorMount"></div>
+                <textarea name="ev_description" id="editorSource" class="cmp-hidden-source" hidden></textarea>
             </div>
             <input type="hidden" name="submit_event" value="1">
             <button type="submit" class="dt-btn-primary">Publish &rarr;</button>
         </form>
     </details>
 </div>
+<script src="/assets/dohw_intranet/js/editor.bundle.js?v=2"></script>
+<script>
+window.DoWHEditor.init({
+    root: document.getElementById('editorMount'),
+    source: document.getElementById('editorSource'),
+    placeholder: 'Event details',
+    initialContent: ''
+});
+</script>
 {% endif %}
 
 <!-- NAVIGATION -->
@@ -98,7 +108,7 @@
         <div class="hour-label">{{ h.label }}</div>
         <div class="hour-content">
             {% for e in h.events %}
-            <div class="day-event" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
+            <div class="day-event" onclick="showModal(this)" data-name="{{ e.name }}" data-subject="{{ e.subject | e }}" data-cat="{{ (e.event_category or '') | e }}" data-starts="{{ e.starts_on }}" data-ends="{{ e.ends_on or '' }}" data-loc="{{ (e.location or '') | e }}" data-desc="{{ e.description | e }}">
                 {{ e.subject }} &middot; {{ e.starts_on.strftime('%H:%M') }}
             </div>
             {% endfor %}
@@ -123,7 +133,7 @@
         <div class="week-cell">
             {% for e in d.events %}
             {% if e.starts_on.hour == h %}
-            <div class="week-event" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
+            <div class="week-event" onclick="showModal(this)" data-name="{{ e.name }}" data-subject="{{ e.subject | e }}" data-cat="{{ (e.event_category or '') | e }}" data-starts="{{ e.starts_on }}" data-ends="{{ e.ends_on or '' }}" data-loc="{{ (e.location or '') | e }}" data-desc="{{ e.description | e }}">
                 {{ e.subject[:15] }}
             </div>
             {% endif %}
@@ -148,7 +158,7 @@
             {% if cell.day > 0 %}
             <div class="day-num">{{ cell.day }}</div>
             {% for e in cell.events[:3] %}
-            <div class="cal-event" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">{{ e.subject[:20] }}</div>
+            <div class="cal-event" onclick="showModal(this)" data-name="{{ e.name }}" data-subject="{{ e.subject | e }}" data-cat="{{ (e.event_category or '') | e }}" data-starts="{{ e.starts_on }}" data-ends="{{ e.ends_on or '' }}" data-loc="{{ (e.location or '') | e }}" data-desc="{{ e.description | e }}">{{ e.subject[:20] }}</div>
             {% endfor %}
             {% if cell.events|length > 3 %}
             <div class="cal-event cal-event-more">+{{ cell.events|length - 3 }} more</div>
@@ -168,7 +178,7 @@
     {% if upcoming %}
     <div class="upcoming-list">
         {% for e in upcoming %}
-        <div class="upcoming-item" onclick="showModal('{{ e.name }}','{{ e.subject|replace("'","\\'") }}','{{ e.event_category or '' }}','{{ e.starts_on }}','{{ e.ends_on or '' }}','{{ e.location or '' }}','{{ e.description|replace("\n","\\n")|replace("'","\\'") }}')">
+        <div class="upcoming-item" onclick="showModal(this)" data-name="{{ e.name }}" data-subject="{{ e.subject | e }}" data-cat="{{ (e.event_category or '') | e }}" data-starts="{{ e.starts_on }}" data-ends="{{ e.ends_on or '' }}" data-loc="{{ (e.location or '') | e }}" data-desc="{{ e.description | e }}">
             <div class="upcoming-date"><div class="d">{{ e.starts_on.day }}</div>{{ e.starts_on.strftime('%b') }}</div>
             <div class="upcoming-info"><div class="t dt-card-title">{{ e.subject }}</div><div class="dt-caption">{{ e.starts_on.strftime('%d %b %Y') }} &middot; {{ e.event_category or 'Event' }}{% if e.location %} &middot; {{ e.location }}{% endif %}</div></div>
         </div>
@@ -188,21 +198,41 @@
         <div class="modal-row"><span class="lbl dt-caption">When</span><span id="modalWhen" class="dt-body"></span></div>
         <div class="modal-row" id="modalEndRow" style="display:none;"><span class="lbl dt-caption">Until</span><span id="modalEnd" class="dt-body"></span></div>
         <div class="modal-row" id="modalLocRow" style="display:none;"><span class="lbl dt-caption">Location</span><span id="modalLoc" class="dt-body"></span></div>
-        <div id="modalDesc" class="modal-desc dt-body" style="display:none;"></div>
+        <div id="modalDesc" class="modal-desc dt-body dohw-rich-text" style="display:none;"></div>
         <div id="modalAttach" style="display:none;"></div>
     </div>
 </div>
 
 <script>
-function showModal(name, title, cat, starts, ends, loc, desc) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalCat').textContent = cat || 'Event';
-    document.getElementById('modalWhen').textContent = new Date(starts).toLocaleString('en-GB', {weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    if(ends){document.getElementById('modalEndRow').style.display='flex';document.getElementById('modalEnd').textContent=new Date(ends).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}else{document.getElementById('modalEndRow').style.display='none';}
-    if(loc){document.getElementById('modalLocRow').style.display='flex';document.getElementById('modalLoc').textContent=loc;}else{document.getElementById('modalLocRow').style.display='none';}
-    if(desc){document.getElementById('modalDesc').style.display='block';document.getElementById('modalDesc').textContent=desc.replace(/\\n/g,'\\n');}else{document.getElementById('modalDesc').style.display='none';}
-    var a=document.getElementById('modalAttach');
-    a.style.display='none';
+function showModal(el) {
+    document.getElementById('modalTitle').textContent = el.getAttribute('data-subject') || '';
+    document.getElementById('modalCat').textContent = el.getAttribute('data-cat') || 'Event';
+    var starts = el.getAttribute('data-starts');
+    document.getElementById('modalWhen').textContent = starts ? new Date(starts).toLocaleString('en-GB', {weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    var ends = el.getAttribute('data-ends');
+    if (ends) {
+        document.getElementById('modalEndRow').style.display = 'flex';
+        document.getElementById('modalEnd').textContent = new Date(ends).toLocaleString('en-GB', {weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    } else {
+        document.getElementById('modalEndRow').style.display = 'none';
+    }
+    var loc = el.getAttribute('data-loc');
+    if (loc) {
+        document.getElementById('modalLocRow').style.display = 'flex';
+        document.getElementById('modalLoc').textContent = loc;
+    } else {
+        document.getElementById('modalLocRow').style.display = 'none';
+    }
+    var desc = el.getAttribute('data-desc');
+    var d = document.getElementById('modalDesc');
+    if (desc) {
+        d.style.display = 'block';
+        d.innerHTML = desc;
+    } else {
+        d.style.display = 'none';
+        d.innerHTML = '';
+    }
+    document.getElementById('modalAttach').style.display = 'none';
     document.getElementById('eventModal').classList.add('show');
 }
 function hideModal(){document.getElementById('eventModal').classList.remove('show');}
@@ -212,13 +242,13 @@ function hideModal(){document.getElementById('eventModal').classList.remove('sho
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="/assets/dohw_intranet/css/editor.css">
 <style>
 /* Page-specific layout not covered by the shared tokens.css/navigation.css
    foundation — see docs/design/new-pages.md for the decision record.
    Restyle of an existing, already-functional page (Day/Week/Month views,
-   content-manager composer, event detail modal) — only visual values
-   changed here, no markup/JS logic touched beyond class-vs-inline-style
-   cleanup on the composer form. */
+   content-manager composer, event detail modal). The composer's description
+   field is now the shared TipTap rich editor. */
 
 .cal-block { max-width: 900px; }
 .cal-block + .cal-block { margin-top: var(--space-6, 24px); }
@@ -334,12 +364,14 @@ function hideModal(){document.getElementById('eventModal').classList.remove('sho
 .modal-card {
     background: #fff; border-radius: 8px; padding: 24px; max-width: 440px;
     width: 100%; border: 1px solid var(--border, #ededed); position: relative;
+    max-height: 90vh; overflow-y: auto;
 }
 .modal-close { position: absolute; top: 14px; right: 18px; font-size: 20px; cursor: pointer; color: var(--ink-muted, #999); font-weight: 400; }
 .modal-card h3 { margin: 0 0 14px; padding-right: 24px; }
 .modal-row { font-size: 12.5px; margin-bottom: 6px; display: flex; gap: 8px; align-items: baseline; }
 .modal-row .lbl { min-width: 64px; }
-.modal-desc { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border, #eee); white-space: pre-wrap; }
+.modal-desc { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border, #eee); }
+.modal-desc { font-size: 13px; }
 
 @media (max-width: 600px) {
     .cal-cell { min-height: 44px; padding: 2px; font-size: 8px; }

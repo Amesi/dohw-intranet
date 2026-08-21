@@ -11,6 +11,8 @@ import frappe
 from frappe.website.page_renderers.document_page import DocumentPage
 from frappe.website.utils import build_response
 
+from dohw_intranet.sanitize import sanitize_rich_html
+
 
 class BlogPostRenderer(DocumentPage):
     def can_render(self):
@@ -34,6 +36,7 @@ class BlogPostRenderer(DocumentPage):
             raise frappe.Redirect
 
         doc = frappe.get_cached_doc("Blog Post", self.docname)
+        doc.content = sanitize_rich_html(doc.content or "")
         author_name = frappe.db.get_value("Employee", doc.author, "employee_name") or doc.author
         word_count = len((doc.content or "").split())
         read_time = max(1, round(word_count / 200))

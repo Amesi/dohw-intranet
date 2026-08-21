@@ -8,6 +8,8 @@ the same pattern already used by Calendar's "New Event" composer.
 
 import frappe
 
+from dohw_intranet.sanitize import sanitize_rich_html
+
 
 def get_context(context):
     context.no_cache = 1
@@ -37,7 +39,7 @@ def get_context(context):
         circular = frappe.get_doc({
             "doctype": "Announcement",
             "title": frappe.form_dict.get("new_title"),
-            "content": frappe.form_dict.get("new_content"),
+            "content": sanitize_rich_html(frappe.form_dict.get("new_content") or ""),
             "wing": wing,
             "classification": frappe.form_dict.get("new_classification", "For Information"),
             "tags": frappe.form_dict.get("new_tags", ""),

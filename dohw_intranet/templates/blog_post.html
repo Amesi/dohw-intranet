@@ -19,13 +19,14 @@
         </p>
     </div>
 
-    <div class="blog-article-body dt-body">
+    <div class="blog-article-body dt-body dohw-rich-text">
         {{ doc.content | safe }}
     </div>
 </article>
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="/assets/dohw_intranet/css/editor.css">
 <style>
 .blog-article-crumb { max-width: 640px; margin: 0 auto var(--space-5, 20px); }
 

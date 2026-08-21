@@ -88,20 +88,7 @@
 
         <div class="cmp-row">
             <label class="dt-caption">Content</label>
-            <div class="cmp-editor">
-                <div class="cmp-toolbar">
-                    <button type="button" class="cmp-tb" data-cmd="bold"><b>B</b></button>
-                    <button type="button" class="cmp-tb" data-cmd="italic"><i>I</i></button>
-                    <button type="button" class="cmp-tb" data-cmd="underline"><u>U</u></button>
-                    <span class="cmp-tb-sep"></span>
-                    <button type="button" class="cmp-tb" data-cmd="createlink">&#128279;</button>
-                    <button type="button" class="cmp-tb" data-cmd="insertUnorderedList">&bull;&mdash;</button>
-                    <button type="button" class="cmp-tb" data-cmd="insertOrderedList">1.</button>
-                    <span class="cmp-tb-sep"></span>
-                    <button type="button" class="cmp-tb" data-cmd="formatBlock" data-arg="blockquote">&ldquo;&rdquo;</button>
-                </div>
-                <div class="cmp-editor-body" id="editorBody" contenteditable="true" data-placeholder="Post content">{{ post.content | safe if post else '' }}</div>
-            </div>
+            <div id="editorMount"></div>
             <textarea name="post_content" id="editorSource" class="cmp-hidden-source" required></textarea>
         </div>
 
@@ -121,7 +108,7 @@
     <p class="dt-caption">By {{ post_author_name }} &middot; submitted {{ frappe.utils.pretty_date(post.modified) }}</p>
 </div>
 
-<div class="mng-block mng-review-body dt-body">
+<div class="mng-block mng-review-body dt-body dohw-rich-text">
     {{ post.content | safe }}
 </div>
 
@@ -142,19 +129,18 @@
 
 </div>
 
+<script src="/assets/dohw_intranet/js/editor.bundle.js?v=2"></script>
 <script>
 (function () {
-    var body = document.getElementById('editorBody');
+    var mount = document.getElementById('editorMount');
     var source = document.getElementById('editorSource');
-    var form = document.getElementById('composeForm');
-    if (body) {
-        document.querySelectorAll('.cmp-tb').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                body.focus();
-                document.execCommand(btn.dataset.cmd, false, btn.dataset.arg || null);
-            });
+    if (mount && source) {
+        window.DoWHEditor.init({
+            root: mount,
+            source: source,
+            placeholder: 'Post content',
+            initialContent: {{ (post.content if post else '') | tojson }}
         });
-        form.addEventListener('submit', function () { source.value = body.innerHTML; });
     }
     var rejectToggle = document.getElementById('rejectToggle');
     if (rejectToggle) {
@@ -168,6 +154,7 @@
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" href="/assets/dohw_intranet/css/editor.css">
 <style>
 .mng-page { max-width: 640px; }
 .mng-block { }
@@ -187,20 +174,6 @@
 .cmp-crumb a { color: var(--ink-muted, #7c7c7c); text-decoration: none; }
 .cmp-form { display: flex; flex-direction: column; gap: 14px; }
 .cmp-row { display: flex; flex-direction: column; gap: 4px; }
-.cmp-editor { border: 1px solid #dcdcdc; border-radius: 6px; overflow: hidden; }
-.cmp-toolbar { display: flex; gap: 2px; padding: 5px 6px; background: #fafafa; border-bottom: 1px solid var(--border, #ededed); }
-.cmp-tb {
-    width: 26px; height: 26px; border: none; background: none; border-radius: 4px;
-    color: var(--ink-secondary, #666); font-size: 12px; cursor: pointer; font-family: var(--font-sans);
-}
-.cmp-tb:hover { background: #eee; color: var(--ink, #171717); }
-.cmp-tb-sep { width: 1px; background: #e0e0e0; margin: 3px 4px; }
-.cmp-editor-body {
-    min-height: 200px; padding: 10px 12px; font-family: var(--font-sans); font-size: 13px;
-    color: var(--ink-secondary, #444); line-height: 1.6; outline: none;
-}
-.cmp-editor-body:empty:before { content: attr(data-placeholder); color: var(--ink-muted, #bbb); }
-.cmp-editor-body blockquote { margin: 0; padding-left: 12px; border-left: 2px solid var(--border, #ddd); color: var(--ink-muted, #777); }
 .cmp-hidden-source { display: none; }
 
 .mng-form-actions { display: flex; gap: 12px; align-items: center; }

@@ -11,6 +11,8 @@ no longer handles POST at all, just the listing.
 
 import frappe
 
+from dohw_intranet.sanitize import sanitize_rich_html
+
 
 def get_context(context):
     context.no_cache = 1
@@ -45,6 +47,12 @@ def get_context(context):
 
     if tag_filter:
         circulars = [c for c in circulars if c.tags and tag_filter.lower() in (c.tags or "").lower()]
+
+    # Sanitize on read — legacy circulars were authored via a bare
+    # contenteditable, so their HTML hasn't been through the new editor's
+    # save-time sanitizer.
+    for c in circulars:
+        c.content = sanitize_rich_html(c.content or "")
 
     context.circulars = circulars
     context.active_wing = wing_filter
