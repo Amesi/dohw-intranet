@@ -24,28 +24,37 @@
 .dowh-sidebar * { box-sizing: border-box; }
 
 .dowh-sidebar .dowh-brand {
-    padding: 6px 8px 14px;
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--ink, #171717);
+    padding: 10px 8px 16px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-decoration: none;
+    border-bottom: 1px solid var(--border, #ededed);
+    margin-bottom: 10px;
 }
-.dowh-sidebar .dowh-brand .dowh-mark {
-    width: 22px;
-    height: 22px;
-    border-radius: 5px;
-    background: var(--dowh-dark);
-    color: var(--dowh-gold);
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.dowh-sidebar .dowh-brand .dowh-seal {
+    width: 30px;
+    height: 30px;
     flex-shrink: 0;
+}
+.dowh-sidebar .dowh-brand .dowh-brand-name {
+    font-family: var(--font-serif, Georgia, serif);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--ink, #171717);
+    line-height: 1.15;
+    display: block;
+}
+.dowh-sidebar .dowh-brand .dowh-brand-sub {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dowh-gold-deep, #8a6d00);
+    display: block;
+    margin-top: 3px;
 }
 
 .dowh-sidebar a.dowh-nav-item {

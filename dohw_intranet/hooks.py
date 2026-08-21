@@ -21,6 +21,7 @@ web_include_css = [
     "/assets/dohw_intranet/css/tokens.css",
     "/assets/dohw_intranet/css/navigation.css",
     "/assets/dohw_intranet/css/dohw_intranet.css",
+    "/assets/dohw_intranet/css/editorial.css",
 ]
 
 # Portal settings hook

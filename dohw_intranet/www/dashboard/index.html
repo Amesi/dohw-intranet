@@ -4,113 +4,63 @@
 
 {% block page_content %}
 
-<div class="dash-block">
-    <h1 class="dt-page-title">Dashboard</h1>
+<div class="ed-hero">
+    <div class="dt-kicker">Intranet · {{ today_long }}</div>
+    <h1 class="dt-display">Good morning{% if first_name %}, {{ first_name }}{% endif %}.</h1>
+    <p class="dt-lede">Here is the latest from the Department — circulars requiring your attention, and activity across the wings.</p>
 </div>
 
-<div class="dash-block">
-    <div class="dash-kpi-grid">
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-num">{{ circular_total }}</div>
-            <div class="dt-caption">Circulars published</div>
-        </div>
-        <div class="dash-kpi-card dash-kpi-warn">
-            <div class="dash-kpi-num">{{ circular_urgent }}</div>
-            <div class="dt-caption">Urgent circulars</div>
-        </div>
-        <div class="dash-kpi-card">
-            <div class="dash-kpi-num">{{ staff_total }}</div>
-            <div class="dt-caption">Active staff</div>
-        </div>
-        <div class="dash-kpi-card dash-kpi-warn">
-            <div class="dash-kpi-num">{{ issues_open }}</div>
-            <div class="dt-caption">Open issues</div>
-        </div>
-    </div>
+<div class="ed-stats">
+    <div class="ed-stat"><span class="ed-stat-num">{{ circular_total }}</span><span class="ed-stat-label">Circulars published</span></div>
+    <div class="ed-stat"><span class="ed-stat-num ed-urgent">{{ circular_urgent }}</span><span class="ed-stat-label">Urgent</span></div>
+    <div class="ed-stat"><span class="ed-stat-num">{{ staff_total }}</span><span class="ed-stat-label">Active staff</span></div>
+    <div class="ed-stat"><span class="ed-stat-num">{{ issues_open }}</span><span class="ed-stat-label">Open issues</span></div>
 </div>
 
-<div class="dash-block">
-    <div class="dash-two-col">
-        <div>
-            <p class="dash-section-label">Circulars by wing</p>
-            {% for w in wing_circulars %}
-            <div class="dash-bar-row">
-                <span class="dash-bar-label">{{ w.name }}</span>
-                <div class="dash-bar-track">
-                    <div class="dash-bar-fill" style="width:{{ (w.count / wing_circulars[0].count * 100)|int if wing_circulars[0].count > 0 else 0 }}%;"></div>
-                </div>
-                <span class="dash-bar-value">{{ w.count }}</span>
-            </div>
-            {% endfor %}
+<div class="ed-layout">
+    <div class="ed-main">
+        <div class="ed-section-head">
+            <h2 class="dt-display-sm">Latest circulars</h2>
+            <a class="ed-view-all" href="/circulars">All circulars →</a>
         </div>
-        <div>
-            <p class="dash-section-label">Staff by wing</p>
-            {% for w in wing_staff %}
-            <div class="dash-bar-row">
-                <span class="dash-bar-label">{{ w.name }}</span>
-                <div class="dash-bar-track">
-                    <div class="dash-bar-fill" style="width:{{ (w.count / wing_staff[0].count * 100)|int if wing_staff[0].count > 0 else 0 }}%;"></div>
-                </div>
-                <span class="dash-bar-value">{{ w.count }}</span>
-            </div>
+        <div class="ed-list">
+            {% for r in recent %}
+            <a class="ed-row" href="{{ r.route or '/circulars' }}">
+                <span class="ed-row__inner">
+                    <span class="ed-row-index">{{ "%02d"|format(loop.index) }}</span>
+                    <span class="ed-row-body">
+                        <span class="ed-row-meta">
+                            <span class="ed-tag {% if r.classification == 'For Action' %}ed-action{% elif r.classification == 'Urgent' %}ed-urgent{% else %}ed-info{% endif %}">{{ r.classification or "For information" }}</span>
+                            {% if r.circular_number %}<span class="ed-ref">{{ r.circular_number }}</span>{% endif %}
+                        </span>
+                        <span class="dt-serif">{{ r.title }}</span>
+                        <span class="ed-row-foot">{{ frappe.utils.format_date(r.date) }}{% if r.wing %} &middot; {{ r.wing.split(' - ')[0] }}{% endif %}</span>
+                    </span>
+                </span>
+            </a>
             {% endfor %}
         </div>
     </div>
-</div>
 
-<div class="dash-block">
-    <p class="dash-section-label">Recent circulars</p>
-    <div class="dt-card-list">
-        {% for r in recent %}
-        <div class="dt-card dash-recent-row">
-            <span class="dt-body">{{ r.title | truncate(60) }}</span>
-            <span class="dash-recent-meta">
-                <span class="dt-badge {% if r.classification == 'For Action' %}dt-badge-action{% elif r.classification == 'Urgent' %}dt-badge-urgent{% else %}dt-badge-info{% endif %}">{{ r.classification or "For information" }}</span>
-                <span class="dt-caption">{{ frappe.utils.format_date(r.date) }}</span>
-            </span>
+    <aside class="ed-rail">
+        <div class="ed-box">
+            <h3 class="ed-box-title">Quick links</h3>
+            <ul class="ed-linklist">
+                <li><a href="/directory">Staff directory</a></li>
+                <li><a href="/circulars/new">Submit a circular</a></li>
+                <li><a href="/calendar">Calendar</a></li>
+                <li><a href="/support">ICT helpdesk</a></li>
+            </ul>
         </div>
-        {% endfor %}
-    </div>
+        <div class="ed-box">
+            <h3 class="ed-box-title">Circulars by wing</h3>
+            <ul class="ed-linklist">
+                {% for w in wing_circulars[:5] %}
+                <li><a href="/circulars?wing={{ w.name }}"><span>{{ w.name }}</span><span class="ed-wing-count">{{ w.count }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
 </div>
 
-{% endblock %}
-
-{% block style %}
-<style>
-/* Page-specific layout not covered by the shared tokens.css/navigation.css
-   foundation — see docs/design/dashboard.md for the decision record. */
-
-.dash-block { max-width: 900px; }
-.dash-block + .dash-block { margin-top: var(--space-6, 24px); }
-
-.dash-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3, 12px); }
-.dash-kpi-card { border: 1px solid var(--border, #ececec); border-radius: 8px; padding: var(--space-4, 14px); }
-.dash-kpi-num { font-family: var(--font-sans); font-size: 22px; font-weight: 700; color: var(--ink, #171717); }
-.dash-kpi-warn .dash-kpi-num { color: var(--semantic-urgent, #c0392b); }
-
-.dash-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6, 24px); }
-.dash-section-label {
-    font-family: var(--font-sans);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted, #9a9a9a);
-    margin: 0 0 var(--space-3, 10px);
-}
-
-.dash-bar-row { display: flex; align-items: center; gap: 10px; font-size: 11.5px; margin-bottom: 8px; }
-.dash-bar-label { width: 130px; flex-shrink: 0; color: var(--ink-secondary, #666); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dash-bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
-.dash-bar-fill { height: 100%; background: var(--ink, #171717); border-radius: 4px; }
-.dash-bar-value { width: 28px; text-align: right; font-weight: 600; color: var(--ink, #171717); }
-
-.dash-recent-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.dash-recent-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-
-@media (max-width: 700px) {
-    .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .dash-two-col { grid-template-columns: 1fr; }
-    .dash-bar-label { width: 90px; }
-}
-</style>
 {% endblock %}

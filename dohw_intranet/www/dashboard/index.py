@@ -1,5 +1,7 @@
 """DoWH Dashboard — key metrics and charts."""
 
+import datetime
+
 import frappe
 
 
@@ -11,6 +13,11 @@ def get_context(context):
 
     context.show_sidebar = 0
     context.title = "Dashboard"
+
+    # Greeting
+    fullname = frappe.db.get_value("User", frappe.session.user, "full_name") or ""
+    context.first_name = fullname.split(" ")[0] if fullname else ""
+    context.today_long = datetime.date.today().strftime("%A, %d %B %Y")
 
     # Circular stats
     context.circular_total = frappe.db.count("Announcement", {"published": 1})
@@ -41,9 +48,9 @@ def get_context(context):
     context.recent = frappe.get_all(
         "Announcement",
         filters={"published": 1},
-        fields=["title", "date", "wing", "classification"],
+        fields=["title", "date", "wing", "classification", "circular_number", "route"],
         order_by="date desc",
-        limit=5,
+        limit=6,
     )
 
     return context
