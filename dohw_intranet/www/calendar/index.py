@@ -3,6 +3,8 @@
 import frappe
 from datetime import datetime, timedelta
 
+from dohw_intranet.sanitize import sanitize_rich_html
+
 
 def get_context(context):
     context.no_cache = 1
@@ -29,7 +31,7 @@ def get_context(context):
             "starts_on": frappe.form_dict.get("ev_starts"),
             "ends_on": frappe.form_dict.get("ev_ends") or None,
             "location": frappe.form_dict.get("ev_location", ""),
-            "description": frappe.form_dict.get("ev_description", ""),
+            "description": sanitize_rich_html(frappe.form_dict.get("ev_description", "")),
             "wing": frappe.form_dict.get("ev_wing_override") or employee.department,
         })
         event.insert(ignore_permissions=True)
@@ -160,13 +162,16 @@ def _get_events(start_date, end_date, wing_filter=None):
     ]
     if wing_filter:
         filters.append(["wing", "=", wing_filter])
-    return frappe.get_all(
+    events = frappe.get_all(
         "Event",
         filters=filters,
         fields=["name", "subject", "starts_on", "ends_on", "event_category", "location", "description", "all_day"],
         order_by="starts_on asc",
         limit=100,
     )
+    for e in events:
+        e.description = sanitize_rich_html(e.description or "")
+    return events
 
 
 def _get_upcoming(wing_filter=None):
@@ -179,10 +184,13 @@ def _get_upcoming(wing_filter=None):
     ]
     if wing_filter:
         filters.append(["wing", "=", wing_filter])
-    return frappe.get_all(
+    events = frappe.get_all(
         "Event",
         filters=filters,
         fields=["name", "subject", "starts_on", "ends_on", "event_category", "location", "description", "all_day"],
         order_by="starts_on asc",
         limit=10,
     )
+    for e in events:
+        e.description = sanitize_rich_html(e.description or "")
+    return events

@@ -53,8 +53,8 @@
                 </span>
             </span>
         </summary>
-        <div class="ed-circular-body">
-            {{ c.content }}
+        <div class="ed-circular-body dohw-rich-text">
+            {{ c.content | safe }}
             {% if c.attachment %}
             <div class="ed-attach"><a href="{{ c.attachment }}" target="_blank" download>&#128206; {{ c.attachment.split("/")[-1] }}</a></div>
             {% endif %}
@@ -69,4 +69,8 @@
     {% endif %}
 </div>
 
+{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="/assets/dohw_intranet/css/editor.css">
 {% endblock %}
