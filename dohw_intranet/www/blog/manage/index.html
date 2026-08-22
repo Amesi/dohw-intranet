@@ -47,7 +47,7 @@
     <p class="dash-section-label">Published</p>
     <div class="dt-card-list">
         {% for p in published %}
-        <a href="/blog/{{ p.route }}" class="dt-card mng-row">
+        <a href="/{{ p.route }}" class="dt-card mng-row">
             <span class="dt-card-title">{{ p.title }}</span>
             <span class="dt-caption">{{ frappe.utils.format_date(p.published_date) }}</span>
         </a>
