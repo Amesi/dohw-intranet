@@ -13,16 +13,10 @@ website_generators = ["Announcement"]
 # Home page: circular listing is the default landing
 home_page = "/circulars"
 
-# Web CSS — loaded on all website pages.
-# tokens.css is the frappe.io-modeled design-token foundation (see docs/design/tokens.md);
-# dohw_intranet.css is the pre-revamp stylesheet, kept until each page's own build
-# ticket migrates it off — do not remove until every page ticket has landed.
-web_include_css = [
-    "/assets/dohw_intranet/css/tokens.css?v=20260821b",
-    "/assets/dohw_intranet/css/navigation.css?v=20260821b",
-    "/assets/dohw_intranet/css/dohw_intranet.css",
-    "/assets/dohw_intranet/css/editorial.css?v=20260821d",
-]
+# Web CSS — all styling now lives in public/scss/website.scss, compiled into the
+# "DoWH" Website Theme (see docs/design/tokens.md + navigation.md). The Website
+# Theme is installed via fixture and activated in Website Settings, so no
+# per-request web_include_css is needed here.
 
 # Portal settings hook
 website_context = {
@@ -48,4 +42,6 @@ page_renderer = [
 # Employee fields) rather than by dt.
 fixtures = [
     {"doctype": "Custom Field", "filters": [["fieldname", "in", ["wing", "content_manager", "blog_author"]]]},
+    {"doctype": "Website Theme", "filters": {"name": "DoWH"}},
+    {"doctype": "Website Settings", "filters": {"name": "Website Settings"}},
 ]
