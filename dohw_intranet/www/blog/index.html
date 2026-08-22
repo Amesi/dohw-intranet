@@ -22,7 +22,7 @@
     {% if posts %}
     <div class="dt-card-list blog-list">
         {% for p in posts %}
-        <a href="/blog/{{ p.route }}" class="dt-card blog-row">
+        <a href="/{{ p.route }}" class="dt-card blog-row">
             {% if p.featured_image %}
             <div class="blog-row-thumb"><img src="{{ p.featured_image }}" alt=""></div>
             {% endif %}

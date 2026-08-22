@@ -1,0 +1,591 @@
+/* ============================================================
+   DoWH Intranet — Website Theme SCSS
+   ============================================================
+   Single source of truth for all intranet styling, consumed via
+   Frappe's Website Theme mechanism (public/scss/website.scss is
+   auto-imported when a non-Standard Website Theme is active).
+
+   This file is a faithful merge of the four former hand-rolled CSS
+   files, in their original cascade order:
+       1. tokens.css        (design tokens + component primitives)
+       2. navigation.css    (persistent left sidebar shell)
+       3. dohw_intranet.css (legacy brand stylesheet)
+       4. editorial.css     (editorial/gazette component layer — wins)
+
+   Decision records: docs/design/tokens.md, docs/design/navigation.md,
+   and the per-page docs/design/*.md files.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Montserrat — official DoWH typeface (self-hosted woff2, OFL)
+   ------------------------------------------------------------ */
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/dohw_intranet/fonts/montserrat-regular.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 500; font-display: swap; src: url('/assets/dohw_intranet/fonts/montserrat-medium.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/dohw_intranet/fonts/montserrat-semibold.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 700; font-display: swap; src: url('/assets/dohw_intranet/fonts/montserrat-bold.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 800; font-display: swap; src: url('/assets/dohw_intranet/fonts/montserrat-extrabold.woff2') format('woff2'); }
+
+/* ------------------------------------------------------------
+   2. Design tokens
+   ------------------------------------------------------------ */
+:root {
+    /* Color — near-monochrome by default; Gold is a RARE accent only,
+       never a background fill. See docs/design/tokens.md "Color". */
+    --ink: #171717;
+    --ink-secondary: #525252;
+    --ink-muted: #999999;
+    --border: #ededed;
+    --surface: #ffffff;
+
+    /* Brand */
+    --dowh-gold: #FFBF00;
+    --dowh-dark: #1A1A1A;
+    --dowh-gold-deep: #8a6d00;
+    --accent-soft: #fff7dd;
+
+    /* Semantic — classification badges */
+    --semantic-urgent: #c0392b;
+    --semantic-action: #8a6d00;
+    --semantic-info: #7c7c7c;
+
+    /* Typography */
+    --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-serif: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; /* display — bold Montserrat */
+
+    /* Spacing — loose 4px-based scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+
+    /* Radius */
+    --radius-pill: 20px;
+    --radius-input: 6px;
+}
+
+/* --- Typography scale --- */
+.dt-page-title { font-family: var(--font-sans); font-size: 20px; font-weight: 600; color: var(--ink); margin: 0; }
+.dt-card-title { font-family: var(--font-sans); font-size: 14.5px; font-weight: 600; color: var(--ink); margin: 0; }
+.dt-body { font-family: var(--font-sans); font-size: 13px; color: var(--ink-secondary); line-height: 1.5; margin: 0; }
+.dt-caption { font-family: var(--font-sans); font-size: 11.5px; color: var(--ink-muted); margin: 0; }
+.dt-nav-label { font-family: var(--font-sans); font-size: 13.5px; font-weight: 500; }
+.dt-badge-label { font-family: var(--font-sans); font-size: 10.5px; font-weight: 600; }
+
+/* --- Editorial display (serif) — gazette hierarchy --- */
+.dt-display {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0;
+}
+.dt-display-sm {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 0;
+}
+.dt-kicker {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dowh-gold-deep);
+    margin: 0 0 10px;
+}
+.dt-serif {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    color: var(--ink);
+}
+.dt-lede {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--ink-secondary);
+    line-height: 1.6;
+}
+
+/* --- Buttons — bare text-link style, no filled containers --- */
+.dt-btn-primary {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--dowh-gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.dt-btn-secondary {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink-muted);
+}
+.dt-btn-secondary:hover { color: var(--ink); }
+
+/* --- Cards — chromeless, separated by hairline dividers, not boxes --- */
+.dt-card-list { display: flex; flex-direction: column; }
+.dt-card { padding: var(--space-4) 0; border-bottom: 1px solid var(--border); }
+.dt-card:first-child { padding-top: 0; }
+.dt-card:last-child { border-bottom: none; }
+
+/* --- Badges — hollow outline pills, colored text/border only, no fill --- */
+.dt-badge {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    background: none;
+    border: 1px solid currentColor;
+    display: inline-block;
+}
+.dt-badge-urgent { color: var(--semantic-urgent); }
+.dt-badge-action { color: var(--semantic-action); }
+.dt-badge-info { color: var(--semantic-info); }
+
+/* --- Forms — plain bordered inputs, no extra chrome --- */
+.dt-input, .dt-select, .dt-textarea {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: var(--radius-input);
+    width: 100%;
+    box-sizing: border-box;
+}
+.dt-textarea { resize: vertical; min-height: 70px; }
+
+/* ------------------------------------------------------------
+   3. Navigation shell — persistent left sidebar
+   ------------------------------------------------------------ */
+.dowh-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: #f8f8f8;
+    border-right: 1px solid var(--border);
+    padding: var(--space-3) var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    z-index: 100;
+    box-sizing: border-box;
+}
+.dowh-sidebar * { box-sizing: border-box; }
+
+.dowh-sidebar .dowh-brand {
+    padding: 10px 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+.dowh-sidebar .dowh-brand .dowh-seal { width: 22px; height: 22px; flex-shrink: 0; }
+.dowh-sidebar .dowh-brand .dowh-brand-name {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    line-height: 1.15;
+    display: block;
+}
+.dowh-sidebar .dowh-brand .dowh-brand-sub {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dowh-gold-deep);
+    display: block;
+    margin-top: 3px;
+}
+
+.dowh-sidebar a.dowh-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--ink-secondary);
+    text-decoration: none;
+}
+.dowh-sidebar a.dowh-nav-item:hover { background: #f0f0f0; color: var(--ink); }
+.dowh-sidebar a.dowh-nav-item.active {
+    background: #f0f0f0;
+    color: var(--ink);
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--dowh-gold);
+}
+
+.dowh-sidebar .dowh-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+/* Push page content right to make room for the fixed sidebar. */
+body { padding-left: 220px; }
+
+/* Mobile top bar with hamburger — hidden on desktop */
+.dowh-mobile-topbar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+.dowh-mobile-topbar .dowh-hamburger {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.dowh-mobile-topbar .dowh-brand-sm {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--ink);
+}
+
+.dowh-sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 95; }
+
+@media (max-width: 1023px) {
+    body { padding-left: 0; }
+    .dowh-mobile-topbar { display: flex; }
+    .dowh-sidebar { left: -240px; width: 220px; transition: left 0.2s ease; box-shadow: none; }
+    body.dowh-drawer-open .dowh-sidebar { left: 0; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.18); }
+    body.dowh-drawer-open .dowh-sidebar-backdrop { display: block; }
+}
+
+/* ------------------------------------------------------------
+   4. Legacy brand stylesheet
+   ------------------------------------------------------------ */
+/* --- Navbar overrides (kept for any page still using .navbar) --- */
+.navbar {
+    background: var(--dowh-dark) !important;
+    border-bottom: 2px solid var(--dowh-gold) !important;
+}
+.navbar .navbar-brand {
+    font-weight: 700;
+    color: var(--dowh-gold) !important;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+.navbar .navbar-brand img { height: 32px; margin-right: 10px; }
+.navbar .nav-link { color: #ccc !important; font-size: 13px; }
+.navbar .nav-link:hover { color: var(--dowh-gold) !important; }
+
+/* --- Sidebar overrides --- */
+.web-sidebar {
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    min-height: calc(100vh - 56px);
+    padding-top: 16px;
+}
+.web-sidebar .sidebar-item a {
+    color: var(--dowh-dark);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px 20px;
+    display: block;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+}
+.web-sidebar .sidebar-item a:hover,
+.web-sidebar .sidebar-item a.active {
+    background: #f8f8f8;
+    border-left-color: var(--dowh-gold);
+    color: var(--dowh-dark);
+}
+
+/* --- Footer overrides --- */
+.web-footer {
+    background: var(--dowh-dark) !important;
+    color: #888 !important;
+    padding: 12px !important;
+    text-align: center !important;
+    font-size: 12px !important;
+}
+
+/* --- Page content area --- */
+.dowh-masthead {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--dowh-gold);
+}
+.dowh-masthead .dowh-seal { height: 64px; margin-bottom: 8px; }
+.dowh-masthead h1 {
+    font-size: 14px; font-weight: 800; color: var(--dowh-dark);
+    letter-spacing: 2px; text-transform: uppercase; margin: 0;
+}
+.dowh-masthead h2 {
+    font-size: 13px; font-weight: 600; color: var(--dowh-gold);
+    letter-spacing: 1px; text-transform: uppercase; margin: 4px 0 0;
+}
+
+/* --- Filter bar --- */
+.dowh-filter-bar {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 13px;
+}
+.dowh-filter-bar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+.dowh-tag-cloud { flex-basis: 100%; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+.dowh-tag-cloud a { padding: 2px 8px; border-radius: 10px; font-size: 10px; text-decoration: none; }
+.dowh-tag-cloud a:hover { opacity: 0.8; }
+
+/* --- Circular cards --- */
+.dowh-circular {
+    background: #fff; border: 1px solid #d0d0d0;
+    border-left: 4px solid var(--dowh-gold);
+    padding: 20px 24px; margin-bottom: 16px; font-size: 14px;
+    transition: box-shadow 0.15s;
+}
+.dowh-circular:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.dowh-circular .circular-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.dowh-circular .circular-no { font-weight: 700; font-size: 12px; color: var(--dowh-dark); }
+.dowh-circular .classification-badge {
+    padding: 3px 10px; border-radius: 3px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+.classification-badge.for-information { background: #e8e8e8; color: #555; }
+.classification-badge.for-action { background: var(--dowh-gold); color: var(--dowh-dark); }
+.classification-badge.urgent { background: #cc0000; color: #fff; }
+.dowh-circular .circular-date { font-size: 11px; color: #888; margin-bottom: 8px; }
+.dowh-circular h3 {
+    font-size: 15px; font-weight: 700; color: var(--dowh-dark);
+    margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.dowh-circular h3 a { color: var(--dowh-dark); text-decoration: none; }
+.dowh-circular h3 a:hover { color: var(--dowh-gold); }
+.dowh-circular .circular-body {
+    font-size: 13px; line-height: 1.6; color: #444;
+    margin-bottom: 10px; max-height: 80px; overflow: hidden;
+}
+.dowh-circular .circular-tags {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;
+}
+.dowh-circular .circular-tags .tag {
+    padding: 2px 8px; background: #e8f0fe; border-radius: 10px;
+    font-size: 10px; color: #1a73e8; text-decoration: none;
+}
+.dowh-circular .circular-tags .wing-pill {
+    padding: 2px 8px; background: #f0f0f0; border-radius: 10px;
+    font-size: 10px; color: #666;
+}
+
+/* --- Detail page --- */
+.dowh-circular-detail {
+    background: #fff; border: 1px solid #d0d0d0;
+    border-left: 4px solid var(--dowh-gold); padding: 32px;
+}
+.detail-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+.detail-content {
+    font-size: 14px; line-height: 1.8; color: #333;
+    padding-bottom: 20px; border-bottom: 1px solid #eee; margin-bottom: 16px;
+}
+.detail-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.detail-tags .tag {
+    padding: 3px 10px; background: #e8f0fe; border-radius: 10px;
+    font-size: 11px; color: #1a73e8; text-decoration: none;
+}
+
+/* --- Stats sidebar widgets --- */
+.dowh-stats {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 16px; margin-bottom: 12px;
+}
+.dowh-stats .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dowh-stats .stat-item { padding: 10px; border-radius: 6px; text-align: center; }
+.dowh-stats .stat-num { font-size: 22px; font-weight: 800; }
+.dowh-stats .stat-label { font-size: 10px; color: #888; }
+
+/* --- Directory cards --- */
+.dowh-staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.dowh-staff-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 16px; display: flex; gap: 12px; align-items: flex-start;
+    transition: box-shadow 0.15s;
+}
+.dowh-staff-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.dowh-staff-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--dowh-gold), #e6ac00);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: var(--dowh-dark); font-weight: 800; font-size: 16px;
+}
+.dowh-staff-name { font-size: 14px; font-weight: 700; color: var(--dowh-dark); margin-bottom: 2px; }
+.dowh-staff-title { font-size: 12px; color: #888; margin-bottom: 2px; }
+.dowh-staff-dept { font-size: 11px; color: #aaa; margin-bottom: 6px; }
+
+/* --- Wing filter tabs --- */
+.dowh-wing-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.dowh-wing-tab {
+    padding: 6px 14px; border-radius: 16px; font-size: 12px;
+    text-decoration: none; font-weight: 600;
+    background: #fff; border: 1px solid #ddd; color: #555;
+    transition: background 0.15s, color 0.15s;
+}
+.dowh-wing-tab.active { background: var(--dowh-gold); color: var(--dowh-dark); border-color: var(--dowh-gold); }
+.dowh-wing-tab:hover { background: #f0f0f0; color: var(--dowh-dark); }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .dowh-staff-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Official use only --- */
+.dowh-sidebar-official {
+    background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 12px 16px; text-align: center; font-size: 10px; color: #999;
+}
+
+/* ------------------------------------------------------------
+   5. Editorial component layer — gazette-style (loaded last, wins)
+   ------------------------------------------------------------ */
+/* Global — Montserrat everywhere, plus breathing room top/bottom */
+body { font-family: var(--font-sans) !important; }
+.page-content-wrapper { padding-top: 32px; padding-bottom: 40px; }
+
+/* Hero */
+.ed-hero { padding: 4px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; max-width: 980px; }
+.ed-hero .dt-display { font-size: 34px; }
+.ed-hero .dt-lede { margin-top: 12px; max-width: 560px; }
+
+/* Stat strip */
+.ed-stats { display: flex; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,.04); margin-bottom: 32px; overflow: hidden; max-width: 980px; }
+.ed-stat { flex: 1; padding: 16px 20px; border-right: 1px solid var(--border); }
+.ed-stat:last-child { border-right: none; }
+.ed-stat-num { font-family: var(--font-serif); font-size: 24px; font-weight: 700; display: block; line-height: 1; color: var(--ink); }
+.ed-stat-num.ed-urgent { color: var(--semantic-urgent); }
+.ed-stat-label { font-size: 12px; color: var(--ink-secondary); margin-top: 6px; display: block; }
+
+/* Layout */
+.ed-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; max-width: 980px; }
+.ed-main { min-width: 0; }
+.ed-rail { display: flex; flex-direction: column; gap: 20px; }
+
+/* Section head */
+.ed-section-head { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 4px; }
+.ed-section-head.ed-attention-head { border-bottom-color: #f0e0c8; }
+.ed-attention-count { font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+.ed-view-all { font-size: 13px; font-weight: 600; color: var(--dowh-gold-deep); }
+.ed-view-all:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Section spacing between stacked lists */
+.ed-list + .ed-section-head { margin-top: 34px; }
+
+/* Gazette list rows — works for both <a> rows and <details> rows. */
+.ed-list { max-width: 980px; }
+.ed-row { display: block; border-bottom: 1px solid var(--border); text-decoration: none; position: relative; transition: background .15s ease; }
+.ed-row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: transparent; transition: background .15s ease; }
+.ed-row:hover { background: var(--accent-soft); }
+.ed-row:hover::before { background: var(--dowh-gold); }
+.ed-row__inner { display: flex; gap: 14px; padding: 18px 8px 18px 0; transition: padding-left .15s ease; }
+.ed-row:hover .ed-row__inner { padding-left: 10px; }
+.ed-row summary { cursor: pointer; list-style: none; }
+.ed-row summary::-webkit-details-marker { display: none; }
+.ed-row summary:hover .dt-serif { text-decoration: underline; text-decoration-color: var(--dowh-gold); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ed-row-index { flex: 0 0 26px; font-family: var(--font-serif); font-size: 14px; color: var(--ink-muted); padding-top: 3px; }
+.ed-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ed-row-meta { display: flex; align-items: center; gap: 10px; }
+.ed-row-foot { font-size: 12px; color: var(--ink-muted); }
+
+/* Classification tags (small caps, no chip) */
+.ed-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.ed-tag.ed-urgent { color: var(--semantic-urgent); }
+.ed-tag.ed-action { color: var(--dowh-gold-deep); }
+.ed-tag.ed-info { color: var(--ink-muted); }
+.ed-ref { font-size: 11px; color: var(--ink-muted); letter-spacing: .02em; }
+
+/* Rail boxes */
+.ed-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.ed-box-title { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 12px; }
+.ed-linklist { list-style: none; }
+.ed-linklist li { border-bottom: 1px solid var(--border); }
+.ed-linklist li:last-child { border-bottom: none; }
+.ed-linklist a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 0; font-size: 13px; color: var(--ink-secondary); text-decoration: none; }
+.ed-linklist a:hover { color: var(--ink); }
+.ed-link-label { display: inline-flex; align-items: center; gap: 9px; }
+.ed-link-label svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--ink-muted); }
+.ed-linklist a:hover .ed-link-label svg { color: var(--dowh-gold-deep); }
+.ed-wing-count { font-family: var(--font-serif); color: var(--dowh-gold-deep); font-weight: 700; }
+
+/* Upcoming events */
+.ed-event { display: flex; gap: 12px; padding: 8px 0; align-items: center; border-bottom: 1px solid var(--border); }
+.ed-event:last-child { border-bottom: none; padding-bottom: 0; }
+.ed-event:first-child { padding-top: 0; }
+.ed-event-date { width: 42px; height: 42px; flex: 0 0 42px; border: 1px solid var(--border); border-radius: 10px; background: #fafafa; display: grid; place-items: center; text-align: center; line-height: 1.05; }
+.ed-event-date b { display: block; font-family: var(--font-serif); font-size: 15px; font-weight: 700; }
+.ed-event-date span { font-size: 9px; color: var(--ink-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.ed-event-body { min-width: 0; }
+.ed-event-body b { display: block; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.ed-event-body span { font-size: 12px; color: var(--ink-muted); }
+
+/* Toolbar / filters */
+.ed-toolbar { max-width: 980px; margin-bottom: 24px; }
+.ed-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Circular detail (details/summary) */
+.ed-circular-body { margin: 0 0 20px 42px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13.5px; color: var(--ink-secondary); line-height: 1.6; white-space: pre-wrap; }
+.ed-circular-body .ed-attach { margin-top: 10px; font-size: 12px; }
+.ed-circular-body .ed-attach a { color: var(--dowh-gold-deep); }
+
+/* Filter chips */
+.ed-chip { font-size: 10.5px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink-secondary); text-decoration: none; }
+.ed-chip:hover { color: var(--ink); border-color: #d8d8d8; }
+.ed-chip.active { border-color: var(--dowh-gold); color: var(--dowh-gold-deep); }
+
+/* Empty state */
+.ed-empty { max-width: 980px; padding: 40px 20px; text-align: center; border: 1px solid var(--border); border-radius: 16px; }
+.ed-empty p { margin: 0 0 4px; }
+
+@media (max-width: 760px) {
+    .ed-layout { grid-template-columns: 1fr; }
+    .ed-stats { flex-wrap: wrap; }
+    .ed-stat { flex: 1 1 50%; }
+    .ed-stat:nth-child(2) { border-right: none; }
+    .ed-stat:nth-child(n+3) { border-top: 1px solid var(--border); }
+    .ed-hero .dt-display { font-size: 28px; }
+}

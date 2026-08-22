@@ -1,0 +1,28 @@
+[
+ {
+  "background_color": null,
+  "button_gradients": 0,
+  "button_rounded_corners": 0,
+  "button_shadows": 0,
+  "custom": 1,
+  "custom_overrides": "$font-family-sans-serif: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n$font-family-base: $font-family-sans-serif;\n$primary: #FFBF00;\n$body-bg: #ffffff;\n$body-color: #171717;\n$border-radius: 6px;\n$border-radius-sm: 4px;\n$border-radius-lg: 16px;\n",
+  "custom_scss": null,
+  "dark_color": null,
+  "docstatus": 0,
+  "doctype": "Website Theme",
+  "font_properties": "wght@300;400;500;600;700;800",
+  "font_size": null,
+  "google_font": null,
+  "ignored_apps": [],
+  "js": null,
+  "light_color": null,
+  "modified": "2026-08-22 10:43:11.571058",
+  "module": "Website",
+  "name": "DoWH",
+  "primary_color": null,
+  "text_color": null,
+  "theme": "DoWH",
+  "theme_scss": "$enable-shadows: false;\n$enable-gradients: false;\n$enable-rounded: false;\n\n// Bootstrap Variable Overrides\n$font-family-sans-serif: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n$font-family-base: $font-family-sans-serif;\n$primary: #FFBF00;\n$body-bg: #ffffff;\n$body-color: #171717;\n$border-radius: 6px;\n$border-radius-sm: 4px;\n$border-radius-lg: 16px;\n\n\n// Import themes from installed apps\n@import \"frappe/public/scss/website.bundle\";\n@import \"erpnext/public/scss/website\";\n@import \"dohw_intranet/public/scss/website\";\n\n\n\n// Custom Theme\n\n\n:root {\n\t\n\t--border-radius-sm: 0px;\n\t--border-radius: 0px;\n\t--border-radius-md: 0px;\n\t--border-radius-lg: 0px;\n\t--border-radius-full: 0px;\n\t}\n",
+  "theme_url": "/files/website_theme/dowh_08746c6c.css"
+ }
+]
