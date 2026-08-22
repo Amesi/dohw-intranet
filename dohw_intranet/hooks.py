@@ -7,8 +7,13 @@ app_description = "DoWH Digital Portal"
 app_email = "ict@works.gov.pg"
 app_license = "mit"
 
-# Website generators — auto-generate web pages from DocTypes
-website_generators = ["Announcement", "Blog Post"]
+# Website generators — auto-generate web pages from DocTypes.
+# Only Blog Post is a true WebsiteGenerator (served at /blog/<slug>).
+# Announcement was removed: circulars are served by the www/circulars
+# controller with inline <details> expansion (no separate detail route),
+# per docs/design/circulars.md — keeping it as a generator shadowed that
+# controller and crashed on /circulars/<slug> (no detail template).
+website_generators = ["Blog Post"]
 
 # Home page: circular listing is the default landing
 home_page = "/circulars"

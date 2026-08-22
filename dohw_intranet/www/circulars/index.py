@@ -18,6 +18,10 @@ def get_context(context):
     context.no_cache = 1
     context.show_sidebar = 0
 
+    if frappe.session.user == "Guest":
+        frappe.local.flags.redirect_location = "/login?redirect-to=/circulars"
+        raise frappe.Redirect
+
     # Check if user is a content manager (controls whether the "+ New
     # circular" link to /circulars/new is shown)
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user},
